@@ -1,5 +1,18 @@
 {
   "cleanUrls": true,
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "calendario-ciclista-chile.vercel.app"
+        }
+      ],
+      "destination": "https://calendariociclista.vercel.app/$1",
+      "permanent": true
+    }
+  ],
   "routes": [
     {
       "handle": "filesystem"
