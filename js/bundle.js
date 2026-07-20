@@ -329,7 +329,7 @@ async function createPendingRaceSupabase(raceData) {
       descripcion: raceData.descripcion || raceData.description || null,
       estado: "pendiente"
     };
-    const insertPromise = client.from("carreras").insert([payload]).select();
+    const insertPromise = client.from("carreras").insert([payload]);
     const timeoutPromise = new Promise(
       (_, reject) => setTimeout(() => reject(new Error("TIMEOUT_EXCEEDED")), 6e3)
     );

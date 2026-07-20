@@ -197,8 +197,7 @@ export async function createPendingRaceSupabase(raceData) {
 
     const insertPromise = client
       .from('carreras')
-      .insert([payload])
-      .select();
+      .insert([payload]);
 
     const timeoutPromise = new Promise((_, reject) =>
       setTimeout(() => reject(new Error('TIMEOUT_EXCEEDED')), 6000)
