@@ -1664,7 +1664,7 @@ function showNotificationToast(message) {
 async function getFilteredRaces() {
   const races = await getAllRaces();
   const bookmarkedIds = getBookmarkedIds();
-  return races.filter((race) => {
+  const filteredList = races.filter((race) => {
     if (activeTab === "my-calendar" || activeTab === "agenda") {
       if (!bookmarkedIds.includes(race.id)) {
         return false;
@@ -1705,6 +1705,12 @@ async function getFilteredRaces() {
     }
     return true;
   });
+  filteredList.sort((a, b) => {
+    if (!a.date) return 1;
+    if (!b.date) return -1;
+    return new Date(a.date) - new Date(b.date);
+  });
+  return filteredList;
 }
 function renderSkeletons(container, count = 3) {
   if (!container) return;
