@@ -294,19 +294,56 @@
 
       </div>
 
-      <!-- Races Counter & Title -->
-      <div class="flex items-center justify-between">
-        <h2 id="calendar-title" class="text-xl sm:text-2xl font-display font-bold text-primary">
-          Próximas Carreras
-        </h2>
-        <span id="races-count" class="text-xs font-bold px-3 py-1 rounded-full bg-surface-container text-outline">
-          Cargando...
-        </span>
+      <!-- Races Counter, View Selector & Title -->
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-outline-variant/30 pb-4">
+        <div>
+          <h2 id="calendar-title" class="text-xl sm:text-2xl font-display font-bold text-primary">
+            Próximas Carreras
+          </h2>
+          <span id="races-count" class="text-xs font-bold px-3 py-1 rounded-full bg-surface-container text-outline">
+            Cargando...
+          </span>
+        </div>
+
+        <!-- Mode View Switcher (Tarjetas, Mes, Semana, Día) -->
+        <div class="flex items-center gap-1 p-1 bg-surface-container-low border border-outline-variant/40 rounded-2xl shadow-sm text-xs font-bold self-stretch sm:self-auto overflow-x-auto">
+          <button type="button" id="btn-view-cards" class="view-mode-btn px-3.5 py-2 rounded-xl bg-primary text-white font-bold transition-all flex items-center gap-1.5 shadow-sm">
+            <span class="material-symbols-outlined text-base">grid_view</span>
+            <span>Tarjetas</span>
+          </button>
+          <button type="button" id="btn-view-month" class="view-mode-btn px-3.5 py-2 rounded-xl text-outline hover:text-primary transition-all flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-base">calendar_view_month</span>
+            <span>Mes</span>
+          </button>
+          <button type="button" id="btn-view-week" class="view-mode-btn px-3.5 py-2 rounded-xl text-outline hover:text-primary transition-all flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-base">calendar_view_week</span>
+            <span>Semana</span>
+          </button>
+          <button type="button" id="btn-view-day" class="view-mode-btn px-3.5 py-2 rounded-xl text-outline hover:text-primary transition-all flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-base">calendar_today</span>
+            <span>Día</span>
+          </button>
+        </div>
       </div>
 
-      <!-- Races Container Grid -->
+      <!-- 1.1 Card Grid Container -->
       <div id="races-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <!-- Race Cards populated dynamically -->
+      </div>
+
+      <!-- 1.2 Month Grid Container -->
+      <div id="month-grid-container" class="hidden bg-white p-4 sm:p-6 rounded-3xl border border-outline-variant/40 shadow-sm space-y-4">
+        <!-- Month Grid rendered by js/ui.js -->
+      </div>
+
+      <!-- 1.3 Week Grid Container -->
+      <div id="week-grid-container" class="hidden bg-white p-4 sm:p-6 rounded-3xl border border-outline-variant/40 shadow-sm space-y-4">
+        <!-- Week Grid rendered by js/ui.js -->
+      </div>
+
+      <!-- 1.4 Day Grid Container -->
+      <div id="day-grid-container" class="hidden bg-white p-4 sm:p-6 rounded-3xl border border-outline-variant/40 shadow-sm space-y-4">
+        <!-- Day Grid rendered by js/ui.js -->
       </div>
 
     </section>
@@ -795,7 +832,7 @@
   </div>
 
   <!-- Main JavaScript bundle (ESM con importmap para Supabase) -->
-  <script type="module" src="js/bundle.js?v=5"></script>
+  <script type="module" src="js/bundle.js?v=6"></script>
 
 </body>
 

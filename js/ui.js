@@ -6,6 +6,88 @@
 import { isBookmarked } from './storage.js';
 
 /**
+ * Parsea una cadena de fecha YYYY-MM-DD a objeto Date a las 00:00:00 hora local
+ * @param {string} dateStr 
+ * @returns {Date|null}
+ */
+export function parseLocalDate(dateStr) {
+  if (!dateStr || typeof dateStr !== 'string') return null;
+  const parts = dateStr.trim().split('T')[0].split('-');
+  if (parts.length !== 3) return null;
+  const year = parseInt(parts[0], 10);
+  const month = parseInt(parts[1], 10) - 1;
+  const day = parseInt(parts[2], 10);
+  if (isNaN(year) || isNaN(month) || isNaN(day)) return null;
+  return new Date(year, month, day);
+}
+
+/**
+ * Utilitario para detectar la duración y el carácter multi-día de una carrera
+ * @param {Object} race 
+ * @returns {{ esMultiDia: boolean, duracionDias: number, startDateStr: string, endDateStr: string, startDateObj: Date|null, endDateObj: Date|null }}
+ */
+export function detectRaceDuration(race) {
+  if (!race) {
+    return { esMultiDia: false, duracionDias: 1, startDateStr: '', endDateStr: '', startDateObj: null, endDateObj: null };
+  }
+
+  const startStr = (race.startDate || race.fecha_inicio || race.date || '').split('T')[0].trim();
+  const endStr = (race.endDate || race.fecha_fin || startStr).split('T')[0].trim();
+
+  const startObj = parseLocalDate(startStr);
+  const endObj = parseLocalDate(endStr || startStr);
+
+  if (!startObj || !endObj || isNaN(startObj.getTime()) || isNaN(endObj.getTime())) {
+    return {
+      esMultiDia: false,
+      duracionDias: 1,
+      startDateStr: startStr,
+      endDateStr: endStr || startStr,
+      startDateObj: startObj,
+      endDateObj: endObj
+    };
+  }
+
+  // Comparación en milisegundos de las fechas a las 00:00:00 local
+  const diffTime = endObj.getTime() - startObj.getTime();
+  const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+  const duracionDias = Math.max(1, diffDays + 1);
+  const esMultiDia = duracionDias > 1;
+
+  return {
+    esMultiDia,
+    duracionDias,
+    startDateStr: startStr,
+    endDateStr: endStr,
+    startDateObj: startObj,
+    endDateObj: endObj
+  };
+}
+
+/**
+ * Calcula el día actual de la carrera respecto a una fecha seleccionada (ej: "Día 2 de 5")
+ * @param {Object} race 
+ * @param {Date|string} currentDate 
+ * @returns {string|null}
+ */
+export function getRaceDayProgress(race, currentDate) {
+  const durationInfo = detectRaceDuration(race);
+  if (!durationInfo.esMultiDia) return null;
+
+  const currentObj = typeof currentDate === 'string' ? parseLocalDate(currentDate) : currentDate;
+  if (!currentObj || !durationInfo.startDateObj || !durationInfo.endDateObj) return null;
+
+  if (currentObj < durationInfo.startDateObj || currentObj > durationInfo.endDateObj) {
+    return null; // Fuera del rango de la carrera
+  }
+
+  const diffTime = currentObj.getTime() - durationInfo.startDateObj.getTime();
+  const currentDay = Math.round(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+  return `Día ${currentDay} de ${durationInfo.duracionDias}`;
+}
+
+/**
  * Lista de disciplinas disponibles para filtrado
  */
 export const DISCIPLINES = ['Todas', 'Ruta', 'MTB', 'Gravel', 'Pista', 'BMX', 'Virtual'];
@@ -140,6 +222,11 @@ export function renderRaceCards(container, races = [], isAdmin = false) {
     const bookmarked = isBookmarked(race.id);
     const disciplineBadgeClass = getDisciplineBadgeClass(race.discipline);
     const formattedPrice = formatPrice(race.price, race.isFree);
+    const durationInfo = detectRaceDuration(race);
+
+    const multiDayBadgeHTML = durationInfo.esMultiDia 
+      ? `<span class="px-2.5 py-1 rounded-full text-xs font-black bg-purple-100 text-purple-900 border border-purple-300 flex items-center gap-1 shadow-sm"><span class="material-symbols-outlined text-xs">date_range</span> ${durationInfo.duracionDias} días</span>`
+      : '';
 
     // Badges de Estado
     let statusBadgeHTML = '';
@@ -170,12 +257,13 @@ export function renderRaceCards(container, races = [], isAdmin = false) {
           >
           <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
           
-          <!-- Badges superiores (Disciplina y Gratuita) -->
+          <!-- Badges superiores (Disciplina, Multi-Día y Gratuita) -->
           <div class="absolute top-3 left-3 flex flex-wrap gap-1.5 z-10">
             <span class="px-3 py-1 rounded-lg text-xs font-bold shadow-md flex items-center gap-1 ${disciplineBadgeClass}">
               <span class="material-symbols-outlined text-sm">${getDisciplineIcon(race.discipline)}</span>
               ${race.discipline}
             </span>
+            ${multiDayBadgeHTML}
             ${freeBadgeHTML}
           </div>
 
@@ -559,4 +647,396 @@ export function renderPendingRaces(container, races = []) {
       </article>
     `;
   }).join('');
+}
+
+/**
+ * Renderiza la vista mensual en grid continuo de 7 columnas con barras para carreras de varios días
+ * @param {HTMLElement} container 
+ * @param {Array} races 
+ * @param {string} activeMonthYear 
+ */
+export function renderMonthGrid(container, races = [], activeMonthYear = 'Todos') {
+  if (!container) return;
+
+  let year = 2026;
+  let monthIndex = 9; // Octubre por defecto
+
+  if (activeMonthYear && activeMonthYear !== 'Todos') {
+    const parts = activeMonthYear.split(' ');
+    const monthsNameMap = {
+      'Enero': 0, 'Febrero': 1, 'Marzo': 2, 'Abril': 3, 'Mayo': 4, 'Junio': 5,
+      'Julio': 6, 'Agosto': 7, 'Septiembre': 8, 'Octubre': 9, 'Noviembre': 10, 'Diciembre': 11
+    };
+    if (monthsNameMap[parts[0]] !== undefined) {
+      monthIndex = monthsNameMap[parts[0]];
+    }
+    if (parts[1] && !isNaN(parseInt(parts[1], 10))) {
+      year = parseInt(parts[1], 10);
+    }
+  } else if (races.length > 0) {
+    const firstWithDate = races.find(r => r.startDate || r.date);
+    if (firstWithDate) {
+      const d = parseLocalDate(firstWithDate.startDate || firstWithDate.date);
+      if (d) {
+        year = d.getFullYear();
+        monthIndex = d.getMonth();
+      }
+    }
+  }
+
+  const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+  const monthName = monthNames[monthIndex];
+
+  // Primer y último día del mes
+  const firstOfMonth = new Date(year, monthIndex, 1);
+  const lastOfMonth = new Date(year, monthIndex + 1, 0);
+
+  // Offset para Lunes como primer día de la semana (0=Lun ... 6=Dom)
+  const firstDayDayOfWeek = firstOfMonth.getDay();
+  const startOffset = (firstDayDayOfWeek === 0 ? 6 : firstDayDayOfWeek - 1);
+
+  // Generar fecha de inicio del grid
+  const startDateGrid = new Date(firstOfMonth);
+  startDateGrid.setDate(startDateGrid.getDate() - startOffset);
+
+  // Semanas totales necesarias (4, 5 o 6)
+  const totalDaysNeeded = startOffset + lastOfMonth.getDate();
+  const totalWeeks = Math.ceil(totalDaysNeeded / 7);
+
+  let html = `
+    <div class="space-y-4 animate-fadeIn">
+      <!-- Header del Mes -->
+      <div class="flex items-center justify-between pb-2 border-b border-outline-variant/30">
+        <h3 class="font-display font-black text-xl text-primary flex items-center gap-2">
+          <span class="material-symbols-outlined text-secondary text-2xl">calendar_month</span>
+          ${monthName} ${year}
+        </h3>
+        <span class="text-xs font-bold px-3 py-1 rounded-full bg-surface-container text-outline uppercase tracking-wider">
+          Vista Mensual
+        </span>
+      </div>
+
+      <!-- Cabecera Días de la Semana -->
+      <div class="grid grid-cols-7 gap-1 sm:gap-2 text-center text-xs font-bold text-outline py-2 border-b border-outline-variant/20">
+        <div>Lun</div>
+        <div>Mar</div>
+        <div>Mié</div>
+        <div>Jue</div>
+        <div>Vie</div>
+        <div>Sáb</div>
+        <div>Dom</div>
+      </div>
+
+      <!-- Filas de Semanas -->
+      <div class="space-y-3">
+  `;
+
+  let currentIterDate = new Date(startDateGrid);
+
+  for (let w = 0; w < totalWeeks; w++) {
+    const weekStartDate = new Date(currentIterDate);
+    const weekEndDate = new Date(currentIterDate);
+    weekEndDate.setDate(weekEndDate.getDate() + 6);
+
+    const weekDays = [];
+    for (let d = 0; d < 7; d++) {
+      weekDays.push(new Date(currentIterDate));
+      currentIterDate.setDate(currentIterDate.getDate() + 1);
+    }
+
+    // Filtrar carreras activas en esta semana
+    const racesInWeek = [];
+    races.forEach(race => {
+      const dur = detectRaceDuration(race);
+      if (!dur.startDateObj || !dur.endDateObj) return;
+
+      if (dur.startDateObj <= weekEndDate && dur.endDateObj >= weekStartDate) {
+        let colStart = 1;
+        let colEnd = 7;
+
+        if (dur.startDateObj > weekStartDate) {
+          const diffMs = dur.startDateObj.getTime() - weekStartDate.getTime();
+          colStart = Math.round(diffMs / (1000 * 60 * 60 * 24)) + 1;
+        }
+
+        if (dur.endDateObj < weekEndDate) {
+          const diffMs = dur.endDateObj.getTime() - weekStartDate.getTime();
+          colEnd = Math.round(diffMs / (1000 * 60 * 60 * 24)) + 1;
+        }
+
+        racesInWeek.push({
+          race,
+          dur,
+          colStart: Math.max(1, Math.min(7, colStart)),
+          colEnd: Math.max(1, Math.min(7, colEnd)),
+          span: Math.max(1, colEnd - colStart + 1)
+        });
+      }
+    });
+
+    // Ordenar: multi-día con mayor extensión primero
+    racesInWeek.sort((a, b) => {
+      if (a.dur.esMultiDia !== b.dur.esMultiDia) {
+        return a.dur.esMultiDia ? -1 : 1;
+      }
+      if (a.colStart !== b.colStart) {
+        return a.colStart - b.colStart;
+      }
+      return b.span - a.span;
+    });
+
+    html += `
+      <div class="relative bg-surface-container-low/50 rounded-2xl p-2.5 border border-outline-variant/30 min-h-[110px] sm:min-h-[130px] flex flex-col justify-between space-y-2">
+        
+        <!-- Números de los Días -->
+        <div class="grid grid-cols-7 gap-1 sm:gap-2 text-right">
+          ${weekDays.map(dayObj => {
+            const isCurrentMonth = dayObj.getMonth() === monthIndex;
+            const isToday = new Date().toDateString() === dayObj.toDateString();
+            const dayNum = dayObj.getDate();
+
+            return `
+              <div class="pr-1 font-display font-bold text-xs ${isCurrentMonth ? 'text-primary' : 'text-outline-variant/50'}">
+                <span class="${isToday ? 'bg-secondary text-white px-1.5 py-0.5 rounded-full' : ''}">
+                  ${dayNum}
+                </span>
+              </div>
+            `;
+          }).join('')}
+        </div>
+
+        <!-- Renderizado de Barras de Eventos -->
+        <div class="grid grid-cols-7 gap-1 sm:gap-2 gap-y-1.5 z-10">
+          ${racesInWeek.map(item => {
+            const { race, dur, colStart, span } = item;
+            const badgeClass = getDisciplineBadgeClass(race.discipline);
+
+            if (dur.esMultiDia) {
+              return `
+                <div 
+                  data-race-id="${race.id}"
+                  style="grid-column: ${colStart} / span ${span};"
+                  class="cursor-pointer group relative bg-gradient-to-r from-primary via-primary/95 to-primary/80 text-white rounded-xl px-2.5 py-1.5 text-xs font-bold shadow-sm hover:brightness-110 transition-all flex items-center justify-between overflow-hidden border-l-4 border-tertiary-fixed"
+                  title="${race.name} (${dur.duracionDias} días)"
+                >
+                  <div class="flex items-center gap-1.5 truncate">
+                    <span class="px-1.5 py-0.5 rounded text-[10px] font-black uppercase ${badgeClass}">${race.discipline}</span>
+                    <span class="truncate font-display font-extrabold text-white">${race.name}</span>
+                  </div>
+                  <span class="shrink-0 text-[10px] font-bold bg-white/20 px-1.5 py-0.5 rounded-full text-tertiary-fixed ml-1">
+                    ${dur.duracionDias}d
+                  </span>
+                </div>
+              `;
+            } else {
+              return `
+                <div 
+                  data-race-id="${race.id}"
+                  style="grid-column: ${colStart} / span 1;"
+                  class="cursor-pointer group relative bg-white border border-outline-variant/60 hover:border-primary text-primary rounded-xl px-2 py-1 text-[11px] font-bold shadow-2xs hover:shadow-md transition-all flex items-center gap-1 truncate"
+                  title="${race.name}"
+                >
+                  <span class="w-2 h-2 rounded-full ${badgeClass} shrink-0"></span>
+                  <span class="truncate font-medium">${race.name}</span>
+                </div>
+              `;
+            }
+          }).join('')}
+        </div>
+
+      </div>
+    `;
+  }
+
+  html += `
+      </div>
+    </div>
+  `;
+
+  container.innerHTML = html;
+}
+
+/**
+ * Renderiza la vista semanal con indicadores de progreso "Día X de Y"
+ * @param {HTMLElement} container 
+ * @param {Array} races 
+ * @param {Date|string} referenceDate 
+ */
+export function renderWeekGrid(container, races = [], referenceDate = new Date()) {
+  if (!container) return;
+
+  const refObj = typeof referenceDate === 'string' ? (parseLocalDate(referenceDate) || new Date()) : referenceDate;
+  
+  const dayOfWeek = refObj.getDay();
+  const offsetToMonday = (dayOfWeek === 0 ? 6 : dayOfWeek - 1);
+  const mondayObj = new Date(refObj);
+  mondayObj.setDate(mondayObj.getDate() - offsetToMonday);
+
+  const weekDays = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(mondayObj);
+    d.setDate(d.getDate() + i);
+    weekDays.push(d);
+  }
+
+  const sundayObj = weekDays[6];
+  const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+  
+  const headerText = `Semana del ${mondayObj.getDate()} de ${monthNames[mondayObj.getMonth()]} al ${sundayObj.getDate()} de ${monthNames[sundayObj.getMonth()]}, ${sundayObj.getFullYear()}`;
+
+  let html = `
+    <div class="space-y-6 animate-fadeIn">
+      <div class="flex items-center justify-between pb-2 border-b border-outline-variant/30">
+        <h3 class="font-display font-black text-xl text-primary flex items-center gap-2">
+          <span class="material-symbols-outlined text-secondary text-2xl">view_week</span>
+          ${headerText}
+        </h3>
+        <span class="text-xs font-bold px-3 py-1 rounded-full bg-surface-container text-outline uppercase tracking-wider">
+          Vista Semanal
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-7 gap-4">
+  `;
+
+  const dayNames = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+
+  weekDays.forEach((dayObj, index) => {
+    const isToday = new Date().toDateString() === dayObj.toDateString();
+
+    const activeRaces = races.filter(race => {
+      const dur = detectRaceDuration(race);
+      return dur.startDateObj && dur.endDateObj && dayObj >= dur.startDateObj && dayObj <= dur.endDateObj;
+    });
+
+    html += `
+      <div class="bg-surface-container-low/50 rounded-2xl p-3 border border-outline-variant/30 flex flex-col space-y-3 min-h-[160px]">
+        <div class="flex items-center justify-between border-b border-outline-variant/20 pb-2">
+          <span class="font-display font-bold text-xs text-primary">${dayNames[index]}</span>
+          <span class="text-xs font-extrabold ${isToday ? 'bg-secondary text-white px-2 py-0.5 rounded-full' : 'text-outline'}">
+            ${dayObj.getDate()}
+          </span>
+        </div>
+
+        <div class="space-y-2 flex-grow">
+          ${activeRaces.length === 0 ? `
+            <p class="text-[11px] text-outline italic py-2 text-center">Sin eventos</p>
+          ` : activeRaces.map(race => {
+            const dur = detectRaceDuration(race);
+            const badgeClass = getDisciplineBadgeClass(race.discipline);
+            const dayProgress = getRaceDayProgress(race, dayObj);
+
+            return `
+              <div 
+                data-race-id="${race.id}" 
+                class="cursor-pointer bg-white border border-outline-variant/40 hover:border-primary p-2.5 rounded-xl shadow-2xs hover:shadow-md transition-all space-y-1.5"
+              >
+                <div class="flex items-center justify-between gap-1">
+                  <span class="px-1.5 py-0.5 rounded text-[10px] font-black uppercase ${badgeClass}">${race.discipline}</span>
+                  ${dur.esMultiDia && dayProgress ? `
+                    <span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-purple-100 text-purple-900 border border-purple-300">
+                      ${dayProgress}
+                    </span>
+                  ` : ''}
+                </div>
+                <h5 class="font-display font-bold text-xs text-primary line-clamp-2">${race.name}</h5>
+                <p class="text-[10px] text-outline font-medium truncate">${race.city}</p>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  });
+
+  html += `
+      </div>
+    </div>
+  `;
+
+  container.innerHTML = html;
+}
+
+/**
+ * Renderiza la vista diaria con indicador detallado de avance "Día X de Y"
+ * @param {HTMLElement} container 
+ * @param {Array} races 
+ * @param {Date|string} referenceDate 
+ */
+export function renderDayGrid(container, races = [], referenceDate = new Date()) {
+  if (!container) return;
+
+  const dayObj = typeof referenceDate === 'string' ? (parseLocalDate(referenceDate) || new Date()) : referenceDate;
+  const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+  const dayNames = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+
+  const headerText = `${dayNames[dayObj.getDay()]} ${dayObj.getDate()} de ${monthNames[dayObj.getMonth()]}, ${dayObj.getFullYear()}`;
+
+  const activeRaces = races.filter(race => {
+    const dur = detectRaceDuration(race);
+    return dur.startDateObj && dur.endDateObj && dayObj >= dur.startDateObj && dayObj <= dur.endDateObj;
+  });
+
+  let html = `
+    <div class="space-y-6 animate-fadeIn">
+      <div class="flex items-center justify-between pb-2 border-b border-outline-variant/30">
+        <h3 class="font-display font-black text-xl text-primary flex items-center gap-2">
+          <span class="material-symbols-outlined text-secondary text-2xl">today</span>
+          ${headerText}
+        </h3>
+        <span class="text-xs font-bold px-3 py-1 rounded-full bg-surface-container text-outline uppercase tracking-wider">
+          Vista Diaria (${activeRaces.length} evento${activeRaces.length === 1 ? '' : 's'})
+        </span>
+      </div>
+
+      <div class="space-y-4">
+        ${activeRaces.length === 0 ? `
+          <div class="py-16 text-center bg-white rounded-3xl border border-dashed border-outline-variant/60 p-8 space-y-3">
+            <span class="material-symbols-outlined text-4xl text-outline">event_busy</span>
+            <h4 class="font-display font-bold text-lg text-primary">No hay eventos para este día</h4>
+            <p class="text-xs text-outline">Prueba seleccionando otra fecha o cambiando las disciplinas.</p>
+          </div>
+        ` : activeRaces.map(race => {
+          const dur = detectRaceDuration(race);
+          const badgeClass = getDisciplineBadgeClass(race.discipline);
+          const dayProgress = getRaceDayProgress(race, dayObj);
+
+          return `
+            <article 
+              data-race-id="${race.id}" 
+              class="cursor-pointer bg-white p-6 rounded-3xl border border-outline-variant/40 hover:border-primary shadow-sm hover:shadow-lg transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 group"
+            >
+              <div class="space-y-2 max-w-xl">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="px-2.5 py-1 rounded-lg text-xs font-bold ${badgeClass}">${race.discipline}</span>
+                  ${dur.esMultiDia && dayProgress ? `
+                    <span class="px-3 py-1 rounded-full text-xs font-black bg-purple-100 text-purple-900 border border-purple-300 shadow-2xs flex items-center gap-1">
+                      <span class="material-symbols-outlined text-xs">flag</span> ${dayProgress}
+                    </span>
+                  ` : `
+                    <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-surface-container text-outline">Un solo día</span>
+                  `}
+                </div>
+                <h4 class="font-display font-black text-xl text-primary group-hover:text-secondary transition-colors">${race.name}</h4>
+                <p class="text-xs text-gray-600 line-clamp-2">${race.description}</p>
+                <div class="flex items-center gap-4 text-xs text-outline font-semibold">
+                  <span>📍 ${race.city}, ${race.region}</span>
+                  <span>📏 ${race.distance}</span>
+                </div>
+              </div>
+
+              <div class="sm:text-right shrink-0 space-y-2">
+                <span class="font-display font-black text-xl text-primary block">${formatPrice(race.price, race.isFree)}</span>
+                <button type="button" class="px-4 py-2 rounded-xl bg-tertiary-fixed text-primary font-bold text-xs hover:brightness-105 shadow-sm inline-flex items-center gap-1">
+                  Ver Detalles <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </button>
+              </div>
+            </article>
+          `;
+        }).join('')}
+      </div>
+    </div>
+  `;
+
+  container.innerHTML = html;
 }

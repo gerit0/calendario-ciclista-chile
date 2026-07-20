@@ -5,7 +5,17 @@
 
 import { REGIONS_CHILE } from './data.js';
 import { getAllRaces, getBookmarkedIds, toggleBookmark, isBookmarked, saveCustomRace, saveRace, deleteRace, updateRace } from './storage.js';
-import { renderDisciplineChips, renderRegionSelect, renderRaceCards, renderDetailView, switchView, renderPendingRaces } from './ui.js';
+import { 
+  renderDisciplineChips, 
+  renderRegionSelect, 
+  renderRaceCards, 
+  renderDetailView, 
+  switchView, 
+  renderPendingRaces,
+  renderMonthGrid,
+  renderWeekGrid,
+  renderDayGrid
+} from './ui.js';
 import { validateRaceForm } from './validation.js';
 import { 
   loginAdmin, 
@@ -22,6 +32,7 @@ let currentRegion = "Todas las regiones";
 let currentMonth = "Todos";
 let searchQuery = "";
 let activeTab = "all"; // "all" o "my-calendar"
+let activeViewMode = "cards"; // "cards", "month", "week", "day"
 let currentRaceId = null;
 let isAdmin = false;
 
@@ -188,10 +199,39 @@ export async function getFilteredRaces() {
  */
 export async function updateCalendar() {
   const filteredRaces = await getFilteredRaces();
-  const racesContainer = document.getElementById('races-container');
   
-  if (racesContainer) {
-    renderRaceCards(racesContainer, filteredRaces, isAdmin);
+  const cardsContainer = document.getElementById('races-container');
+  const monthContainer = document.getElementById('month-grid-container');
+  const weekContainer = document.getElementById('week-grid-container');
+  const dayContainer = document.getElementById('day-grid-container');
+
+  // Ocultar todos los contenedores
+  if (cardsContainer) cardsContainer.classList.add('hidden');
+  if (monthContainer) monthContainer.classList.add('hidden');
+  if (weekContainer) weekContainer.classList.add('hidden');
+  if (dayContainer) dayContainer.classList.add('hidden');
+
+  if (activeViewMode === 'month') {
+    if (monthContainer) {
+      monthContainer.classList.remove('hidden');
+      renderMonthGrid(monthContainer, filteredRaces, currentMonth);
+    }
+  } else if (activeViewMode === 'week') {
+    if (weekContainer) {
+      weekContainer.classList.remove('hidden');
+      renderWeekGrid(weekContainer, filteredRaces);
+    }
+  } else if (activeViewMode === 'day') {
+    if (dayContainer) {
+      dayContainer.classList.remove('hidden');
+      renderDayGrid(dayContainer, filteredRaces);
+    }
+  } else {
+    // Modo por defecto: Tarjetas
+    if (cardsContainer) {
+      cardsContainer.classList.remove('hidden');
+      renderRaceCards(cardsContainer, filteredRaces, isAdmin);
+    }
   }
 
   // Contador de carreras filtradas
@@ -227,6 +267,28 @@ export async function updateCalendar() {
  * 4. Configuración de Event Handlers e Interactividad
  */
 function setupEventHandlers() {
+  // Selector de Modo de Vista (Tarjetas, Mes, Semana, Día)
+  const viewModes = ['cards', 'month', 'week', 'day'];
+  viewModes.forEach(mode => {
+    const btn = document.getElementById(`btn-view-${mode}`);
+    if (btn) {
+      btn.addEventListener('click', () => {
+        activeViewMode = mode;
+        viewModes.forEach(m => {
+          const b = document.getElementById(`btn-view-${m}`);
+          if (b) {
+            if (m === mode) {
+              b.className = 'view-mode-btn px-3.5 py-2 rounded-xl bg-primary text-white font-bold transition-all flex items-center gap-1.5 shadow-sm';
+            } else {
+              b.className = 'view-mode-btn px-3.5 py-2 rounded-xl text-outline hover:text-primary transition-all flex items-center gap-1.5';
+            }
+          }
+        });
+        updateCalendar();
+      });
+    }
+  });
+
   // Búsqueda por texto (#search-input)
   const searchInput = document.getElementById('search-input');
   if (searchInput) {

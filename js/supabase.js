@@ -95,11 +95,16 @@ function mapSupabaseToFrontend(row) {
     categories = ['General'];
   }
 
+  const startDate = row.fecha_inicio || row.fecha || '';
+  const endDate = row.fecha_fin || row.fecha_inicio || row.fecha || '';
+
   return {
     id: row.id,
     name: row.nombre || '',
     discipline: row.disciplina || '',
-    date: row.fecha || '',
+    date: startDate || row.fecha || '',
+    startDate: startDate,
+    endDate: endDate,
     month: month,
     displayDate: displayDate,
     region: row.region || '',
