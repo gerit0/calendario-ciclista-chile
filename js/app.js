@@ -23,7 +23,8 @@ import {
   getCurrentUser, 
   checkIsAdmin, 
   fetchPendingRacesSupabase, 
-  updateRaceStatusSupabase
+  updateRaceStatusSupabase,
+  uploadRaceImageSupabase
 } from './supabase.js';
 
 // 2. Estado de la Aplicación
@@ -207,12 +208,48 @@ export async function getFilteredRaces() {
 }
 
 /**
+ * Renderiza skeletons de tarjetas animadas para feedback visual de carga.
+ * @param {HTMLElement} container Contenedor donde renderizar.
+ * @param {number} count Número de skeletons.
+ */
+export function renderSkeletons(container, count = 3) {
+  if (!container) return;
+  let html = '';
+  for (let i = 0; i < count; i++) {
+    html += `
+      <div class="bg-surface border border-outline-variant/30 rounded-3xl overflow-hidden shadow-sm animate-pulse">
+        <div class="h-48 bg-surface-container-high w-full"></div>
+        <div class="p-6 space-y-4">
+          <div class="h-4 bg-surface-container-high rounded w-1/3"></div>
+          <div class="h-6 bg-surface-container-high rounded w-3/4"></div>
+          <div class="h-4 bg-surface-container-high rounded w-1/2"></div>
+          <div class="pt-4 border-t border-outline-variant/20 flex justify-between items-center">
+            <div class="h-4 bg-surface-container-high rounded w-1/4"></div>
+            <div class="h-8 bg-surface-container-high rounded w-1/3"></div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  container.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">${html}</div>`;
+}
+
+/**
  * Actualiza el renderizado del calendario y sus contadores/badges
  */
 export async function updateCalendar() {
+  const cardsContainer = document.getElementById('races-container');
+
+  // Si estamos en vista de tarjetas, mostrar skeletons animados durante la consulta
+  if (activeViewMode === 'cards' || !activeViewMode) {
+    if (cardsContainer) {
+      cardsContainer.classList.remove('hidden');
+      renderSkeletons(cardsContainer, 3);
+    }
+  }
+
   const filteredRaces = await getFilteredRaces();
   
-  const cardsContainer = document.getElementById('races-container');
   const monthContainer = document.getElementById('month-grid-container');
   const weekContainer = document.getElementById('week-grid-container');
   const dayContainer = document.getElementById('day-grid-container');
@@ -276,9 +313,138 @@ export async function updateCalendar() {
 }
 
 /**
+ * Inicializa los controladores de Drag & Drop y subida de imágenes para un formulario.
+ */
+function setupImageUploadHandlers() {
+  const configureForm = (zoneId, fileInputId, urlInputId, previewContainerId, previewImgId, removeBtnId) => {
+    const zone = document.getElementById(zoneId);
+    const fileInput = document.getElementById(fileInputId);
+    const urlInput = document.getElementById(urlInputId);
+    const previewContainer = document.getElementById(previewContainerId);
+    const previewImg = document.getElementById(previewImgId);
+    const removeBtn = document.getElementById(removeBtnId);
+
+    if (!zone || !fileInput || !urlInput) return;
+
+    zone.addEventListener('click', () => fileInput.click());
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+      zone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        zone.classList.add('border-primary', 'bg-primary/5');
+      }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      zone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        zone.classList.remove('border-primary', 'bg-primary/5');
+      }, false);
+    });
+
+    zone.addEventListener('drop', (e) => {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      if (files && files.length > 0) {
+        processImageFile(files[0]);
+      }
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files.length > 0) {
+        processImageFile(e.target.files[0]);
+      }
+    });
+
+    urlInput.addEventListener('input', (e) => {
+      const val = e.target.value.trim();
+      if (val) {
+        if (previewImg) previewImg.src = val;
+        if (previewContainer) previewContainer.classList.remove('hidden');
+      } else {
+        if (previewContainer) previewContainer.classList.add('hidden');
+      }
+    });
+
+    if (removeBtn) {
+      removeBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        fileInput.value = '';
+        urlInput.value = '';
+        if (previewContainer) previewContainer.classList.add('hidden');
+        if (previewImg) previewImg.src = '';
+      });
+    }
+
+    async function processImageFile(file) {
+      if (!file.type.startsWith('image/')) {
+        showNotificationToast('⚠️ Por favor selecciona un archivo de imagen válido.');
+        return;
+      }
+      
+      const originalHtml = zone.innerHTML;
+      zone.innerHTML = `
+        <span class="material-symbols-outlined text-primary text-3xl animate-spin">sync</span>
+        <span class="text-xs font-bold text-primary">Subiendo...</span>
+      `;
+      zone.style.pointerEvents = 'none';
+
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        const base64Data = event.target.result;
+
+        if (previewImg) previewImg.src = base64Data;
+        if (previewContainer) previewContainer.classList.remove('hidden');
+
+        let finalUrl = base64Data;
+        try {
+          const uploadRes = await uploadRaceImageSupabase(file);
+          if (uploadRes && uploadRes.success && uploadRes.url) {
+            finalUrl = uploadRes.url;
+            showNotificationToast('📸 Imagen subida a Storage correctamente.');
+          } else {
+            console.warn('Fallo Storage, usando fallback Base64:', uploadRes?.error);
+            showNotificationToast('💾 Imagen procesada localmente.');
+          }
+        } catch (err) {
+          console.warn('Error subiendo imagen, usando Base64:', err);
+        }
+
+        urlInput.value = finalUrl;
+        zone.innerHTML = originalHtml;
+        zone.style.pointerEvents = 'auto';
+      };
+
+      reader.readAsDataURL(file);
+    }
+  };
+
+  configureForm(
+    'form-upload-zone',
+    'form-image-file',
+    'form-image',
+    'form-image-preview-container',
+    'form-image-preview',
+    'btn-remove-form-image'
+  );
+
+  configureForm(
+    'edit-form-upload-zone',
+    'edit-form-image-file',
+    'edit-form-image',
+    'edit-form-image-preview-container',
+    'edit-form-image-preview',
+    'btn-remove-edit-image'
+  );
+}
+
+/**
  * 4. Configuración de Event Handlers e Interactividad
  */
 function setupEventHandlers() {
+  setupImageUploadHandlers();
+
   // Selector de Modo de Vista (Tarjetas, Mes, Semana, Día)
   const viewModes = ['cards', 'month', 'week', 'day'];
   viewModes.forEach(mode => {
@@ -1092,6 +1258,16 @@ export async function openEditModal(raceId) {
   document.getElementById('edit-form-organizer').value = race.organizer || race.organizador || '';
   document.getElementById('edit-form-url').value = race.registrationUrl || '';
   document.getElementById('edit-form-image').value = race.heroImage || '';
+  
+  const editPreviewContainer = document.getElementById('edit-form-image-preview-container');
+  const editPreviewImg = document.getElementById('edit-form-image-preview');
+  if (editPreviewContainer && editPreviewImg && race.heroImage) {
+    editPreviewImg.src = race.heroImage;
+    editPreviewContainer.classList.remove('hidden');
+  } else if (editPreviewContainer) {
+    editPreviewContainer.classList.add('hidden');
+  }
+
   document.getElementById('edit-form-categories').value = Array.isArray(race.categories) ? race.categories.join(', ') : '';
   document.getElementById('edit-form-description').value = race.description || '';
 

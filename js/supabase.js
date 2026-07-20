@@ -404,3 +404,40 @@ export async function updateRaceSupabase(raceId, raceData) {
   }
 }
 
+/**
+ * Sube una imagen al Storage de Supabase en el bucket 'race-images'.
+ * @param {File} file Objeto File a subir.
+ * @returns {Promise<{ success: boolean, url?: string, error?: any }>}
+ */
+export async function uploadRaceImageSupabase(file) {
+  const client = getSupabase();
+  if (!client) return { success: false, error: 'Supabase no está configurado.' };
+
+  try {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
+    const filePath = `hero-images/${fileName}`;
+
+    const { data, error } = await client.storage
+      .from('race-images')
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false
+      });
+
+    if (error) throw error;
+
+    const { data: publicUrlData } = client.storage
+      .from('race-images')
+      .getPublicUrl(filePath);
+
+    return {
+      success: true,
+      url: publicUrlData.publicUrl
+    };
+  } catch (err) {
+    console.error('Error en uploadRaceImageSupabase:', err);
+    return { success: false, error: err.message || err };
+  }
+}
+

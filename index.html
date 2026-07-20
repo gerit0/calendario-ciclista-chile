@@ -577,13 +577,36 @@
           </div>
         </div>
 
-        <!-- URL Imagen Hero (Opcional) -->
-        <div>
-          <label for="form-image" class="block font-display font-bold text-sm text-primary mb-2">
-            URL Imagen de Portada (Opcional)
+        <!-- URL Imagen Hero & Subida Directa (Publicación) -->
+        <div class="space-y-2">
+          <label class="block font-display font-bold text-sm text-primary">
+            Imagen de Portada <span class="text-xs text-outline/80 font-normal">(Opcional)</span>
           </label>
-          <input type="text" id="form-image" name="heroImage" placeholder="https://images.unsplash.com/..."
-            class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all">
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Zona Drag & Drop -->
+            <div id="form-upload-zone" class="border-2 border-dashed border-outline-variant/60 hover:border-primary/50 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 transition-colors cursor-pointer bg-surface-container-low/20 min-h-[120px] select-none text-center">
+              <span class="material-symbols-outlined text-outline text-3xl">add_a_photo</span>
+              <span class="text-xs font-bold text-outline">Arrastra una imagen o haz clic aquí</span>
+              <span class="text-[10px] text-outline/60">JPG, PNG (Max 5MB)</span>
+              <input type="file" id="form-image-file" accept="image/*" class="hidden">
+            </div>
+
+            <!-- Input URL (Modo tradicional / Preview) -->
+            <div class="flex flex-col justify-between gap-3">
+              <div>
+                <span class="text-xs font-bold text-outline block mb-1">O ingresa un enlace web:</span>
+                <input type="text" id="form-image" name="heroImage" placeholder="https://images.unsplash.com/..."
+                  class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all">
+              </div>
+              
+              <!-- Miniatura de Vista Previa -->
+              <div id="form-image-preview-container" class="hidden h-[70px] rounded-xl overflow-hidden border border-outline-variant/40 relative bg-surface-container-low">
+                <img id="form-image-preview" src="" class="w-full h-full object-cover">
+                <button type="button" id="btn-remove-form-image" class="absolute top-1 right-1 w-6 h-6 rounded-full bg-primary/80 text-white flex items-center justify-center font-bold text-[10px] hover:bg-primary transition-all active:scale-90">✕</button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Categorías -->
@@ -875,12 +898,36 @@
               class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all">
           </div>
         </div>
-        <div>
-          <label for="edit-form-image" class="block font-display font-bold text-sm text-primary mb-2">
-            URL Imagen de Portada (Opcional)
+        <!-- URL Imagen Hero & Subida Directa (Edición) -->
+        <div class="space-y-2">
+          <label class="block font-display font-bold text-sm text-primary">
+            Imagen de Portada <span class="text-xs text-outline/80 font-normal">(Opcional)</span>
           </label>
-          <input type="text" id="edit-form-image" name="heroImage" placeholder="https://images.unsplash.com/..."
-            class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all">
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Zona Drag & Drop -->
+            <div id="edit-form-upload-zone" class="border-2 border-dashed border-outline-variant/60 hover:border-primary/50 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 transition-colors cursor-pointer bg-surface-container-low/20 min-h-[120px] select-none text-center">
+              <span class="material-symbols-outlined text-outline text-3xl">add_a_photo</span>
+              <span class="text-xs font-bold text-outline">Arrastra una imagen o haz clic aquí</span>
+              <span class="text-[10px] text-outline/60">JPG, PNG (Max 5MB)</span>
+              <input type="file" id="edit-form-image-file" accept="image/*" class="hidden">
+            </div>
+
+            <!-- Input URL (Modo tradicional / Preview) -->
+            <div class="flex flex-col justify-between gap-3">
+              <div>
+                <span class="text-xs font-bold text-outline block mb-1">O ingresa un enlace web:</span>
+                <input type="text" id="edit-form-image" name="heroImage" placeholder="https://images.unsplash.com/..."
+                  class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all">
+              </div>
+              
+              <!-- Miniatura de Vista Previa -->
+              <div id="edit-form-image-preview-container" class="hidden h-[70px] rounded-xl overflow-hidden border border-outline-variant/40 relative bg-surface-container-low">
+                <img id="edit-form-image-preview" src="" class="w-full h-full object-cover">
+                <button type="button" id="btn-remove-edit-image" class="absolute top-1 right-1 w-6 h-6 rounded-full bg-primary/80 text-white flex items-center justify-center font-bold text-[10px] hover:bg-primary transition-all active:scale-90">✕</button>
+              </div>
+            </div>
+          </div>
         </div>
         <div>
           <label for="edit-form-categories" class="block font-display font-bold text-sm text-primary mb-2">
@@ -913,7 +960,7 @@
   </div>
 
   <!-- Main JavaScript bundle (ESM con importmap para Supabase) -->
-  <script type="module" src="js/bundle.js?v=9"></script>
+  <script type="module" src="js/bundle.js?v=10"></script>
 
 </body>
 

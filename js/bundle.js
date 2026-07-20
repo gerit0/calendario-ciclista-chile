@@ -413,6 +413,28 @@ async function updateRaceStatusSupabase(raceId, status) {
     return { success: false, error: err.message || err };
   }
 }
+async function uploadRaceImageSupabase(file) {
+  const client = getSupabase();
+  if (!client) return { success: false, error: "Supabase no est\xE1 configurado." };
+  try {
+    const fileExt = file.name.split(".").pop();
+    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
+    const filePath = `hero-images/${fileName}`;
+    const { data, error } = await client.storage.from("race-images").upload(filePath, file, {
+      cacheControl: "3600",
+      upsert: false
+    });
+    if (error) throw error;
+    const { data: publicUrlData } = client.storage.from("race-images").getPublicUrl(filePath);
+    return {
+      success: true,
+      url: publicUrlData.publicUrl
+    };
+  } catch (err) {
+    console.error("Error en uploadRaceImageSupabase:", err);
+    return { success: false, error: err.message || err };
+  }
+}
 
 // js/storage.js
 var BOOKMARKS_KEY = "calendariociclista_bookmarks";
@@ -1679,9 +1701,36 @@ async function getFilteredRaces() {
     return true;
   });
 }
+function renderSkeletons(container, count = 3) {
+  if (!container) return;
+  let html = "";
+  for (let i = 0; i < count; i++) {
+    html += `
+      <div class="bg-surface border border-outline-variant/30 rounded-3xl overflow-hidden shadow-sm animate-pulse">
+        <div class="h-48 bg-surface-container-high w-full"></div>
+        <div class="p-6 space-y-4">
+          <div class="h-4 bg-surface-container-high rounded w-1/3"></div>
+          <div class="h-6 bg-surface-container-high rounded w-3/4"></div>
+          <div class="h-4 bg-surface-container-high rounded w-1/2"></div>
+          <div class="pt-4 border-t border-outline-variant/20 flex justify-between items-center">
+            <div class="h-4 bg-surface-container-high rounded w-1/4"></div>
+            <div class="h-8 bg-surface-container-high rounded w-1/3"></div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  container.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">${html}</div>`;
+}
 async function updateCalendar() {
-  const filteredRaces = await getFilteredRaces();
   const cardsContainer = document.getElementById("races-container");
+  if (activeViewMode === "cards" || !activeViewMode) {
+    if (cardsContainer) {
+      cardsContainer.classList.remove("hidden");
+      renderSkeletons(cardsContainer, 3);
+    }
+  }
+  const filteredRaces = await getFilteredRaces();
   const monthContainer = document.getElementById("month-grid-container");
   const weekContainer = document.getElementById("week-grid-container");
   const dayContainer = document.getElementById("day-grid-container");
@@ -1733,7 +1782,114 @@ async function updateCalendar() {
     }
   }
 }
+function setupImageUploadHandlers() {
+  const configureForm = (zoneId, fileInputId, urlInputId, previewContainerId, previewImgId, removeBtnId) => {
+    const zone = document.getElementById(zoneId);
+    const fileInput = document.getElementById(fileInputId);
+    const urlInput = document.getElementById(urlInputId);
+    const previewContainer = document.getElementById(previewContainerId);
+    const previewImg = document.getElementById(previewImgId);
+    const removeBtn = document.getElementById(removeBtnId);
+    if (!zone || !fileInput || !urlInput) return;
+    zone.addEventListener("click", () => fileInput.click());
+    ["dragenter", "dragover"].forEach((eventName) => {
+      zone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        zone.classList.add("border-primary", "bg-primary/5");
+      }, false);
+    });
+    ["dragleave", "drop"].forEach((eventName) => {
+      zone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        zone.classList.remove("border-primary", "bg-primary/5");
+      }, false);
+    });
+    zone.addEventListener("drop", (e) => {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      if (files && files.length > 0) {
+        processImageFile(files[0]);
+      }
+    });
+    fileInput.addEventListener("change", (e) => {
+      if (e.target.files && e.target.files.length > 0) {
+        processImageFile(e.target.files[0]);
+      }
+    });
+    urlInput.addEventListener("input", (e) => {
+      const val = e.target.value.trim();
+      if (val) {
+        if (previewImg) previewImg.src = val;
+        if (previewContainer) previewContainer.classList.remove("hidden");
+      } else {
+        if (previewContainer) previewContainer.classList.add("hidden");
+      }
+    });
+    if (removeBtn) {
+      removeBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        fileInput.value = "";
+        urlInput.value = "";
+        if (previewContainer) previewContainer.classList.add("hidden");
+        if (previewImg) previewImg.src = "";
+      });
+    }
+    async function processImageFile(file) {
+      if (!file.type.startsWith("image/")) {
+        showNotificationToast("\u26A0\uFE0F Por favor selecciona un archivo de imagen v\xE1lido.");
+        return;
+      }
+      const originalHtml = zone.innerHTML;
+      zone.innerHTML = `
+        <span class="material-symbols-outlined text-primary text-3xl animate-spin">sync</span>
+        <span class="text-xs font-bold text-primary">Subiendo...</span>
+      `;
+      zone.style.pointerEvents = "none";
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        const base64Data = event.target.result;
+        if (previewImg) previewImg.src = base64Data;
+        if (previewContainer) previewContainer.classList.remove("hidden");
+        let finalUrl = base64Data;
+        try {
+          const uploadRes = await uploadRaceImageSupabase(file);
+          if (uploadRes && uploadRes.success && uploadRes.url) {
+            finalUrl = uploadRes.url;
+            showNotificationToast("\u{1F4F8} Imagen subida a Storage correctamente.");
+          } else {
+            console.warn("Fallo Storage, usando fallback Base64:", uploadRes?.error);
+            showNotificationToast("\u{1F4BE} Imagen procesada localmente.");
+          }
+        } catch (err) {
+          console.warn("Error subiendo imagen, usando Base64:", err);
+        }
+        urlInput.value = finalUrl;
+        zone.innerHTML = originalHtml;
+        zone.style.pointerEvents = "auto";
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  configureForm(
+    "form-upload-zone",
+    "form-image-file",
+    "form-image",
+    "form-image-preview-container",
+    "form-image-preview",
+    "btn-remove-form-image"
+  );
+  configureForm(
+    "edit-form-upload-zone",
+    "edit-form-image-file",
+    "edit-form-image",
+    "edit-form-image-preview-container",
+    "edit-form-image-preview",
+    "btn-remove-edit-image"
+  );
+}
 function setupEventHandlers() {
+  setupImageUploadHandlers();
   const viewModes = ["cards", "month", "week", "day"];
   viewModes.forEach((mode) => {
     const btn = document.getElementById(`btn-view-${mode}`);
@@ -2411,6 +2567,14 @@ async function openEditModal(raceId) {
   document.getElementById("edit-form-organizer").value = race.organizer || race.organizador || "";
   document.getElementById("edit-form-url").value = race.registrationUrl || "";
   document.getElementById("edit-form-image").value = race.heroImage || "";
+  const editPreviewContainer = document.getElementById("edit-form-image-preview-container");
+  const editPreviewImg = document.getElementById("edit-form-image-preview");
+  if (editPreviewContainer && editPreviewImg && race.heroImage) {
+    editPreviewImg.src = race.heroImage;
+    editPreviewContainer.classList.remove("hidden");
+  } else if (editPreviewContainer) {
+    editPreviewContainer.classList.add("hidden");
+  }
   document.getElementById("edit-form-categories").value = Array.isArray(race.categories) ? race.categories.join(", ") : "";
   document.getElementById("edit-form-description").value = race.description || "";
   const editRegionSelect = document.getElementById("edit-form-region");
@@ -2474,6 +2638,7 @@ export {
   loadPendingRacesList,
   openEditModal,
   renderFormErrors,
+  renderSkeletons,
   showNotificationToast,
   updateAuthUI,
   updateCalendar
