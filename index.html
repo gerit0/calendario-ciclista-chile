@@ -387,37 +387,8 @@
       <form id="race-form" class="bg-white p-6 sm:p-8 rounded-3xl border border-outline-variant/40 shadow-sm space-y-6">
 
         <!-- Advertencia de conflicto de fechas (oculta por defecto, mostrada por JS) -->
-        <div id="form-conflict-warning" class="hidden w-full p-4 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-800 text-sm font-semibold flex flex-col gap-1">
+        <div id="form-conflict-warning" class="hidden w-full p-4 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-850 text-sm font-semibold flex flex-col gap-1">
         </div>
-        <!-- ... resto del form ... -->
-        <!-- Form Submit Button ... -->
-      </form>
-    </section>
-
-    <!-- 4. VIEW ADMIN PANEL (Hidden by default) -->
-    <section id="view-admin-panel" class="hidden space-y-8">
-      <div class="flex items-center justify-between border-b border-outline-variant/30 pb-4">
-        <div>
-          <h1 class="text-2xl sm:text-3xl font-display font-black text-primary flex items-center gap-2">
-            <span class="material-symbols-outlined text-3xl text-secondary">admin_panel_settings</span>
-            Panel de Moderación
-          </h1>
-          <p class="text-outline text-sm">Gestiona y aprueba las propuestas de carreras recibidas.</p>
-        </div>
-        <div id="admin-session-badge" class="px-4 py-2 rounded-xl bg-surface-container border border-outline-variant/40 flex items-center gap-2 text-xs font-bold">
-          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-          Sesión Activa
-        </div>
-      </div>
-
-      <div class="space-y-4">
-        <h3 class="font-display font-bold text-lg text-primary">Propuestas Pendientes (<span id="pending-count">0</span>)</h3>
-        
-        <div id="pending-races-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <!-- Pending race items populated dynamically -->
-        </div>
-      </div>
-    </section>
 
         <!-- Nombre de la Carrera -->
         <div>
@@ -643,6 +614,31 @@
 
       </form>
 
+    </section>
+
+    <!-- 4. VIEW ADMIN PANEL (Hidden by default) -->
+    <section id="view-admin-panel" class="hidden space-y-8">
+      <div class="flex items-center justify-between border-b border-outline-variant/30 pb-4">
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-display font-black text-primary flex items-center gap-2">
+            <span class="material-symbols-outlined text-3xl text-secondary">admin_panel_settings</span>
+            Panel de Moderación
+          </h1>
+          <p class="text-outline text-sm">Gestiona y aprueba las propuestas de carreras recibidas.</p>
+        </div>
+        <div id="admin-session-badge" class="px-4 py-2 rounded-xl bg-surface-container border border-outline-variant/40 flex items-center gap-2 text-xs font-bold">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          Sesión Activa
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <h3 class="font-display font-bold text-lg text-primary">Propuestas Pendientes (<span id="pending-count">0</span>)</h3>
+        
+        <div id="pending-races-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Pending race items populated dynamically -->
+        </div>
+      </div>
     </section>
 
   </main>
@@ -960,7 +956,7 @@
   </div>
 
   <!-- Main JavaScript bundle (ESM con importmap para Supabase) -->
-  <script type="module" src="js/bundle.js?v=11"></script>
+  <script type="module" src="js/bundle.js?v=12"></script>
 
 </body>
 
