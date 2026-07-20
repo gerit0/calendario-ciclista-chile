@@ -3,7 +3,7 @@
  * Maneja la inicialización del cliente de Supabase y las operaciones de datos para carreras.
  */
 
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+import { createClient } from '@supabase/supabase-js';
 
 // Carga de credenciales desde window con fallback seguro
 const DEFAULT_URL = '';

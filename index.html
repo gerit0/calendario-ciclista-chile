@@ -19,6 +19,15 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block"
     rel="stylesheet">
 
+  <!-- Import map: resuelve @supabase/supabase-js a la CDN para el bundle ESM -->
+  <script type="importmap">
+  {
+    "imports": {
+      "@supabase/supabase-js": "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm"
+    }
+  }
+  </script>
+
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 
@@ -521,8 +530,8 @@
     </div>
   </footer>
 
-  <!-- Main JavaScript bundle (soporta apertura directa file:// y servidor web) -->
-  <script src="js/bundle.js"></script>
+  <!-- Main JavaScript bundle (ESM con importmap para Supabase) -->
+  <script type="module" src="js/bundle.js"></script>
 
 </body>
 
