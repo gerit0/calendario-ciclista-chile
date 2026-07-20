@@ -195,10 +195,16 @@ export async function createPendingRaceSupabase(raceData) {
       estado: 'pendiente'
     };
 
-    const { data, error } = await client
+    const insertPromise = client
       .from('carreras')
       .insert([payload])
       .select();
+
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('TIMEOUT_EXCEEDED')), 6000)
+    );
+
+    const { data, error } = await Promise.race([insertPromise, timeoutPromise]);
 
     if (error) {
       console.error('Error al insertar carrera pendiente en Supabase:', error);
@@ -211,6 +217,7 @@ export async function createPendingRaceSupabase(raceData) {
     };
   } catch (err) {
     console.error('Excepción al crear carrera pendiente en Supabase:', err);
+    throw err;
   }
 }
 

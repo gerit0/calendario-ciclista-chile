@@ -736,11 +736,16 @@ function setupEventHandlers() {
     raceForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      // Anti doble-envío: deshabilitar el botón de publicar inmediatamente
+      // Anti doble-envío: deshabilitar el botón de publicar inmediatamente y mostrar spinner
       const submitBtn = raceForm.querySelector('[type="submit"]');
+      const originalSubmitHtml = submitBtn ? submitBtn.innerHTML : '';
       if (submitBtn) {
         submitBtn.disabled = true;
         submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        submitBtn.innerHTML = `
+          <span class="material-symbols-outlined text-lg animate-spin">sync</span>
+          <span>Publicando...</span>
+        `;
       }
 
       const formData = new FormData(raceForm);
@@ -781,6 +786,7 @@ function setupEventHandlers() {
         if (submitBtn) {
           submitBtn.disabled = false;
           submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+          submitBtn.innerHTML = originalSubmitHtml;
         }
         // Scroll al primer error
         const firstError = raceForm.querySelector('.field-error-msg');
@@ -893,6 +899,7 @@ function setupEventHandlers() {
         if (submitBtn) {
           submitBtn.disabled = false;
           submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+          submitBtn.innerHTML = originalSubmitHtml;
         }
         return;
       }
@@ -912,6 +919,7 @@ function setupEventHandlers() {
       if (submitBtn) {
         submitBtn.disabled = false;
         submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        submitBtn.innerHTML = originalSubmitHtml;
       }
 
       activeTab = 'all';

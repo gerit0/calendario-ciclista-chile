@@ -329,7 +329,11 @@ async function createPendingRaceSupabase(raceData) {
       descripcion: raceData.descripcion || raceData.description || null,
       estado: "pendiente"
     };
-    const { data, error } = await client.from("carreras").insert([payload]).select();
+    const insertPromise = client.from("carreras").insert([payload]).select();
+    const timeoutPromise = new Promise(
+      (_, reject) => setTimeout(() => reject(new Error("TIMEOUT_EXCEEDED")), 6e3)
+    );
+    const { data, error } = await Promise.race([insertPromise, timeoutPromise]);
     if (error) {
       console.error("Error al insertar carrera pendiente en Supabase:", error);
       return { success: false, error: error.message || error };
@@ -340,6 +344,7 @@ async function createPendingRaceSupabase(raceData) {
     };
   } catch (err) {
     console.error("Excepci\xF3n al crear carrera pendiente en Supabase:", err);
+    throw err;
   }
 }
 async function loginAdmin(email, password) {
@@ -2134,9 +2139,14 @@ function setupEventHandlers() {
     raceForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const submitBtn = raceForm.querySelector('[type="submit"]');
+      const originalSubmitHtml = submitBtn ? submitBtn.innerHTML : "";
       if (submitBtn) {
         submitBtn.disabled = true;
         submitBtn.classList.add("opacity-50", "cursor-not-allowed");
+        submitBtn.innerHTML = `
+          <span class="material-symbols-outlined text-lg animate-spin">sync</span>
+          <span>Publicando...</span>
+        `;
       }
       const formData = new FormData(raceForm);
       const isFree = document.getElementById("form-is-free")?.checked || false;
@@ -2170,6 +2180,7 @@ function setupEventHandlers() {
         if (submitBtn) {
           submitBtn.disabled = false;
           submitBtn.classList.remove("opacity-50", "cursor-not-allowed");
+          submitBtn.innerHTML = originalSubmitHtml;
         }
         const firstError = raceForm.querySelector(".field-error-msg");
         if (firstError) firstError.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -2266,6 +2277,7 @@ function setupEventHandlers() {
         if (submitBtn) {
           submitBtn.disabled = false;
           submitBtn.classList.remove("opacity-50", "cursor-not-allowed");
+          submitBtn.innerHTML = originalSubmitHtml;
         }
         return;
       }
@@ -2280,6 +2292,7 @@ function setupEventHandlers() {
       if (submitBtn) {
         submitBtn.disabled = false;
         submitBtn.classList.remove("opacity-50", "cursor-not-allowed");
+        submitBtn.innerHTML = originalSubmitHtml;
       }
       activeTab = "all";
       switchView("calendar");
