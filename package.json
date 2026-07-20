@@ -1,0 +1,13 @@
+{
+  "name": "calendario-ciclista-chile",
+  "version": "1.0.0",
+  "description": "Calendario Nacional de Ciclismo Chile – Plataforma open para Gran Fondo, MTB, Gravel y más.",
+  "private": true,
+  "scripts": {
+    "build": "npx esbuild js/app.js --bundle --outfile=js/bundle.js --format=iife --platform=browser",
+    "dev": "npx serve . -p 3000",
+    "test": "node qa_test_runner.js"
+  },
+  "keywords": ["ciclismo", "chile", "calendario", "ruta", "mtb", "gravel"],
+  "license": "UNLICENSED"
+}

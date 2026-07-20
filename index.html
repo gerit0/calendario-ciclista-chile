@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="es" class="light scroll-smooth">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CalendarioCiclista Chile | Eventos y Carreras de Ciclismo</title>
+  <meta name="description"
+    content="El calendario centralizado del ciclismo en Chile. Encuentra y publica competencias de Ruta, MTB, Gravel, Pista, BMX y Virtual.">
+
+  <!-- Google Fonts: Montserrat & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@500;600;700;800;900&display=swap"
+    rel="stylesheet">
+
+  <!-- Material Symbols Outlined -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block"
+    rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+  <!-- Tailwind Config Customization -->
+  <script id="tailwind-config">
+    try {
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: '#181919',
+              secondary: '#a73918',
+              'tertiary-fixed': '#d8ef00',
+              surface: '#f8f9f9',
+              'surface-container': '#edeeee',
+              'surface-container-low': '#f3f4f4',
+              'surface-container-high': '#e7e8e8',
+              'surface-container-highest': '#e1e3e3',
+              'surface-container-lowest': '#ffffff',
+              outline: '#747878',
+              'outline-variant': '#c4c7c7',
+              background: '#f8f9f9',
+              'on-background': '#191c1c',
+              'on-surface': '#191c1c',
+              'on-primary': '#ffffff',
+              'on-secondary': '#ffffff'
+            },
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              display: ['Montserrat', 'sans-serif']
+            }
+          }
+        }
+      }
+    } catch (e) { }
+  </script>
+
+  <!-- Configuración pública de Supabase -->
+  <script>
+    window.SUPABASE_URL = "https://mhzktzvxdmhanqkhhaqm.supabase.co/rest/v1/";
+    window.SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1oemt0enZ4ZG1oYW5xa2hoYXFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ1NjAyMzMsImV4cCI6MjEwMDEzNjIzM30.WNC9F2xqRPk7Ry5Sxr53BloWaq1hZ09FDI7OItfQB8s";
+  </script>
+
+
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+
+    .material-symbols-outlined.filled {
+      font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+</head>
+
+<body
+  class="bg-background text-on-background font-sans antialiased flex flex-col min-h-screen selection:bg-tertiary-fixed selection:text-primary">
+
+  <!-- Header / Navigation Bar -->
+  <header
+    class="sticky top-0 z-50 bg-surface/90 backdrop-blur-md border-b border-outline-variant/30 transition-all duration-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+
+      <!-- Logo & Brand -->
+      <a href="#" id="brand-logo" class="flex items-center gap-3 group">
+        <div
+          class="w-10 h-10 rounded-xl bg-primary text-tertiary-fixed flex items-center justify-center font-display font-black text-xl shadow-md group-hover:scale-105 transition-transform">
+          <span class="material-symbols-outlined text-2xl">directions_bike</span>
+        </div>
+        <div class="flex flex-col">
+          <span class="font-display font-black text-2xl tracking-tight text-primary leading-none">
+            Calendario<span class="text-secondary">Ciclista</span>
+          </span>
+          <span class="text-[10px] uppercase font-bold tracking-widest text-outline">Chile</span>
+        </div>
+      </a>
+
+      <!-- Desktop Navigation -->
+      <nav class="hidden md:flex items-center gap-2">
+        <button id="nav-explore"
+          class="nav-btn px-4 py-2 rounded-lg font-display font-bold text-sm text-primary hover:bg-surface-container-low transition-colors flex items-center gap-2">
+          <span class="material-symbols-outlined text-lg">explore</span>
+          Explorar Carreras
+        </button>
+
+        <button id="nav-agenda"
+          class="nav-btn px-4 py-2 rounded-lg font-display font-bold text-sm text-outline hover:text-primary hover:bg-surface-container-low transition-colors flex items-center gap-2">
+          <span class="material-symbols-outlined text-lg">bookmark</span>
+          Mi Agenda
+          <span id="agenda-badge"
+            class="hidden ml-1 px-2 py-0.5 text-xs bg-secondary text-white rounded-full font-bold">0</span>
+        </button>
+
+        <button id="nav-register"
+          class="ml-2 px-5 py-2.5 rounded-lg bg-tertiary-fixed text-primary font-display font-bold text-sm hover:brightness-105 active:scale-95 transition-all shadow-sm flex items-center gap-2">
+          <span class="material-symbols-outlined text-lg">add_circle</span>
+          + Publicar Carrera
+        </button>
+      </nav>
+
+      <!-- Mobile Navigation Buttons -->
+      <div class="flex md:hidden items-center gap-2">
+        <button id="mobile-nav-register"
+          class="px-3 py-1.5 rounded-lg bg-tertiary-fixed text-primary font-display font-bold text-xs flex items-center gap-1">
+          <span class="material-symbols-outlined text-sm">add</span>
+          Publicar
+        </button>
+        <button id="mobile-menu-toggle" class="p-2 rounded-lg text-primary hover:bg-surface-container"
+          aria-label="Abrir menú">
+          <span class="material-symbols-outlined text-2xl">menu</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Mobile Dropdown Menu -->
+    <div id="mobile-menu" class="hidden md:hidden border-t border-outline-variant/30 bg-surface px-4 py-3 space-y-2">
+      <button id="mobile-nav-explore"
+        class="w-full text-left px-4 py-2.5 rounded-lg font-display font-bold text-sm text-primary hover:bg-surface-container flex items-center gap-3">
+        <span class="material-symbols-outlined">explore</span>
+        Explorar Carreras
+      </button>
+      <button id="mobile-nav-agenda"
+        class="w-full text-left px-4 py-2.5 rounded-lg font-display font-bold text-sm text-outline hover:text-primary hover:bg-surface-container flex items-center gap-3">
+        <span class="material-symbols-outlined">bookmark</span>
+        Mi Agenda
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- 1. VIEW CALENDAR (Active by default) -->
+    <section id="view-calendar" class="space-y-8">
+
+      <!-- Hero Banner -->
+      <div class="relative rounded-3xl bg-primary text-white overflow-hidden p-8 sm:p-12 shadow-xl">
+        <div class="absolute inset-0 bg-gradient-to-r from-primary via-primary/90 to-transparent z-10"></div>
+        <img src="https://images.unsplash.com/photo-1541625602330-2277a4c46182?auto=format&fit=crop&w=1600&q=80"
+          alt="Ciclismo en Chile"
+          class="absolute inset-0 w-full h-full object-cover object-center opacity-30 mix-blend-overlay">
+
+        <div class="relative z-20 max-w-2xl space-y-4">
+          <span
+            class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-tertiary-fixed text-primary uppercase tracking-wider">
+            <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span> Temporada 2026
+          </span>
+          <h1 class="text-3xl sm:text-5xl font-display font-black tracking-tight leading-tight">
+            Descubre las mejores carreras de Chile
+          </h1>
+          <p class="text-gray-300 text-sm sm:text-base">
+            Gran Fondo, Desafíos XCM, Rutas Gravel y más. Explora el calendario oficial y planifica tu próxima meta.
+          </p>
+        </div>
+      </div>
+
+      <!-- Filter Bar & Controls -->
+      <div class="bg-surface-container-low p-6 rounded-2xl border border-outline-variant/30 space-y-6 shadow-sm">
+
+        <!-- Search & Region Filters Row -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+
+          <!-- Search Bar -->
+          <div class="md:col-span-5 relative">
+            <span
+              class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-outline pointer-events-none">
+              search
+            </span>
+            <input type="text" id="search-input" placeholder="Buscar por nombre, ciudad u organizador..."
+              class="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-outline-variant/50 text-sm font-medium placeholder-outline focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+          </div>
+
+          <!-- Region Selector -->
+          <div class="md:col-span-4" id="region-select-container">
+            <select id="region-select"
+              class="w-full px-4 py-3 rounded-xl bg-white border border-outline-variant/50 text-sm font-medium text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all cursor-pointer">
+              <!-- Options populated by UI module -->
+            </select>
+          </div>
+
+          <!-- Month Selector -->
+          <div class="md:col-span-3">
+            <select id="month-select"
+              class="w-full px-4 py-3 rounded-xl bg-white border border-outline-variant/50 text-sm font-medium text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all cursor-pointer">
+              <option value="Todos">Todos los meses</option>
+              <option value="Enero 2026">Enero 2026</option>
+              <option value="Febrero 2026">Febrero 2026</option>
+              <option value="Marzo 2026">Marzo 2026</option>
+              <option value="Abril 2026">Abril 2026</option>
+              <option value="Mayo 2026">Mayo 2026</option>
+              <option value="Junio 2026">Junio 2026</option>
+              <option value="Julio 2026">Julio 2026</option>
+              <option value="Agosto 2026">Agosto 2026</option>
+              <option value="Septiembre 2026">Septiembre 2026</option>
+              <option value="Octubre 2026">Octubre 2026</option>
+              <option value="Noviembre 2026">Noviembre 2026</option>
+              <option value="Diciembre 2026">Diciembre 2026</option>
+              <option value="Enero 2027">Enero 2027</option>
+              <option value="Febrero 2027">Febrero 2027</option>
+              <option value="Marzo 2027">Marzo 2027</option>
+              <option value="Abril 2027">Abril 2027</option>
+              <option value="Mayo 2027">Mayo 2027</option>
+              <option value="Junio 2027">Junio 2027</option>
+              <option value="Julio 2027">Julio 2027</option>
+              <option value="Agosto 2027">Agosto 2027</option>
+              <option value="Septiembre 2027">Septiembre 2027</option>
+              <option value="Octubre 2027">Octubre 2027</option>
+              <option value="Noviembre 2027">Noviembre 2027</option>
+              <option value="Diciembre 2027">Diciembre 2027</option>
+            </select>
+          </div>
+
+        </div>
+
+        <!-- Discipline Filter Chips -->
+        <div class="space-y-2">
+          <label class="block text-xs font-display font-bold uppercase tracking-wider text-outline">
+            Disciplinas:
+          </label>
+          <div id="discipline-chips" class="flex flex-wrap gap-2">
+            <!-- Discipline Chips populated by UI module -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Races Counter & Title -->
+      <div class="flex items-center justify-between">
+        <h2 id="calendar-title" class="text-xl sm:text-2xl font-display font-bold text-primary">
+          Próximas Carreras
+        </h2>
+        <span id="races-count" class="text-xs font-bold px-3 py-1 rounded-full bg-surface-container text-outline">
+          Cargando...
+        </span>
+      </div>
+
+      <!-- Races Container Grid -->
+      <div id="races-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Race Cards populated dynamically -->
+      </div>
+
+    </section>
+
+    <!-- 2. VIEW DETAIL (Hidden by default) -->
+    <section id="view-detail" class="hidden space-y-6">
+      <div id="detail-content">
+        <!-- Rendered by js/ui.js -->
+      </div>
+    </section>
+
+    <!-- 3. VIEW REGISTER (Hidden by default) -->
+    <section id="view-register" class="hidden max-w-3xl mx-auto space-y-8">
+
+      <div class="flex items-center gap-4">
+        <button id="btn-back-from-register"
+          class="p-2 rounded-xl bg-surface-container hover:bg-surface-container-high transition-colors">
+          <span class="material-symbols-outlined">arrow_back</span>
+        </button>
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-display font-black text-primary">Publicar Nueva Carrera</h1>
+          <p class="text-outline text-sm">Completa el formulario para registrar un nuevo evento en el calendario.</p>
+        </div>
+      </div>
+
+      <form id="race-form" class="bg-white p-6 sm:p-8 rounded-3xl border border-outline-variant/40 shadow-sm space-y-6">
+
+        <!-- Advertencia de conflicto de fechas (oculta por defecto, mostrada por JS) -->
+        <div id="form-conflict-warning" class="hidden w-full p-4 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-800 text-sm font-semibold flex flex-col gap-1">
+        </div>
+
+        <!-- Nombre de la Carrera -->
+        <div>
+          <label for="form-name" class="block font-display font-bold text-sm text-primary mb-2">
+            Nombre de la Carrera <span class="text-secondary">*</span>
+          </label>
+          <input type="text" id="form-name" name="name" placeholder="Ej: Gran Fondo Andes Challenge 2026"
+            class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all">
+        </div>
+
+        <!-- Grid: Disciplina y Fecha -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="form-discipline" class="block font-display font-bold text-sm text-primary mb-2">
+              Disciplina <span class="text-secondary">*</span>
+            </label>
+            <select id="form-discipline" name="discipline"
+              class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all cursor-pointer">
+              <option value="Ruta">Ruta</option>
+              <option value="MTB">MTB</option>
+              <option value="Gravel">Gravel</option>
+              <option value="Pista">Pista</option>
+              <option value="BMX">BMX</option>
+              <option value="Virtual">Virtual</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="form-date" class="block font-display font-bold text-sm text-primary mb-2">
+              Fecha del Evento <span class="text-secondary">*</span>
+            </label>
+            <input type="date" id="form-date" name="date"
+              class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all cursor-pointer">
+          </div>
+        </div>
+
+        <!-- Grid: Región y Ciudad -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="form-region" class="block font-display font-bold text-sm text-primary mb-2">
+              Región <span class="text-secondary">*</span>
+            </label>
+            <select id="form-region" name="region"
+              class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all cursor-pointer">
+              <!-- Filled via JS or hardcoded -->
+            </select>
+          </div>
+
+          <div>
+            <label for="form-city" class="block font-display font-bold text-sm text-primary mb-2">
+              Ciudad / Comuna <span class="text-secondary">*</span>
+            </label>
+            <input type="text" id="form-city" name="city" placeholder="Ej: Pucón"
+              class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all">
+          </div>
+        </div>
+
+        <!-- Grid: Distancia y Desnivel -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="form-distance" class="block font-display font-bold text-sm text-primary mb-2">
+              Distancia (km) <span class="text-secondary">*</span>
+            </label>
+            <input type="text" id="form-distance" name="distance" placeholder="Ej: 120 km"
+              class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all">
+          </div>
+
+          <div>
+            <label for="form-elevation" class="block font-display font-bold text-sm text-primary mb-2">
+              Desnivel Acumulado (m)
+            </label>
+            <input type="text" id="form-elevation" name="elevation" placeholder="Ej: 1850 m"
+              class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all">
+          </div>
+        </div>
+
+        <!-- Grid: Precio, Gratuita & Estado -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
+          <div>
+            <label for="form-price" class="block font-display font-bold text-sm text-primary mb-2">
+              Precio Inscripción ($ CLP)
+            </label>
+            <input type="number" id="form-price" name="price" min="0" step="1000" placeholder="Ej: 35000"
+              class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all">
+          </div>
+
+          <div class="flex items-center h-12">
+            <label class="inline-flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" id="form-is-free" name="isFree"
+                class="w-5 h-5 rounded text-primary focus:ring-primary border-outline-variant">
+              <span class="font-display font-bold text-sm text-primary">¿Evento Gratuito?</span>
+            </label>
+          </div>
+
+          <div>
+            <label for="form-status" class="block font-display font-bold text-sm text-primary mb-2">
+              Estado de Inscripción
+            </label>
+            <select id="form-status" name="status"
+              class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all cursor-pointer">
+              <option value="Inscripciones Abiertas">Inscripciones Abiertas</option>
+              <option value="Últimos Cupos">Últimos Cupos</option>
+              <option value="Próximamente">Próximamente</option>
+              <option value="Cupos Agotados">Cupos Agotados</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Organizador & URL Inscripción -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="form-organizer" class="block font-display font-bold text-sm text-primary mb-2">
+              Organizador <span class="text-secondary">*</span>
+            </label>
+            <input type="text" id="form-organizer" name="organizer" placeholder="Ej: Club Ciclismo Chile"
+              class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all">
+          </div>
+
+          <div>
+            <label for="form-url" class="block font-display font-bold text-sm text-primary mb-2">
+              Link de Inscripción / Sitio Web <span class="text-secondary">*</span>
+            </label>
+            <input type="text" id="form-url" name="registrationUrl" placeholder="https://ejemplo.cl/registro"
+              class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all">
+          </div>
+        </div>
+
+        <!-- URL Imagen Hero (Opcional) -->
+        <div>
+          <label for="form-image" class="block font-display font-bold text-sm text-primary mb-2">
+            URL Imagen de Portada (Opcional)
+          </label>
+          <input type="text" id="form-image" name="heroImage" placeholder="https://images.unsplash.com/..."
+            class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all">
+        </div>
+
+        <!-- Categorías -->
+        <div>
+          <label for="form-categories" class="block font-display font-bold text-sm text-primary mb-2">
+            Categorías (separadas por comas)
+          </label>
+          <input type="text" id="form-categories" name="categories" placeholder="Ej: Elite, Master A, Master B, Damas"
+            class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all">
+        </div>
+
+        <!-- Descripción -->
+        <div>
+          <label for="form-description" class="block font-display font-bold text-sm text-primary mb-2">
+            Descripción del Evento <span class="text-secondary">*</span>
+          </label>
+          <textarea id="form-description" name="description" rows="4"
+            placeholder="Describe la ruta, puntos de hidratación, premios, etc..."
+            class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all"></textarea>
+        </div>
+
+        <!-- Form Submit Button -->
+        <div class="pt-4 flex justify-end gap-4">
+          <button type="button" id="btn-cancel-register"
+            class="px-6 py-3 rounded-xl bg-surface-container text-primary font-display font-bold text-sm hover:bg-surface-container-high transition-colors">
+            Cancelar
+          </button>
+          <button type="submit"
+            class="px-8 py-3 rounded-xl bg-tertiary-fixed text-primary font-display font-bold text-sm hover:brightness-105 active:scale-95 transition-all shadow-md flex items-center gap-2">
+            <span class="material-symbols-outlined text-lg">publish</span>
+            Publicar Carrera
+          </button>
+        </div>
+
+      </form>
+
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-primary text-white border-t border-outline/20 mt-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+
+        <!-- Brand Info -->
+        <div class="md:col-span-2 space-y-4">
+          <div class="flex items-center gap-3">
+            <div
+              class="w-9 h-9 rounded-xl bg-tertiary-fixed text-primary flex items-center justify-center font-display font-black text-lg">
+              <span class="material-symbols-outlined text-xl">directions_bike</span>
+            </div>
+            <span class="font-display font-black text-xl tracking-tight">
+              Calendario<span class="text-secondary">Ciclista</span>
+            </span>
+          </div>
+          <p class="text-gray-400 text-sm max-w-sm leading-relaxed">
+            Plataforma abierta y centralizada para la difusión y gestión de competencias ciclistas a lo largo de todo
+            Chile.
+          </p>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="space-y-3">
+          <h4 class="font-display font-bold text-sm uppercase tracking-wider text-tertiary-fixed">Disciplinas</h4>
+          <ul class="space-y-2 text-sm text-gray-400">
+            <li><a href="#" class="hover:text-white transition-colors">Ciclismo de Ruta</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Mountain Bike (MTB / XCM)</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Gravel & Aventura</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Pista & Velódromo</a></li>
+          </ul>
+        </div>
+
+        <!-- Info / Contact -->
+        <div class="space-y-3">
+          <h4 class="font-display font-bold text-sm uppercase tracking-wider text-tertiary-fixed">Contacto</h4>
+          <p class="text-sm text-gray-400">¿Eres organizador? Publica tus eventos de forma completamente gratuita.</p>
+          <a href="mailto:contacto@calendariociclista.cl"
+            class="inline-flex items-center gap-2 text-sm font-bold text-tertiary-fixed hover:underline">
+            <span class="material-symbols-outlined text-base">mail</span>
+            contacto@calendariociclista.cl
+          </a>
+        </div>
+
+      </div>
+
+      <div
+        class="border-t border-outline/20 mt-8 pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-gray-400 gap-4">
+        <p>&copy; 2026 CalendarioCiclista Chile. Todos los derechos reservados.</p>
+        <p class="flex items-center gap-1">
+          Hecho con <span class="material-symbols-outlined text-secondary text-sm filled">favorite</span> para la
+          comunidad ciclista
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Main JavaScript bundle (soporta apertura directa file:// y servidor web) -->
+  <script src="js/bundle.js"></script>
+
+</body>
+
+</html>
