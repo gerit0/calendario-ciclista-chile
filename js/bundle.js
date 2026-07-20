@@ -324,6 +324,113 @@ async function createPendingRaceSupabase(raceData) {
     };
   } catch (err) {
     console.error("Excepci\xF3n al crear carrera pendiente en Supabase:", err);
+  }
+}
+async function loginAdmin(email, password) {
+  const client = getSupabase();
+  if (!client) return { success: false, error: "Supabase no est\xE1 configurado." };
+  try {
+    const { data, error } = await client.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    return { success: true, session: data.session, user: data.user };
+  } catch (err) {
+    console.error("Error al iniciar sesi\xF3n de admin:", err);
+    return { success: false, error: err.message || err };
+  }
+}
+async function logoutAdmin() {
+  const client = getSupabase();
+  if (!client) return { success: false, error: "Supabase no est\xE1 configurado." };
+  try {
+    const { error } = await client.auth.signOut();
+    if (error) throw error;
+    return { success: true };
+  } catch (err) {
+    console.error("Error al cerrar sesi\xF3n:", err);
+    return { success: false, error: err.message || err };
+  }
+}
+async function getCurrentUser() {
+  const client = getSupabase();
+  if (!client) return null;
+  try {
+    const { data: { user } } = await client.auth.getUser();
+    return user;
+  } catch {
+    return null;
+  }
+}
+async function checkIsAdmin(userId) {
+  const client = getSupabase();
+  if (!client || !userId) return false;
+  try {
+    const { data, error } = await client.from("usuarios_admin").select("user_id").eq("user_id", userId).maybeSingle();
+    if (error) throw error;
+    return !!data;
+  } catch (err) {
+    console.error("Error al verificar rol de admin:", err);
+    return false;
+  }
+}
+async function fetchPendingRacesSupabase() {
+  const client = getSupabase();
+  if (!client) return [];
+  try {
+    const { data, error } = await client.from("carreras").select("*").eq("estado", "pendiente").order("fecha", { ascending: true });
+    if (error) throw error;
+    if (!Array.isArray(data)) return [];
+    return data.map(mapSupabaseToFrontend);
+  } catch (err) {
+    console.error("Error al consultar carreras pendientes:", err);
+    return [];
+  }
+}
+async function updateRaceStatusSupabase(raceId, status) {
+  const client = getSupabase();
+  if (!client) return { success: false, error: "Supabase no est\xE1 configurado." };
+  try {
+    const { error } = await client.from("carreras").update({ estado: status }).eq("id", raceId);
+    if (error) throw error;
+    return { success: true };
+  } catch (err) {
+    console.error("Error al actualizar estado de carrera:", err);
+    return { success: false, error: err.message || err };
+  }
+}
+async function deleteRaceSupabase(raceId) {
+  const client = getSupabase();
+  if (!client) return { success: false, error: "Supabase no est\xE1 configurado." };
+  try {
+    const { error } = await client.from("carreras").delete().eq("id", raceId);
+    if (error) throw error;
+    return { success: true };
+  } catch (err) {
+    console.error("Error al eliminar carrera de Supabase:", err);
+    return { success: false, error: err.message || err };
+  }
+}
+async function updateRaceSupabase(raceId, raceData) {
+  const client = getSupabase();
+  if (!client) return { success: false, error: "Supabase no est\xE1 configurado." };
+  try {
+    const payload = {
+      nombre: raceData.name || raceData.nombre,
+      fecha: raceData.date || raceData.fecha,
+      disciplina: raceData.discipline || raceData.disciplina,
+      region: raceData.region,
+      ubicacion: raceData.city || raceData.ubicacion,
+      organizador: raceData.organizer || raceData.organizador,
+      link_inscripcion: raceData.registrationUrl || raceData.link_inscripcion,
+      categoria: Array.isArray(raceData.categories) ? raceData.categories.join(", ") : raceData.categoria || raceData.categories,
+      precio: raceData.price != null ? Number(raceData.price) : 0,
+      hero_image: raceData.heroImage || raceData.hero_image,
+      descripcion: raceData.description || raceData.descripcion
+    };
+    const { error } = await client.from("carreras").update(payload).eq("id", raceId);
+    if (error) throw error;
+    return { success: true };
+  } catch (err) {
+    console.error("Error al actualizar carrera en Supabase:", err);
     return { success: false, error: err.message || err };
   }
 }
@@ -494,7 +601,7 @@ function renderRegionSelect(container, regions = [], activeRegion = "Todas las r
     </option>
   `).join("");
 }
-function renderRaceCards(container, races = []) {
+function renderRaceCards(container, races = [], isAdmin2 = false) {
   if (!container) return;
   if (races.length === 0) {
     container.innerHTML = `
@@ -612,7 +719,7 @@ function renderRaceCards(container, races = []) {
           </div>
 
           <!-- Card Footer & CTA -->
-          <div class="pt-4 border-t border-outline-variant/30 flex items-center gap-2">
+          <div class="pt-4 border-t border-outline-variant/30 flex flex-col gap-2">
             <button 
               type="button" 
               data-race-id="${race.id}" 
@@ -621,6 +728,16 @@ function renderRaceCards(container, races = []) {
               Ver Detalle
               <span class="material-symbols-outlined text-base">arrow_forward</span>
             </button>
+            ${isAdmin2 ? `
+            <div class="flex gap-2 w-full pt-1">
+              <button type="button" data-edit-id="${race.id}" class="flex-grow py-2.5 rounded-xl bg-surface-container border border-outline-variant/60 text-primary font-bold text-xs hover:bg-surface-container-high transition-colors flex items-center justify-center gap-1">
+                <span class="material-symbols-outlined text-sm">edit</span> Editar
+              </button>
+              <button type="button" data-delete-id="${race.id}" class="py-2.5 px-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-600 font-bold text-xs hover:bg-red-500/20 transition-colors flex items-center justify-center gap-1" title="Eliminar Carrera">
+                <span class="material-symbols-outlined text-sm">delete</span>
+              </button>
+            </div>
+            ` : ""}
           </div>
 
         </div>
@@ -629,7 +746,7 @@ function renderRaceCards(container, races = []) {
     `;
   }).join("");
 }
-function renderDetailView(container, race) {
+function renderDetailView(container, race, isAdmin2 = false) {
   if (!container || !race) return;
   const bookmarked = isBookmarked(race.id);
   const disciplineBadgeClass = getDisciplineBadgeClass(race.discipline);
@@ -643,7 +760,7 @@ function renderDetailView(container, race) {
     <div class="space-y-8 animate-fadeIn">
       
       <!-- Back Button & Actions Bar -->
-      <div class="flex items-center justify-between">
+      <div class="flex items-center justify-between flex-wrap gap-4">
         <button 
           type="button" 
           id="btn-back-to-calendar" 
@@ -653,16 +770,26 @@ function renderDetailView(container, race) {
           Volver a Carreras
         </button>
 
-        <button 
-          type="button" 
-          data-bookmark-id="${race.id}" 
-          class="btn-bookmark px-4 py-2.5 rounded-xl bg-white border border-outline-variant/50 text-primary font-display font-bold text-sm flex items-center gap-2 hover:bg-surface-container transition-all shadow-sm"
-        >
-          <span class="material-symbols-outlined ${bookmarked ? "filled text-secondary" : "text-outline"}">
-            ${bookmarked ? "bookmark" : "bookmark_border"}
-          </span>
-          ${bookmarked ? "Guardada en Agenda" : "Guardar en Agenda"}
-        </button>
+        <div class="flex items-center gap-2">
+          ${isAdmin2 ? `
+            <button type="button" data-edit-id="${race.id}" class="px-4 py-2.5 rounded-xl bg-surface-container border border-outline-variant/55 text-primary font-display font-bold text-sm flex items-center gap-2 hover:bg-surface-container-high transition-all shadow-sm">
+              <span class="material-symbols-outlined text-base">edit</span> Editar
+            </button>
+            <button type="button" data-delete-id="${race.id}" class="px-4 py-2.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-600 font-display font-bold text-sm flex items-center gap-2 hover:bg-red-500/20 transition-all shadow-sm">
+              <span class="material-symbols-outlined text-base">delete</span> Eliminar
+            </button>
+          ` : ""}
+          <button 
+            type="button" 
+            data-bookmark-id="${race.id}" 
+            class="btn-bookmark px-4 py-2.5 rounded-xl bg-white border border-outline-variant/50 text-primary font-display font-bold text-sm flex items-center gap-2 hover:bg-surface-container transition-all shadow-sm"
+          >
+            <span class="material-symbols-outlined ${bookmarked ? "filled text-secondary" : "text-outline"}">
+              ${bookmarked ? "bookmark" : "bookmark_border"}
+            </span>
+            ${bookmarked ? "Guardada en Agenda" : "Guardar en Agenda"}
+          </button>
+        </div>
       </div>
 
       <!-- Hero Banner Details -->
@@ -807,24 +934,73 @@ function switchView(viewName) {
   const viewCalendar = document.getElementById("view-calendar");
   const viewDetail = document.getElementById("view-detail");
   const viewRegister = document.getElementById("view-register");
+  const viewAdminPanel = document.getElementById("view-admin-panel");
   const navExplore = document.getElementById("nav-explore");
   const navAgenda = document.getElementById("nav-agenda");
   const navRegister = document.getElementById("nav-register");
+  const navAdminPanel = document.getElementById("nav-admin-panel");
   if (viewCalendar) viewCalendar.classList.add("hidden");
   if (viewDetail) viewDetail.classList.add("hidden");
   if (viewRegister) viewRegister.classList.add("hidden");
+  if (viewAdminPanel) viewAdminPanel.classList.add("hidden");
   const inactiveNavClasses = "text-outline hover:text-primary hover:bg-surface-container-low";
   const activeNavClasses = "text-primary bg-surface-container-low font-bold";
   if (navExplore) navExplore.className = `nav-btn px-4 py-2 rounded-lg font-display font-bold text-sm transition-colors flex items-center gap-2 ${viewName === "calendar" ? activeNavClasses : inactiveNavClasses}`;
   if (navAgenda) navAgenda.className = `nav-btn px-4 py-2 rounded-lg font-display font-bold text-sm transition-colors flex items-center gap-2 ${viewName === "agenda" ? activeNavClasses : inactiveNavClasses}`;
+  if (navAdminPanel) navAdminPanel.className = `nav-btn px-4 py-2 rounded-lg font-display font-bold text-sm transition-colors flex items-center gap-2 ${viewName === "admin-panel" ? activeNavClasses : inactiveNavClasses}`;
   if (viewName === "calendar" || viewName === "agenda") {
     if (viewCalendar) viewCalendar.classList.remove("hidden");
   } else if (viewName === "detail") {
     if (viewDetail) viewDetail.classList.remove("hidden");
   } else if (viewName === "register") {
     if (viewRegister) viewRegister.classList.remove("hidden");
+  } else if (viewName === "admin-panel") {
+    if (viewAdminPanel) viewAdminPanel.classList.remove("hidden");
   }
   window.scrollTo({ top: 0, behavior: "smooth" });
+}
+function renderPendingRaces(container, races = []) {
+  if (!container) return;
+  if (races.length === 0) {
+    container.innerHTML = `
+      <div class="col-span-full py-16 text-center bg-white rounded-3xl border border-dashed border-outline-variant/60 p-8 space-y-4">
+        <div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mx-auto text-outline">
+          <span class="material-symbols-outlined text-4xl">task_alt</span>
+        </div>
+        <h3 class="font-display font-bold text-xl text-primary">No hay propuestas pendientes</h3>
+        <p class="text-outline text-sm max-w-md mx-auto">Buen trabajo, el calendario est\xE1 al d\xEDa y moderado.</p>
+      </div>
+    `;
+    return;
+  }
+  container.innerHTML = races.map((race) => {
+    const disciplineBadgeClass = getDisciplineBadgeClass(race.discipline);
+    return `
+      <article class="bg-white rounded-3xl border border-outline-variant/40 overflow-hidden shadow-sm flex flex-col group p-6 space-y-4">
+        <div class="flex items-center justify-between">
+          <span class="px-2.5 py-1 rounded-lg text-xs font-bold ${disciplineBadgeClass}">
+            ${race.discipline}
+          </span>
+          <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
+            Pendiente
+          </span>
+        </div>
+        <div>
+          <h3 class="font-display font-bold text-lg text-primary line-clamp-2">${race.name}</h3>
+          <p class="text-xs text-outline font-semibold">${race.displayDate || race.date} \u2014 ${race.city}, ${race.region}</p>
+        </div>
+        <p class="text-xs text-gray-600 line-clamp-3">${race.description}</p>
+        <div class="pt-4 border-t border-outline-variant/30 grid grid-cols-2 gap-2">
+          <button type="button" data-approve-id="${race.id}" class="py-2.5 rounded-xl bg-emerald-600 text-white font-display font-bold text-xs hover:bg-emerald-700 transition-colors flex items-center justify-center gap-1 shadow-sm">
+            <span class="material-symbols-outlined text-sm">check_circle</span> Aprobar
+          </button>
+          <button type="button" data-reject-id="${race.id}" class="py-2.5 rounded-xl bg-red-600 text-white font-display font-bold text-xs hover:bg-red-700 transition-colors flex items-center justify-center gap-1 shadow-sm">
+            <span class="material-symbols-outlined text-sm">cancel</span> Rechazar
+          </button>
+        </div>
+      </article>
+    `;
+  }).join("");
 }
 
 // js/validation.js
@@ -918,6 +1094,7 @@ var currentMonth = "Todos";
 var searchQuery = "";
 var activeTab = "all";
 var currentRaceId = null;
+var isAdmin = false;
 function clearFormErrors(form) {
   if (!form) return;
   form.querySelectorAll(".field-error-msg").forEach((el) => el.remove());
@@ -1037,7 +1214,7 @@ async function updateCalendar() {
   const filteredRaces = await getFilteredRaces();
   const racesContainer = document.getElementById("races-container");
   if (racesContainer) {
-    renderRaceCards(racesContainer, filteredRaces);
+    renderRaceCards(racesContainer, filteredRaces, isAdmin);
   }
   const countElem = document.getElementById("races-count");
   if (countElem) {
@@ -1175,6 +1352,20 @@ function setupEventHandlers() {
         await updateCalendar();
         return;
       }
+      const editBtn = e.target.closest("[data-edit-id]");
+      if (editBtn) {
+        e.stopPropagation();
+        const raceId = editBtn.getAttribute("data-edit-id");
+        openEditModal(raceId);
+        return;
+      }
+      const deleteBtn = e.target.closest("[data-delete-id]");
+      if (deleteBtn) {
+        e.stopPropagation();
+        const raceId = deleteBtn.getAttribute("data-delete-id");
+        handleDeleteRace(raceId);
+        return;
+      }
       const detailBtn = e.target.closest("[data-race-id]");
       if (detailBtn) {
         const raceId = detailBtn.getAttribute("data-race-id");
@@ -1183,7 +1374,7 @@ function setupEventHandlers() {
         if (race) {
           currentRaceId = raceId;
           const detailContainer2 = document.getElementById("detail-content");
-          renderDetailView(detailContainer2, race);
+          renderDetailView(detailContainer2, race, isAdmin);
           switchView("detail");
         }
       }
@@ -1198,6 +1389,18 @@ function setupEventHandlers() {
         await updateCalendar();
         return;
       }
+      const editBtn = e.target.closest("[data-edit-id]");
+      if (editBtn) {
+        const raceId = editBtn.getAttribute("data-edit-id");
+        openEditModal(raceId);
+        return;
+      }
+      const deleteBtn = e.target.closest("[data-delete-id]");
+      if (deleteBtn) {
+        const raceId = deleteBtn.getAttribute("data-delete-id");
+        handleDeleteRace(raceId);
+        return;
+      }
       const bookmarkBtn = e.target.closest("[data-bookmark-id]");
       if (bookmarkBtn) {
         const raceId = bookmarkBtn.getAttribute("data-bookmark-id");
@@ -1205,7 +1408,7 @@ function setupEventHandlers() {
         const races = await getAllRaces();
         const race = races.find((r) => r.id === raceId);
         if (race) {
-          renderDetailView(detailContainer, race);
+          renderDetailView(detailContainer, race, isAdmin);
         }
         await updateCalendar();
       }
@@ -1352,13 +1555,284 @@ function setupEventHandlers() {
       await updateCalendar();
     });
   }
+  const loginModal = document.getElementById("login-modal");
+  const editModal = document.getElementById("edit-modal");
+  const openLoginBtns = ["nav-admin-login", "mobile-nav-admin-login"];
+  openLoginBtns.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener("click", (e) => {
+        e.preventDefault();
+        const errorContainer = document.getElementById("login-error-container");
+        if (errorContainer) errorContainer.classList.add("hidden");
+        document.getElementById("login-form")?.reset();
+        if (loginModal) loginModal.classList.remove("hidden");
+      });
+    }
+  });
+  const closeLoginBtn = document.getElementById("btn-close-login");
+  if (closeLoginBtn) {
+    closeLoginBtn.addEventListener("click", () => {
+      if (loginModal) loginModal.classList.add("hidden");
+    });
+  }
+  const loginForm = document.getElementById("login-form");
+  if (loginForm) {
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("login-email")?.value || "";
+      const password = document.getElementById("login-password")?.value || "";
+      const submitBtn = document.getElementById("btn-submit-login");
+      const errorContainer = document.getElementById("login-error-container");
+      const errorMsgEl = document.getElementById("login-error-msg");
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.classList.add("opacity-50");
+      }
+      const res = await loginAdmin(email, password);
+      if (res.success && res.user) {
+        const checkAdmin = await checkIsAdmin(res.user.id);
+        if (checkAdmin) {
+          isAdmin = true;
+          updateAuthUI();
+          if (loginModal) loginModal.classList.add("hidden");
+          showNotificationToast("\u{1F513} \xA1Sesi\xF3n iniciada con \xE9xito! Has ingresado como Administrador del sistema.");
+          await updateCalendar();
+        } else {
+          await logoutAdmin();
+          isAdmin = false;
+          updateAuthUI();
+          if (errorContainer && errorMsgEl) {
+            errorMsgEl.textContent = "Acceso denegado: El usuario no es administrador.";
+            errorContainer.classList.remove("hidden");
+          }
+        }
+      } else {
+        if (errorContainer && errorMsgEl) {
+          errorMsgEl.textContent = res.error || "Credenciales incorrectas o problema de conexi\xF3n.";
+          errorContainer.classList.remove("hidden");
+        }
+      }
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove("opacity-50");
+      }
+    });
+  }
+  const logoutBtns = ["nav-admin-logout", "mobile-nav-admin-logout"];
+  logoutBtns.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener("click", async (e) => {
+        e.preventDefault();
+        const res = await logoutAdmin();
+        if (res.success) {
+          isAdmin = false;
+          updateAuthUI();
+          switchView("calendar");
+          showNotificationToast("\u{1F512} Sesi\xF3n de administrador cerrada.");
+          await updateCalendar();
+        }
+      });
+    }
+  });
+  const adminPanelBtns = ["nav-admin-panel", "mobile-nav-admin-panel"];
+  adminPanelBtns.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener("click", async (e) => {
+        e.preventDefault();
+        switchView("admin-panel");
+        await loadPendingRacesList();
+      });
+    }
+  });
+  const closeEditBtn = document.getElementById("btn-close-edit");
+  if (closeEditBtn) {
+    closeEditBtn.addEventListener("click", () => {
+      if (editModal) editModal.classList.add("hidden");
+    });
+  }
+  const cancelEditBtn = document.getElementById("btn-cancel-edit");
+  if (cancelEditBtn) {
+    cancelEditBtn.addEventListener("click", () => {
+      if (editModal) editModal.classList.add("hidden");
+    });
+  }
+  const pendingRacesList = document.getElementById("pending-races-list");
+  if (pendingRacesList) {
+    pendingRacesList.addEventListener("click", async (e) => {
+      const approveBtn = e.target.closest("[data-approve-id]");
+      if (approveBtn) {
+        const id = approveBtn.getAttribute("data-approve-id");
+        approveBtn.disabled = true;
+        const res = await updateRaceStatusSupabase(id, "aprobada");
+        if (res.success) {
+          showNotificationToast("\u2705 Carrera aprobada con \xE9xito. Ya es visible en el calendario.");
+          await loadPendingRacesList();
+          await updateCalendar();
+        } else {
+          showNotificationToast("\u26A0\uFE0F No se pudo aprobar la carrera: " + res.error);
+          approveBtn.disabled = false;
+        }
+        return;
+      }
+      const rejectBtn = e.target.closest("[data-reject-id]");
+      if (rejectBtn) {
+        const id = rejectBtn.getAttribute("data-reject-id");
+        rejectBtn.disabled = true;
+        const res = await updateRaceStatusSupabase(id, "rechazada");
+        if (res.success) {
+          showNotificationToast("\u274C Propuesta rechazada.");
+          await loadPendingRacesList();
+          await updateCalendar();
+        } else {
+          showNotificationToast("\u26A0\uFE0F No se pudo rechazar la carrera: " + res.error);
+          rejectBtn.disabled = false;
+        }
+      }
+    });
+  }
+  const editForm = document.getElementById("edit-form");
+  if (editForm) {
+    editForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const raceId = document.getElementById("edit-race-id")?.value;
+      if (!raceId) return;
+      const submitBtn = document.getElementById("btn-save-edit");
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.classList.add("opacity-50");
+      }
+      const isFree = document.getElementById("edit-form-is-free")?.checked || false;
+      const formData = new FormData(editForm);
+      const rawFormData = {
+        name: formData.get("name") || "",
+        discipline: formData.get("discipline") || "",
+        date: formData.get("date") || "",
+        region: formData.get("region") || "",
+        organizador: formData.get("organizer") || "",
+        organizer: formData.get("organizer") || "",
+        registrationUrl: formData.get("registrationUrl") || "",
+        city: formData.get("city") || "",
+        distance: formData.get("distance") || "",
+        elevation: formData.get("elevation") || "",
+        price: isFree ? 0 : formData.get("price") || 0,
+        heroImage: formData.get("heroImage") || "",
+        description: formData.get("description") || "",
+        categories: formData.get("categories") || ""
+      };
+      const validationResult = validateRaceForm(rawFormData);
+      if (!validationResult.isValid) {
+        renderFormErrors(editForm, validationResult.errors);
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.classList.remove("opacity-50");
+        }
+        return;
+      }
+      clearFormErrors(editForm);
+      const res = await updateRaceSupabase(raceId, validationResult.sanitizedData);
+      if (res.success) {
+        showNotificationToast("\u{1F4BE} Cambios guardados con \xE9xito.");
+        if (editModal) editModal.classList.add("hidden");
+        await updateCalendar();
+        if (document.getElementById("view-detail")?.classList.contains("hidden") === false && currentRaceId === raceId) {
+          const races = await getAllRaces();
+          const updatedRace = races.find((r) => r.id === raceId);
+          if (updatedRace) {
+            renderDetailView(document.getElementById("detail-content"), updatedRace, isAdmin);
+          }
+        }
+      } else {
+        showNotificationToast("\u26A0\uFE0F Error al guardar los cambios: " + res.error);
+      }
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove("opacity-50");
+      }
+    });
+  }
+}
+function updateAuthUI() {
+  const adminPanelBtns = [document.getElementById("nav-admin-panel"), document.getElementById("mobile-nav-admin-panel")];
+  const adminLogoutBtns = [document.getElementById("nav-admin-logout"), document.getElementById("mobile-nav-admin-logout")];
+  const adminLoginBtns = [document.getElementById("nav-admin-login"), document.getElementById("mobile-nav-admin-login")];
+  adminPanelBtns.forEach((btn) => {
+    if (btn) {
+      if (isAdmin) btn.classList.remove("hidden");
+      else btn.classList.add("hidden");
+    }
+  });
+  adminLogoutBtns.forEach((btn) => {
+    if (btn) {
+      if (isAdmin) btn.classList.remove("hidden");
+      else btn.classList.add("hidden");
+    }
+  });
+  adminLoginBtns.forEach((btn) => {
+    if (btn) {
+      if (isAdmin) btn.classList.add("hidden");
+      else btn.classList.remove("hidden");
+    }
+  });
+}
+async function loadPendingRacesList() {
+  const container = document.getElementById("pending-races-list");
+  const countEl = document.getElementById("pending-count");
+  if (!container) return;
+  const pending = await fetchPendingRacesSupabase();
+  if (countEl) countEl.textContent = pending.length;
+  renderPendingRaces(container, pending);
+}
+async function openEditModal(raceId) {
+  const editModal = document.getElementById("edit-modal");
+  if (!editModal) return;
+  const races = await getAllRaces();
+  const race = races.find((r) => r.id === raceId);
+  if (!race) return;
+  document.getElementById("edit-race-id").value = raceId;
+  document.getElementById("edit-form-name").value = race.name || "";
+  document.getElementById("edit-form-discipline").value = race.discipline || "Ruta";
+  document.getElementById("edit-form-date").value = race.date || "";
+  document.getElementById("edit-form-city").value = race.city || "";
+  document.getElementById("edit-form-distance").value = race.distance || "";
+  document.getElementById("edit-form-elevation").value = race.elevation || "";
+  document.getElementById("edit-form-price").value = race.price || 0;
+  document.getElementById("edit-form-is-free").checked = !!race.isFree || race.price === 0;
+  document.getElementById("edit-form-status").value = race.status || "Inscripciones Abiertas";
+  document.getElementById("edit-form-organizer").value = race.organizer || race.organizador || "";
+  document.getElementById("edit-form-url").value = race.registrationUrl || "";
+  document.getElementById("edit-form-image").value = race.heroImage || "";
+  document.getElementById("edit-form-categories").value = Array.isArray(race.categories) ? race.categories.join(", ") : "";
+  document.getElementById("edit-form-description").value = race.description || "";
+  const editRegionSelect = document.getElementById("edit-form-region");
+  if (editRegionSelect) {
+    const filterRegions = REGIONS_CHILE.filter((r) => r !== "Todas las regiones");
+    renderRegionSelect(editRegionSelect, filterRegions, race.region || filterRegions[0]);
+  }
+  const editForm = document.getElementById("edit-form");
+  if (editForm) clearFormErrors(editForm);
+  editModal.classList.remove("hidden");
+}
+async function handleDeleteRace(raceId) {
+  const confirmed = confirm("\u26A0\uFE0F \xBFEst\xE1s seguro de que deseas eliminar esta carrera de forma permanente? Esta acci\xF3n no se puede deshacer.");
+  if (!confirmed) return;
+  const res = await deleteRaceSupabase(raceId);
+  if (res.success) {
+    showNotificationToast("\u{1F5D1}\uFE0F Carrera eliminada con \xE9xito.");
+    switchView("calendar");
+    await updateCalendar();
+  } else {
+    showNotificationToast("\u26A0\uFE0F No se pudo eliminar la carrera: " + res.error);
+  }
 }
 async function initApp() {
   const regionSelectContainer = document.getElementById("region-select");
   if (regionSelectContainer) {
     renderRegionSelect(regionSelectContainer, REGIONS_CHILE, currentRegion);
   }
-  const formRegionSelect = document.getElementById("form-region");
+  const formRegionSelect = document.getElementById("edit-form-region") || document.getElementById("form-region");
   if (formRegionSelect) {
     const filterRegions = REGIONS_CHILE.filter((r) => r !== "Todas las regiones");
     renderRegionSelect(formRegionSelect, filterRegions, filterRegions[0]);
@@ -1368,6 +1842,13 @@ async function initApp() {
     renderDisciplineChips(disciplineChipsContainer, currentDiscipline);
   }
   setupEventHandlers();
+  const user = await getCurrentUser();
+  if (user) {
+    isAdmin = await checkIsAdmin(user.id);
+  } else {
+    isAdmin = false;
+  }
+  updateAuthUI();
   await updateCalendar();
 }
 if (document.readyState === "loading") {
@@ -1378,7 +1859,11 @@ if (document.readyState === "loading") {
 export {
   clearFormErrors,
   getFilteredRaces,
+  handleDeleteRace,
+  loadPendingRacesList,
+  openEditModal,
   renderFormErrors,
   showNotificationToast,
+  updateAuthUI,
   updateCalendar
 };

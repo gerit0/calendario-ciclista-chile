@@ -118,7 +118,7 @@ export function renderRegionSelect(container, regions = [], activeRegion = 'Toda
  * @param {HTMLElement} container 
  * @param {Array} races 
  */
-export function renderRaceCards(container, races = []) {
+export function renderRaceCards(container, races = [], isAdmin = false) {
   if (!container) return;
 
   if (races.length === 0) {
@@ -244,7 +244,7 @@ export function renderRaceCards(container, races = []) {
           </div>
 
           <!-- Card Footer & CTA -->
-          <div class="pt-4 border-t border-outline-variant/30 flex items-center gap-2">
+          <div class="pt-4 border-t border-outline-variant/30 flex flex-col gap-2">
             <button 
               type="button" 
               data-race-id="${race.id}" 
@@ -253,6 +253,16 @@ export function renderRaceCards(container, races = []) {
               Ver Detalle
               <span class="material-symbols-outlined text-base">arrow_forward</span>
             </button>
+            ${isAdmin ? `
+            <div class="flex gap-2 w-full pt-1">
+              <button type="button" data-edit-id="${race.id}" class="flex-grow py-2.5 rounded-xl bg-surface-container border border-outline-variant/60 text-primary font-bold text-xs hover:bg-surface-container-high transition-colors flex items-center justify-center gap-1">
+                <span class="material-symbols-outlined text-sm">edit</span> Editar
+              </button>
+              <button type="button" data-delete-id="${race.id}" class="py-2.5 px-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-600 font-bold text-xs hover:bg-red-500/20 transition-colors flex items-center justify-center gap-1" title="Eliminar Carrera">
+                <span class="material-symbols-outlined text-sm">delete</span>
+              </button>
+            </div>
+            ` : ''}
           </div>
 
         </div>
@@ -267,7 +277,7 @@ export function renderRaceCards(container, races = []) {
  * @param {HTMLElement} container 
  * @param {Object} race 
  */
-export function renderDetailView(container, race) {
+export function renderDetailView(container, race, isAdmin = false) {
   if (!container || !race) return;
 
   const bookmarked = isBookmarked(race.id);
@@ -286,7 +296,7 @@ export function renderDetailView(container, race) {
     <div class="space-y-8 animate-fadeIn">
       
       <!-- Back Button & Actions Bar -->
-      <div class="flex items-center justify-between">
+      <div class="flex items-center justify-between flex-wrap gap-4">
         <button 
           type="button" 
           id="btn-back-to-calendar" 
@@ -296,16 +306,26 @@ export function renderDetailView(container, race) {
           Volver a Carreras
         </button>
 
-        <button 
-          type="button" 
-          data-bookmark-id="${race.id}" 
-          class="btn-bookmark px-4 py-2.5 rounded-xl bg-white border border-outline-variant/50 text-primary font-display font-bold text-sm flex items-center gap-2 hover:bg-surface-container transition-all shadow-sm"
-        >
-          <span class="material-symbols-outlined ${bookmarked ? 'filled text-secondary' : 'text-outline'}">
-            ${bookmarked ? 'bookmark' : 'bookmark_border'}
-          </span>
-          ${bookmarked ? 'Guardada en Agenda' : 'Guardar en Agenda'}
-        </button>
+        <div class="flex items-center gap-2">
+          ${isAdmin ? `
+            <button type="button" data-edit-id="${race.id}" class="px-4 py-2.5 rounded-xl bg-surface-container border border-outline-variant/55 text-primary font-display font-bold text-sm flex items-center gap-2 hover:bg-surface-container-high transition-all shadow-sm">
+              <span class="material-symbols-outlined text-base">edit</span> Editar
+            </button>
+            <button type="button" data-delete-id="${race.id}" class="px-4 py-2.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-600 font-display font-bold text-sm flex items-center gap-2 hover:bg-red-500/20 transition-all shadow-sm">
+              <span class="material-symbols-outlined text-base">delete</span> Eliminar
+            </button>
+          ` : ''}
+          <button 
+            type="button" 
+            data-bookmark-id="${race.id}" 
+            class="btn-bookmark px-4 py-2.5 rounded-xl bg-white border border-outline-variant/50 text-primary font-display font-bold text-sm flex items-center gap-2 hover:bg-surface-container transition-all shadow-sm"
+          >
+            <span class="material-symbols-outlined ${bookmarked ? 'filled text-secondary' : 'text-outline'}">
+              ${bookmarked ? 'bookmark' : 'bookmark_border'}
+            </span>
+            ${bookmarked ? 'Guardada en Agenda' : 'Guardar en Agenda'}
+          </button>
+        </div>
       </div>
 
       <!-- Hero Banner Details -->
@@ -449,37 +469,94 @@ export function renderDetailView(container, race) {
 
 /**
  * Cambia la vista principal SPA visible
- * @param {'calendar' | 'detail' | 'register'} viewName 
+ * @param {'calendar' | 'detail' | 'register' | 'admin-panel'} viewName 
  */
 export function switchView(viewName) {
   const viewCalendar = document.getElementById('view-calendar');
   const viewDetail = document.getElementById('view-detail');
   const viewRegister = document.getElementById('view-register');
-
+  const viewAdminPanel = document.getElementById('view-admin-panel');
+ 
   const navExplore = document.getElementById('nav-explore');
   const navAgenda = document.getElementById('nav-agenda');
   const navRegister = document.getElementById('nav-register');
-
+  const navAdminPanel = document.getElementById('nav-admin-panel');
+ 
   // Reset visibilidad
   if (viewCalendar) viewCalendar.classList.add('hidden');
   if (viewDetail) viewDetail.classList.add('hidden');
   if (viewRegister) viewRegister.classList.add('hidden');
-
+  if (viewAdminPanel) viewAdminPanel.classList.add('hidden');
+ 
   // Reset estilos nav desktop
   const inactiveNavClasses = 'text-outline hover:text-primary hover:bg-surface-container-low';
   const activeNavClasses = 'text-primary bg-surface-container-low font-bold';
-
+ 
   if (navExplore) navExplore.className = `nav-btn px-4 py-2 rounded-lg font-display font-bold text-sm transition-colors flex items-center gap-2 ${viewName === 'calendar' ? activeNavClasses : inactiveNavClasses}`;
   if (navAgenda) navAgenda.className = `nav-btn px-4 py-2 rounded-lg font-display font-bold text-sm transition-colors flex items-center gap-2 ${viewName === 'agenda' ? activeNavClasses : inactiveNavClasses}`;
-
+  if (navAdminPanel) navAdminPanel.className = `nav-btn px-4 py-2 rounded-lg font-display font-bold text-sm transition-colors flex items-center gap-2 ${viewName === 'admin-panel' ? activeNavClasses : inactiveNavClasses}`;
+ 
   if (viewName === 'calendar' || viewName === 'agenda') {
     if (viewCalendar) viewCalendar.classList.remove('hidden');
   } else if (viewName === 'detail') {
     if (viewDetail) viewDetail.classList.remove('hidden');
   } else if (viewName === 'register') {
     if (viewRegister) viewRegister.classList.remove('hidden');
+  } else if (viewName === 'admin-panel') {
+    if (viewAdminPanel) viewAdminPanel.classList.remove('hidden');
   }
-
+ 
   // Scroll to top
   window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/**
+ * Renderiza las propuestas de carreras pendientes en el panel de moderación.
+ * @param {HTMLElement} container 
+ * @param {Array} races 
+ */
+export function renderPendingRaces(container, races = []) {
+  if (!container) return;
+
+  if (races.length === 0) {
+    container.innerHTML = `
+      <div class="col-span-full py-16 text-center bg-white rounded-3xl border border-dashed border-outline-variant/60 p-8 space-y-4">
+        <div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mx-auto text-outline">
+          <span class="material-symbols-outlined text-4xl">task_alt</span>
+        </div>
+        <h3 class="font-display font-bold text-xl text-primary">No hay propuestas pendientes</h3>
+        <p class="text-outline text-sm max-w-md mx-auto">Buen trabajo, el calendario está al día y moderado.</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = races.map(race => {
+    const disciplineBadgeClass = getDisciplineBadgeClass(race.discipline);
+    return `
+      <article class="bg-white rounded-3xl border border-outline-variant/40 overflow-hidden shadow-sm flex flex-col group p-6 space-y-4">
+        <div class="flex items-center justify-between">
+          <span class="px-2.5 py-1 rounded-lg text-xs font-bold ${disciplineBadgeClass}">
+            ${race.discipline}
+          </span>
+          <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
+            Pendiente
+          </span>
+        </div>
+        <div>
+          <h3 class="font-display font-bold text-lg text-primary line-clamp-2">${race.name}</h3>
+          <p class="text-xs text-outline font-semibold">${race.displayDate || race.date} — ${race.city}, ${race.region}</p>
+        </div>
+        <p class="text-xs text-gray-600 line-clamp-3">${race.description}</p>
+        <div class="pt-4 border-t border-outline-variant/30 grid grid-cols-2 gap-2">
+          <button type="button" data-approve-id="${race.id}" class="py-2.5 rounded-xl bg-emerald-600 text-white font-display font-bold text-xs hover:bg-emerald-700 transition-colors flex items-center justify-center gap-1 shadow-sm">
+            <span class="material-symbols-outlined text-sm">check_circle</span> Aprobar
+          </button>
+          <button type="button" data-reject-id="${race.id}" class="py-2.5 rounded-xl bg-red-600 text-white font-display font-bold text-xs hover:bg-red-700 transition-colors flex items-center justify-center gap-1 shadow-sm">
+            <span class="material-symbols-outlined text-sm">cancel</span> Rechazar
+          </button>
+        </div>
+      </article>
+    `;
+  }).join('');
 }

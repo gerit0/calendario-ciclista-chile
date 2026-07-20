@@ -206,6 +206,196 @@ export async function createPendingRaceSupabase(raceData) {
     };
   } catch (err) {
     console.error('Excepción al crear carrera pendiente en Supabase:', err);
+  }
+}
+
+/**
+ * Inicia sesión de administrador con correo y contraseña.
+ * @param {string} email 
+ * @param {string} password 
+ * @returns {Promise<{ success: boolean, session?: Object, error?: any }>}
+ */
+export async function loginAdmin(email, password) {
+  const client = getSupabase();
+  if (!client) return { success: false, error: 'Supabase no está configurado.' };
+
+  try {
+    const { data, error } = await client.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    return { success: true, session: data.session, user: data.user };
+  } catch (err) {
+    console.error('Error al iniciar sesión de admin:', err);
     return { success: false, error: err.message || err };
   }
 }
+
+/**
+ * Cierra la sesión activa.
+ * @returns {Promise<{ success: boolean, error?: any }>}
+ */
+export async function logoutAdmin() {
+  const client = getSupabase();
+  if (!client) return { success: false, error: 'Supabase no está configurado.' };
+
+  try {
+    const { error } = await client.auth.signOut();
+    if (error) throw error;
+    return { success: true };
+  } catch (err) {
+    console.error('Error al cerrar sesión:', err);
+    return { success: false, error: err.message || err };
+  }
+}
+
+/**
+ * Obtiene el usuario autenticado actual.
+ * @returns {Promise<Object|null>}
+ */
+export async function getCurrentUser() {
+  const client = getSupabase();
+  if (!client) return null;
+
+  try {
+    const { data: { user } } = await client.auth.getUser();
+    return user;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Verifica si un usuario tiene rol de administrador en la tabla `usuarios_admin`.
+ * @param {string} userId 
+ * @returns {Promise<boolean>}
+ */
+export async function checkIsAdmin(userId) {
+  const client = getSupabase();
+  if (!client || !userId) return false;
+
+  try {
+    const { data, error } = await client
+      .from('usuarios_admin')
+      .select('user_id')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (error) throw error;
+    return !!data;
+  } catch (err) {
+    console.error('Error al verificar rol de admin:', err);
+    return false;
+  }
+}
+
+/**
+ * Obtiene todas las carreras pendientes (solo accesible para administradores).
+ * @returns {Promise<Array>} Array de carreras pendientes en formato frontend.
+ */
+export async function fetchPendingRacesSupabase() {
+  const client = getSupabase();
+  if (!client) return [];
+
+  try {
+    const { data, error } = await client
+      .from('carreras')
+      .select('*')
+      .eq('estado', 'pendiente')
+      .order('fecha', { ascending: true });
+
+    if (error) throw error;
+    if (!Array.isArray(data)) return [];
+
+    return data.map(mapSupabaseToFrontend);
+  } catch (err) {
+    console.error('Error al consultar carreras pendientes:', err);
+    return [];
+  }
+}
+
+/**
+ * Actualiza el estado de una carrera (ej. 'aprobada', 'rechazada').
+ * @param {string} raceId 
+ * @param {'aprobada'|'rechazada'|'pendiente'} status 
+ * @returns {Promise<{ success: boolean, error?: any }>}
+ */
+export async function updateRaceStatusSupabase(raceId, status) {
+  const client = getSupabase();
+  if (!client) return { success: false, error: 'Supabase no está configurado.' };
+
+  try {
+    const { error } = await client
+      .from('carreras')
+      .update({ estado: status })
+      .eq('id', raceId);
+
+    if (error) throw error;
+    return { success: true };
+  } catch (err) {
+    console.error('Error al actualizar estado de carrera:', err);
+    return { success: false, error: err.message || err };
+  }
+}
+
+/**
+ * Elimina físicamente una carrera de la base de datos.
+ * @param {string} raceId 
+ * @returns {Promise<{ success: boolean, error?: any }>}
+ */
+export async function deleteRaceSupabase(raceId) {
+  const client = getSupabase();
+  if (!client) return { success: false, error: 'Supabase no está configurado.' };
+
+  try {
+    const { error } = await client
+      .from('carreras')
+      .delete()
+      .eq('id', raceId);
+
+    if (error) throw error;
+    return { success: true };
+  } catch (err) {
+    console.error('Error al eliminar carrera de Supabase:', err);
+    return { success: false, error: err.message || err };
+  }
+}
+
+/**
+ * Modifica los datos de una carrera existente.
+ * @param {string} raceId 
+ * @param {Object} raceData 
+ * @returns {Promise<{ success: boolean, error?: any }>}
+ */
+export async function updateRaceSupabase(raceId, raceData) {
+  const client = getSupabase();
+  if (!client) return { success: false, error: 'Supabase no está configurado.' };
+
+  try {
+    const payload = {
+      nombre: raceData.name || raceData.nombre,
+      fecha: raceData.date || raceData.fecha,
+      disciplina: raceData.discipline || raceData.disciplina,
+      region: raceData.region,
+      ubicacion: raceData.city || raceData.ubicacion,
+      organizador: raceData.organizer || raceData.organizador,
+      link_inscripcion: raceData.registrationUrl || raceData.link_inscripcion,
+      categoria: Array.isArray(raceData.categories) 
+        ? raceData.categories.join(', ') 
+        : (raceData.categoria || raceData.categories),
+      precio: raceData.price != null ? Number(raceData.price) : 0,
+      hero_image: raceData.heroImage || raceData.hero_image,
+      descripcion: raceData.description || raceData.descripcion
+    };
+
+    const { error } = await client
+      .from('carreras')
+      .update(payload)
+      .eq('id', raceId);
+
+    if (error) throw error;
+    return { success: true };
+  } catch (err) {
+    console.error('Error al actualizar carrera en Supabase:', err);
+    return { success: false, error: err.message || err };
+  }
+}
+

@@ -5,8 +5,18 @@
 
 import { REGIONS_CHILE } from './data.js';
 import { getAllRaces, getBookmarkedIds, toggleBookmark, isBookmarked, saveCustomRace, saveRace } from './storage.js';
-import { renderDisciplineChips, renderRegionSelect, renderRaceCards, renderDetailView, switchView } from './ui.js';
+import { renderDisciplineChips, renderRegionSelect, renderRaceCards, renderDetailView, switchView, renderPendingRaces } from './ui.js';
 import { validateRaceForm } from './validation.js';
+import { 
+  loginAdmin, 
+  logoutAdmin, 
+  getCurrentUser, 
+  checkIsAdmin, 
+  fetchPendingRacesSupabase, 
+  updateRaceStatusSupabase, 
+  deleteRaceSupabase, 
+  updateRaceSupabase 
+} from './supabase.js';
 
 // 2. Estado de la Aplicación
 let currentDiscipline = "Todas";
@@ -15,6 +25,7 @@ let currentMonth = "Todos";
 let searchQuery = "";
 let activeTab = "all"; // "all" o "my-calendar"
 let currentRaceId = null;
+let isAdmin = false;
 
 /**
  * Limpia todos los mensajes de error del formulario
@@ -182,7 +193,7 @@ export async function updateCalendar() {
   const racesContainer = document.getElementById('races-container');
   
   if (racesContainer) {
-    renderRaceCards(racesContainer, filteredRaces);
+    renderRaceCards(racesContainer, filteredRaces, isAdmin);
   }
 
   // Contador de carreras filtradas
@@ -352,6 +363,24 @@ function setupEventHandlers() {
         return;
       }
 
+      // Editar Carrera (Admin)
+      const editBtn = e.target.closest('[data-edit-id]');
+      if (editBtn) {
+        e.stopPropagation();
+        const raceId = editBtn.getAttribute('data-edit-id');
+        openEditModal(raceId);
+        return;
+      }
+
+      // Eliminar Carrera (Admin)
+      const deleteBtn = e.target.closest('[data-delete-id]');
+      if (deleteBtn) {
+        e.stopPropagation();
+        const raceId = deleteBtn.getAttribute('data-delete-id');
+        handleDeleteRace(raceId);
+        return;
+      }
+
       // Ver detalle ([data-race-id] o .btn-view-detail)
       const detailBtn = e.target.closest('[data-race-id]');
       if (detailBtn) {
@@ -361,7 +390,7 @@ function setupEventHandlers() {
         if (race) {
           currentRaceId = raceId;
           const detailContainer = document.getElementById('detail-content');
-          renderDetailView(detailContainer, race);
+          renderDetailView(detailContainer, race, isAdmin);
           switchView('detail');
         }
       }
@@ -379,6 +408,22 @@ function setupEventHandlers() {
         return;
       }
 
+      // Editar desde Detalle
+      const editBtn = e.target.closest('[data-edit-id]');
+      if (editBtn) {
+        const raceId = editBtn.getAttribute('data-edit-id');
+        openEditModal(raceId);
+        return;
+      }
+
+      // Eliminar desde Detalle
+      const deleteBtn = e.target.closest('[data-delete-id]');
+      if (deleteBtn) {
+        const raceId = deleteBtn.getAttribute('data-delete-id');
+        handleDeleteRace(raceId);
+        return;
+      }
+
       const bookmarkBtn = e.target.closest('[data-bookmark-id]');
       if (bookmarkBtn) {
         const raceId = bookmarkBtn.getAttribute('data-bookmark-id');
@@ -386,7 +431,7 @@ function setupEventHandlers() {
         const races = await getAllRaces();
         const race = races.find(r => r.id === raceId);
         if (race) {
-          renderDetailView(detailContainer, race);
+          renderDetailView(detailContainer, race, isAdmin);
         }
         await updateCalendar();
       }
@@ -564,6 +609,342 @@ function setupEventHandlers() {
       await updateCalendar();
     });
   }
+
+  // --- Admin Auth Modals and Event Listeners ---
+  const loginModal = document.getElementById('login-modal');
+  const editModal = document.getElementById('edit-modal');
+
+  // Open login modal
+  const openLoginBtns = ['nav-admin-login', 'mobile-nav-admin-login'];
+  openLoginBtns.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        const errorContainer = document.getElementById('login-error-container');
+        if (errorContainer) errorContainer.classList.add('hidden');
+        document.getElementById('login-form')?.reset();
+        if (loginModal) loginModal.classList.remove('hidden');
+      });
+    }
+  });
+
+  // Close login modal
+  const closeLoginBtn = document.getElementById('btn-close-login');
+  if (closeLoginBtn) {
+    closeLoginBtn.addEventListener('click', () => {
+      if (loginModal) loginModal.classList.add('hidden');
+    });
+  }
+
+  // Handle Login Form Submit
+  const loginForm = document.getElementById('login-form');
+  if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('login-email')?.value || '';
+      const password = document.getElementById('login-password')?.value || '';
+      const submitBtn = document.getElementById('btn-submit-login');
+      const errorContainer = document.getElementById('login-error-container');
+      const errorMsgEl = document.getElementById('login-error-msg');
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.classList.add('opacity-50');
+      }
+
+      const res = await loginAdmin(email, password);
+      if (res.success && res.user) {
+        const checkAdmin = await checkIsAdmin(res.user.id);
+        if (checkAdmin) {
+          isAdmin = true;
+          updateAuthUI();
+          if (loginModal) loginModal.classList.add('hidden');
+          showNotificationToast("🔓 ¡Sesión iniciada con éxito! Has ingresado como Administrador del sistema.");
+          await updateCalendar();
+        } else {
+          await logoutAdmin();
+          isAdmin = false;
+          updateAuthUI();
+          if (errorContainer && errorMsgEl) {
+            errorMsgEl.textContent = "Acceso denegado: El usuario no es administrador.";
+            errorContainer.classList.remove('hidden');
+          }
+        }
+      } else {
+        if (errorContainer && errorMsgEl) {
+          errorMsgEl.textContent = res.error || "Credenciales incorrectas o problema de conexión.";
+          errorContainer.classList.remove('hidden');
+        }
+      }
+
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('opacity-50');
+      }
+    });
+  }
+
+  // Handle Admin Logout
+  const logoutBtns = ['nav-admin-logout', 'mobile-nav-admin-logout'];
+  logoutBtns.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const res = await logoutAdmin();
+        if (res.success) {
+          isAdmin = false;
+          updateAuthUI();
+          switchView('calendar');
+          showNotificationToast("🔒 Sesión de administrador cerrada.");
+          await updateCalendar();
+        }
+      });
+    }
+  });
+
+  // Navigation: Moderation Panel
+  const adminPanelBtns = ['nav-admin-panel', 'mobile-nav-admin-panel'];
+  adminPanelBtns.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('click', async (e) => {
+        e.preventDefault();
+        switchView('admin-panel');
+        await loadPendingRacesList();
+      });
+    }
+  });
+
+  // Close Edit Modal
+  const closeEditBtn = document.getElementById('btn-close-edit');
+  if (closeEditBtn) {
+    closeEditBtn.addEventListener('click', () => {
+      if (editModal) editModal.classList.add('hidden');
+    });
+  }
+
+  const cancelEditBtn = document.getElementById('btn-cancel-edit');
+  if (cancelEditBtn) {
+    cancelEditBtn.addEventListener('click', () => {
+      if (editModal) editModal.classList.add('hidden');
+    });
+  }
+
+  // Handle Moderation Approvals/Rejections (click delegates inside pending list)
+  const pendingRacesList = document.getElementById('pending-races-list');
+  if (pendingRacesList) {
+    pendingRacesList.addEventListener('click', async (e) => {
+      const approveBtn = e.target.closest('[data-approve-id]');
+      if (approveBtn) {
+        const id = approveBtn.getAttribute('data-approve-id');
+        approveBtn.disabled = true;
+        const res = await updateRaceStatusSupabase(id, 'aprobada');
+        if (res.success) {
+          showNotificationToast("✅ Carrera aprobada con éxito. Ya es visible en el calendario.");
+          await loadPendingRacesList();
+          await updateCalendar();
+        } else {
+          showNotificationToast("⚠️ No se pudo aprobar la carrera: " + res.error);
+          approveBtn.disabled = false;
+        }
+        return;
+      }
+
+      const rejectBtn = e.target.closest('[data-reject-id]');
+      if (rejectBtn) {
+        const id = rejectBtn.getAttribute('data-reject-id');
+        rejectBtn.disabled = true;
+        const res = await updateRaceStatusSupabase(id, 'rechazada');
+        if (res.success) {
+          showNotificationToast("❌ Propuesta rechazada.");
+          await loadPendingRacesList();
+          await updateCalendar();
+        } else {
+          showNotificationToast("⚠️ No se pudo rechazar la carrera: " + res.error);
+          rejectBtn.disabled = false;
+        }
+      }
+    });
+  }
+
+  // Handle Edit Form Submit
+  const editForm = document.getElementById('edit-form');
+  if (editForm) {
+    editForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const raceId = document.getElementById('edit-race-id')?.value;
+      if (!raceId) return;
+
+      const submitBtn = document.getElementById('btn-save-edit');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.classList.add('opacity-50');
+      }
+
+      const isFree = document.getElementById('edit-form-is-free')?.checked || false;
+      const formData = new FormData(editForm);
+
+      const rawFormData = {
+        name: formData.get('name') || '',
+        discipline: formData.get('discipline') || '',
+        date: formData.get('date') || '',
+        region: formData.get('region') || '',
+        organizador: formData.get('organizer') || '',
+        organizer: formData.get('organizer') || '',
+        registrationUrl: formData.get('registrationUrl') || '',
+        city: formData.get('city') || '',
+        distance: formData.get('distance') || '',
+        elevation: formData.get('elevation') || '',
+        price: isFree ? 0 : formData.get('price') || 0,
+        heroImage: formData.get('heroImage') || '',
+        description: formData.get('description') || '',
+        categories: formData.get('categories') || ''
+      };
+
+      const validationResult = validateRaceForm(rawFormData);
+      if (!validationResult.isValid) {
+        renderFormErrors(editForm, validationResult.errors);
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.classList.remove('opacity-50');
+        }
+        return;
+      }
+
+      clearFormErrors(editForm);
+      const res = await updateRaceSupabase(raceId, validationResult.sanitizedData);
+      if (res.success) {
+        showNotificationToast("💾 Cambios guardados con éxito.");
+        if (editModal) editModal.classList.add('hidden');
+        await updateCalendar();
+        
+        // Si estábamos viendo el detalle, actualizar la vista
+        if (document.getElementById('view-detail')?.classList.contains('hidden') === false && currentRaceId === raceId) {
+          const races = await getAllRaces();
+          const updatedRace = races.find(r => r.id === raceId);
+          if (updatedRace) {
+            renderDetailView(document.getElementById('detail-content'), updatedRace, isAdmin);
+          }
+        }
+      } else {
+        showNotificationToast("⚠️ Error al guardar los cambios: " + res.error);
+      }
+
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('opacity-50');
+      }
+    });
+  }
+}
+
+/**
+ * Sincroniza la visualización de los controles de administración en el DOM
+ */
+export function updateAuthUI() {
+  const adminPanelBtns = [document.getElementById('nav-admin-panel'), document.getElementById('mobile-nav-admin-panel')];
+  const adminLogoutBtns = [document.getElementById('nav-admin-logout'), document.getElementById('mobile-nav-admin-logout')];
+  const adminLoginBtns = [document.getElementById('nav-admin-login'), document.getElementById('mobile-nav-admin-login')];
+
+  adminPanelBtns.forEach(btn => {
+    if (btn) {
+      if (isAdmin) btn.classList.remove('hidden');
+      else btn.classList.add('hidden');
+    }
+  });
+
+  adminLogoutBtns.forEach(btn => {
+    if (btn) {
+      if (isAdmin) btn.classList.remove('hidden');
+      else btn.classList.add('hidden');
+    }
+  });
+
+  adminLoginBtns.forEach(btn => {
+    if (btn) {
+      if (isAdmin) btn.classList.add('hidden');
+      else btn.classList.remove('hidden');
+    }
+  });
+}
+
+/**
+ * Carga y renderiza la lista de carreras pendientes en el panel de moderación
+ */
+export async function loadPendingRacesList() {
+  const container = document.getElementById('pending-races-list');
+  const countEl = document.getElementById('pending-count');
+  if (!container) return;
+
+  const pending = await fetchPendingRacesSupabase();
+  if (countEl) countEl.textContent = pending.length;
+  renderPendingRaces(container, pending);
+}
+
+/**
+ * Abre el modal de edición de carrera pre-rellenando los datos correspondientes.
+ * @param {string} raceId 
+ */
+export async function openEditModal(raceId) {
+  const editModal = document.getElementById('edit-modal');
+  if (!editModal) return;
+
+  const races = await getAllRaces();
+  const race = races.find(r => r.id === raceId);
+  if (!race) return;
+
+  // Pre-rellenar id
+  document.getElementById('edit-race-id').value = raceId;
+  
+  // Pre-rellenar textos
+  document.getElementById('edit-form-name').value = race.name || '';
+  document.getElementById('edit-form-discipline').value = race.discipline || 'Ruta';
+  document.getElementById('edit-form-date').value = race.date || '';
+  document.getElementById('edit-form-city').value = race.city || '';
+  document.getElementById('edit-form-distance').value = race.distance || '';
+  document.getElementById('edit-form-elevation').value = race.elevation || '';
+  document.getElementById('edit-form-price').value = race.price || 0;
+  document.getElementById('edit-form-is-free').checked = !!race.isFree || race.price === 0;
+  document.getElementById('edit-form-status').value = race.status || 'Inscripciones Abiertas';
+  document.getElementById('edit-form-organizer').value = race.organizer || race.organizador || '';
+  document.getElementById('edit-form-url').value = race.registrationUrl || '';
+  document.getElementById('edit-form-image').value = race.heroImage || '';
+  document.getElementById('edit-form-categories').value = Array.isArray(race.categories) ? race.categories.join(', ') : '';
+  document.getElementById('edit-form-description').value = race.description || '';
+
+  // Poblar regiones
+  const editRegionSelect = document.getElementById('edit-form-region');
+  if (editRegionSelect) {
+    const filterRegions = REGIONS_CHILE.filter(r => r !== 'Todas las regiones');
+    renderRegionSelect(editRegionSelect, filterRegions, race.region || filterRegions[0]);
+  }
+
+  // Limpiar errores previos
+  const editForm = document.getElementById('edit-form');
+  if (editForm) clearFormErrors(editForm);
+
+  // Mostrar modal
+  editModal.classList.remove('hidden');
+}
+
+/**
+ * Gestiona la eliminación de una carrera pidiendo confirmación al usuario.
+ * @param {string} raceId 
+ */
+export async function handleDeleteRace(raceId) {
+  const confirmed = confirm("⚠️ ¿Estás seguro de que deseas eliminar esta carrera de forma permanente? Esta acción no se puede deshacer.");
+  if (!confirmed) return;
+
+  const res = await deleteRaceSupabase(raceId);
+  if (res.success) {
+    showNotificationToast("🗑️ Carrera eliminada con éxito.");
+    switchView('calendar');
+    await updateCalendar();
+  } else {
+    showNotificationToast("⚠️ No se pudo eliminar la carrera: " + res.error);
+  }
 }
 
 // 5. Inicialización segura (soporta scripts diferidos o al final del body)
@@ -573,7 +954,7 @@ async function initApp() {
     renderRegionSelect(regionSelectContainer, REGIONS_CHILE, currentRegion);
   }
 
-  const formRegionSelect = document.getElementById('form-region');
+  const formRegionSelect = document.getElementById('edit-form-region') || document.getElementById('form-region');
   if (formRegionSelect) {
     const filterRegions = REGIONS_CHILE.filter(r => r !== 'Todas las regiones');
     renderRegionSelect(formRegionSelect, filterRegions, filterRegions[0]);
@@ -585,6 +966,16 @@ async function initApp() {
   }
 
   setupEventHandlers();
+
+  // Auth Check Inicial
+  const user = await getCurrentUser();
+  if (user) {
+    isAdmin = await checkIsAdmin(user.id);
+  } else {
+    isAdmin = false;
+  }
+  updateAuthUI();
+
   await updateCalendar();
 }
 
