@@ -34,8 +34,12 @@ export function sanitizeHTML(str) {
  */
 export function isValidURL(urlStr) {
   if (!urlStr || typeof urlStr !== 'string') return true;
-  const trimmed = urlStr.trim();
+  let trimmed = urlStr.trim();
   if (trimmed === '') return true;
+
+  if (!/^https?:\/\//i.test(trimmed)) {
+    trimmed = 'https://' + trimmed;
+  }
 
   try {
     const parsed = new URL(trimmed);
@@ -104,10 +108,13 @@ export function validateRaceForm(data) {
   }
 
   // 6. registrationUrl (valida con isValidURL)
-  const registrationUrl = typeof raw.registrationUrl === 'string' ? raw.registrationUrl.trim() : '';
+  let registrationUrl = typeof raw.registrationUrl === 'string' ? raw.registrationUrl.trim() : '';
+  if (registrationUrl && !/^https?:\/\//i.test(registrationUrl)) {
+    registrationUrl = 'https://' + registrationUrl;
+  }
   sanitizedData.registrationUrl = registrationUrl;
   if (!isValidURL(registrationUrl)) {
-    errors.registrationUrl = 'La URL de inscripción debe ser una URL válida con protocolo http: o https:.';
+    errors.registrationUrl = 'La URL de inscripción debe ser una URL válida (ej: https://ejemplo.cl).';
   }
 
   // 7. city (obligatorio, 1 a 100 caracteres)

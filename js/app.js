@@ -57,10 +57,14 @@ export function renderFormErrors(form, errors) {
   clearFormErrors(form);
   if (!form || !errors) return;
 
+  const isMultiDay = form.querySelector('[name="isMultiDay"]')?.checked || false;
+
   const fieldMap = {
     name: 'name',
     discipline: 'discipline',
-    date: 'date',
+    date: isMultiDay ? 'startDate' : 'date',
+    startDate: 'startDate',
+    endDate: 'endDate',
     region: 'region',
     organizador: 'organizer',
     organizer: 'organizer',
@@ -71,17 +75,25 @@ export function renderFormErrors(form, errors) {
   };
 
   for (const [key, errorMsg] of Object.entries(errors)) {
-    const fieldName = fieldMap[key] || key;
-    const inputElem = form.querySelector(`[name="${fieldName}"]`) || form.querySelector(`#form-${fieldName}`);
-    
+    let fieldName = fieldMap[key] || key;
+    let inputElem = form.querySelector(`[name="${fieldName}"]`) || 
+                    form.querySelector(`#form-${fieldName}`) ||
+                    form.querySelector(`#edit-form-${fieldName}`);
+
+    // Si el campo de fecha única está oculto por ser multi-día, redirigir al campo de fecha de inicio
+    if (isMultiDay && (key === 'date' || key === 'startDate')) {
+      inputElem = form.querySelector('[name="startDate"]') || form.querySelector('#form-start-date') || form.querySelector('#edit-form-start-date') || inputElem;
+    }
+
     if (inputElem) {
       inputElem.classList.add('border-secondary', 'ring-1', 'ring-secondary');
       const errEl = document.createElement('p');
       errEl.className = 'field-error-msg text-secondary text-xs font-semibold mt-1 flex items-center gap-1';
       errEl.innerHTML = `<span class="material-symbols-outlined text-sm">error</span> ${errorMsg}`;
       
-      if (inputElem.parentNode) {
-        inputElem.parentNode.appendChild(errEl);
+      const parent = inputElem.closest('.space-y-2') || inputElem.parentNode;
+      if (parent) {
+        parent.appendChild(errEl);
       }
     }
   }
@@ -724,6 +736,18 @@ function setupEventHandlers() {
 
       // 6. Limpiar el formulario y navegar a la vista de calendario
       raceForm.reset();
+      const singleContainer = document.getElementById('form-single-date-container');
+      const startContainer = document.getElementById('form-start-date-container');
+      const endContainer = document.getElementById('form-end-date-container');
+      if (singleContainer) singleContainer.classList.remove('hidden');
+      if (startContainer) startContainer.classList.add('hidden');
+      if (endContainer) endContainer.classList.add('hidden');
+
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+      }
+
       activeTab = 'all';
       switchView('calendar');
       await updateCalendar();

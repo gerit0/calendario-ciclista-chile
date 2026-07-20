@@ -1464,8 +1464,11 @@ function sanitizeHTML(str) {
 }
 function isValidURL(urlStr) {
   if (!urlStr || typeof urlStr !== "string") return true;
-  const trimmed = urlStr.trim();
+  let trimmed = urlStr.trim();
   if (trimmed === "") return true;
+  if (!/^https?:\/\//i.test(trimmed)) {
+    trimmed = "https://" + trimmed;
+  }
   try {
     const parsed = new URL(trimmed);
     return parsed.protocol === "http:" || parsed.protocol === "https:";
@@ -1512,10 +1515,13 @@ function validateRaceForm(data) {
   if (!organizador || organizador.length < 2 || organizador.length > 100) {
     errors.organizador = "El organizador debe tener entre 2 y 100 caracteres.";
   }
-  const registrationUrl = typeof raw.registrationUrl === "string" ? raw.registrationUrl.trim() : "";
+  let registrationUrl = typeof raw.registrationUrl === "string" ? raw.registrationUrl.trim() : "";
+  if (registrationUrl && !/^https?:\/\//i.test(registrationUrl)) {
+    registrationUrl = "https://" + registrationUrl;
+  }
   sanitizedData.registrationUrl = registrationUrl;
   if (!isValidURL(registrationUrl)) {
-    errors.registrationUrl = "La URL de inscripci\xF3n debe ser una URL v\xE1lida con protocolo http: o https:.";
+    errors.registrationUrl = "La URL de inscripci\xF3n debe ser una URL v\xE1lida (ej: https://ejemplo.cl).";
   }
   const city = sanitizeHTML(raw.city);
   sanitizedData.city = city;
@@ -1561,10 +1567,13 @@ function clearFormErrors(form) {
 function renderFormErrors(form, errors) {
   clearFormErrors(form);
   if (!form || !errors) return;
+  const isMultiDay = form.querySelector('[name="isMultiDay"]')?.checked || false;
   const fieldMap = {
     name: "name",
     discipline: "discipline",
-    date: "date",
+    date: isMultiDay ? "startDate" : "date",
+    startDate: "startDate",
+    endDate: "endDate",
     region: "region",
     organizador: "organizer",
     organizer: "organizer",
@@ -1574,15 +1583,19 @@ function renderFormErrors(form, errors) {
     description: "description"
   };
   for (const [key, errorMsg] of Object.entries(errors)) {
-    const fieldName = fieldMap[key] || key;
-    const inputElem = form.querySelector(`[name="${fieldName}"]`) || form.querySelector(`#form-${fieldName}`);
+    let fieldName = fieldMap[key] || key;
+    let inputElem = form.querySelector(`[name="${fieldName}"]`) || form.querySelector(`#form-${fieldName}`) || form.querySelector(`#edit-form-${fieldName}`);
+    if (isMultiDay && (key === "date" || key === "startDate")) {
+      inputElem = form.querySelector('[name="startDate"]') || form.querySelector("#form-start-date") || form.querySelector("#edit-form-start-date") || inputElem;
+    }
     if (inputElem) {
       inputElem.classList.add("border-secondary", "ring-1", "ring-secondary");
       const errEl = document.createElement("p");
       errEl.className = "field-error-msg text-secondary text-xs font-semibold mt-1 flex items-center gap-1";
       errEl.innerHTML = `<span class="material-symbols-outlined text-sm">error</span> ${errorMsg}`;
-      if (inputElem.parentNode) {
-        inputElem.parentNode.appendChild(errEl);
+      const parent = inputElem.closest(".space-y-2") || inputElem.parentNode;
+      if (parent) {
+        parent.appendChild(errEl);
       }
     }
   }
@@ -2102,6 +2115,16 @@ function setupEventHandlers() {
       }
       showNotificationToast("\xA1Propuesta de carrera enviada a moderaci\xF3n! Tu evento ha sido registrado en estado 'pendiente' y se mostrar\xE1 en el calendario p\xFAblico una vez sea revisado y aprobado por el administrador.");
       raceForm.reset();
+      const singleContainer = document.getElementById("form-single-date-container");
+      const startContainer = document.getElementById("form-start-date-container");
+      const endContainer = document.getElementById("form-end-date-container");
+      if (singleContainer) singleContainer.classList.remove("hidden");
+      if (startContainer) startContainer.classList.add("hidden");
+      if (endContainer) endContainer.classList.add("hidden");
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove("opacity-50", "cursor-not-allowed");
+      }
       activeTab = "all";
       switchView("calendar");
       await updateCalendar();
