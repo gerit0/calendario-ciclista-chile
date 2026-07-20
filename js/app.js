@@ -289,6 +289,58 @@ function setupEventHandlers() {
     }
   });
 
+  // Checkbox Multi-Día en Formulario de Publicación (#race-form)
+  const isMultiDayCheck = document.getElementById('form-is-multiday');
+  if (isMultiDayCheck) {
+    isMultiDayCheck.addEventListener('change', (e) => {
+      const checked = e.target.checked;
+      const singleContainer = document.getElementById('form-single-date-container');
+      const startContainer = document.getElementById('form-start-date-container');
+      const endContainer = document.getElementById('form-end-date-container');
+
+      if (checked) {
+        if (singleContainer) singleContainer.classList.add('hidden');
+        if (startContainer) startContainer.classList.remove('hidden');
+        if (endContainer) endContainer.classList.remove('hidden');
+
+        const singleVal = document.getElementById('form-date')?.value;
+        if (singleVal && !document.getElementById('form-start-date')?.value) {
+          document.getElementById('form-start-date').value = singleVal;
+        }
+      } else {
+        if (singleContainer) singleContainer.classList.remove('hidden');
+        if (startContainer) startContainer.classList.add('hidden');
+        if (endContainer) endContainer.classList.add('hidden');
+      }
+    });
+  }
+
+  // Checkbox Multi-Día en Formulario de Edición (#edit-form)
+  const editIsMultiDayCheck = document.getElementById('edit-form-is-multiday');
+  if (editIsMultiDayCheck) {
+    editIsMultiDayCheck.addEventListener('change', (e) => {
+      const checked = e.target.checked;
+      const singleContainer = document.getElementById('edit-form-single-date-container');
+      const startContainer = document.getElementById('edit-form-start-date-container');
+      const endContainer = document.getElementById('edit-form-end-date-container');
+
+      if (checked) {
+        if (singleContainer) singleContainer.classList.add('hidden');
+        if (startContainer) startContainer.classList.remove('hidden');
+        if (endContainer) endContainer.classList.remove('hidden');
+
+        const singleVal = document.getElementById('edit-form-date')?.value;
+        if (singleVal && !document.getElementById('edit-form-start-date')?.value) {
+          document.getElementById('edit-form-start-date').value = singleVal;
+        }
+      } else {
+        if (singleContainer) singleContainer.classList.remove('hidden');
+        if (startContainer) startContainer.classList.add('hidden');
+        if (endContainer) endContainer.classList.add('hidden');
+      }
+    });
+  }
+
   // Búsqueda por texto (#search-input)
   const searchInput = document.getElementById('search-input');
   if (searchInput) {
@@ -517,10 +569,18 @@ function setupEventHandlers() {
       const isFree = document.getElementById('form-is-free')?.checked || false;
       const dateStr = formData.get('date') || '';
 
+      const isMultiDay = document.getElementById('form-is-multiday')?.checked || false;
+      const startDateVal = document.getElementById('form-start-date')?.value || '';
+      const endDateVal = document.getElementById('form-end-date')?.value || '';
+      const singleDateVal = formData.get('date') || '';
+
       const rawFormData = {
         name: formData.get('name') || '',
         discipline: formData.get('discipline') || '',
-        date: dateStr,
+        isMultiDay: isMultiDay,
+        date: isMultiDay ? (startDateVal || singleDateVal) : singleDateVal,
+        startDate: isMultiDay ? (startDateVal || singleDateVal) : singleDateVal,
+        endDate: isMultiDay ? (endDateVal || startDateVal || singleDateVal) : singleDateVal,
         region: formData.get('region') || '',
         organizador: formData.get('organizer') || '',
         organizer: formData.get('organizer') || '',
@@ -846,10 +906,18 @@ function setupEventHandlers() {
       const isFree = document.getElementById('edit-form-is-free')?.checked || false;
       const formData = new FormData(editForm);
 
+      const isMultiDay = document.getElementById('edit-form-is-multiday')?.checked || false;
+      const startDateVal = document.getElementById('edit-form-start-date')?.value || '';
+      const endDateVal = document.getElementById('edit-form-end-date')?.value || '';
+      const singleDateVal = formData.get('date') || '';
+
       const rawFormData = {
         name: formData.get('name') || '',
         discipline: formData.get('discipline') || '',
-        date: formData.get('date') || '',
+        isMultiDay: isMultiDay,
+        date: isMultiDay ? (startDateVal || singleDateVal) : singleDateVal,
+        startDate: isMultiDay ? (startDateVal || singleDateVal) : singleDateVal,
+        endDate: isMultiDay ? (endDateVal || startDateVal || singleDateVal) : singleDateVal,
         region: formData.get('region') || '',
         organizador: formData.get('organizer') || '',
         organizer: formData.get('organizer') || '',
@@ -961,7 +1029,36 @@ export async function openEditModal(raceId) {
   // Pre-rellenar textos
   document.getElementById('edit-form-name').value = race.name || '';
   document.getElementById('edit-form-discipline').value = race.discipline || 'Ruta';
-  document.getElementById('edit-form-date').value = race.date || '';
+  const startDate = race.startDate || race.fecha_inicio || race.date || '';
+  const endDate = race.endDate || race.fecha_fin || startDate;
+  const isMultiDay = !!(startDate && endDate && startDate !== endDate);
+
+  const isMultiDayCheck = document.getElementById('edit-form-is-multiday');
+  if (isMultiDayCheck) {
+    isMultiDayCheck.checked = isMultiDay;
+    const singleContainer = document.getElementById('edit-form-single-date-container');
+    const startContainer = document.getElementById('edit-form-start-date-container');
+    const endContainer = document.getElementById('edit-form-end-date-container');
+
+    if (isMultiDay) {
+      if (singleContainer) singleContainer.classList.add('hidden');
+      if (startContainer) startContainer.classList.remove('hidden');
+      if (endContainer) endContainer.classList.remove('hidden');
+    } else {
+      if (singleContainer) singleContainer.classList.remove('hidden');
+      if (startContainer) startContainer.classList.add('hidden');
+      if (endContainer) endContainer.classList.add('hidden');
+    }
+  }
+
+  document.getElementById('edit-form-date').value = startDate;
+  if (document.getElementById('edit-form-start-date')) {
+    document.getElementById('edit-form-start-date').value = startDate;
+  }
+  if (document.getElementById('edit-form-end-date')) {
+    document.getElementById('edit-form-end-date').value = endDate;
+  }
+
   document.getElementById('edit-form-city').value = race.city || '';
   document.getElementById('edit-form-distance').value = race.distance || '';
   document.getElementById('edit-form-elevation').value = race.elevation || '';
@@ -1014,10 +1111,16 @@ async function initApp() {
     renderRegionSelect(regionSelectContainer, REGIONS_CHILE, currentRegion);
   }
 
-  const formRegionSelect = document.getElementById('edit-form-region') || document.getElementById('form-region');
-  if (formRegionSelect) {
-    const filterRegions = REGIONS_CHILE.filter(r => r !== 'Todas las regiones');
-    renderRegionSelect(formRegionSelect, filterRegions, filterRegions[0]);
+  const filterRegions = REGIONS_CHILE.filter(r => r !== 'Todas las regiones');
+  
+  const publishRegionSelect = document.getElementById('form-region');
+  if (publishRegionSelect) {
+    renderRegionSelect(publishRegionSelect, filterRegions, filterRegions[0]);
+  }
+
+  const editRegionSelect = document.getElementById('edit-form-region');
+  if (editRegionSelect) {
+    renderRegionSelect(editRegionSelect, filterRegions, filterRegions[0]);
   }
 
   const disciplineChipsContainer = document.getElementById('discipline-chips');

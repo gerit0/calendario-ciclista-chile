@@ -69,12 +69,24 @@ export function validateRaceForm(data) {
     errors.discipline = 'Debe seleccionar una disciplina válida (Ruta, MTB, Gravel, Pista, BMX, Virtual).';
   }
 
-  // 3. date (formato AAAA-MM-DD)
+  // 3. date / startDate / endDate (formato AAAA-MM-DD)
+  const isMultiDay = raw.isMultiDay === true || raw.isMultiDay === 'on' || raw.isMultiDay === 'true';
   const dateStr = typeof raw.date === 'string' ? raw.date.trim() : '';
-  sanitizedData.date = dateStr;
+  const startDateStr = (isMultiDay && typeof raw.startDate === 'string' && raw.startDate.trim() !== '') ? raw.startDate.trim() : dateStr;
+  const endDateStr = (isMultiDay && typeof raw.endDate === 'string' && raw.endDate.trim() !== '') ? raw.endDate.trim() : startDateStr;
+
   const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-  if (!dateStr || !dateRegex.test(dateStr) || isNaN(Date.parse(dateStr))) {
-    errors.date = 'La fecha debe tener un formato válido (AAAA-MM-DD).';
+  
+  sanitizedData.date = startDateStr || dateStr;
+  sanitizedData.startDate = startDateStr || dateStr;
+  sanitizedData.endDate = endDateStr || startDateStr || dateStr;
+
+  if (!sanitizedData.startDate || !dateRegex.test(sanitizedData.startDate) || isNaN(Date.parse(sanitizedData.startDate))) {
+    errors.date = 'La fecha de inicio debe tener un formato válido (AAAA-MM-DD).';
+  } else if (isMultiDay && (!sanitizedData.endDate || !dateRegex.test(sanitizedData.endDate) || isNaN(Date.parse(sanitizedData.endDate)))) {
+    errors.endDate = 'La fecha de término debe tener un formato válido (AAAA-MM-DD).';
+  } else if (isMultiDay && sanitizedData.endDate < sanitizedData.startDate) {
+    errors.endDate = 'La fecha de término no puede ser anterior a la fecha de inicio.';
   }
 
   // 4. region (obligatorio)

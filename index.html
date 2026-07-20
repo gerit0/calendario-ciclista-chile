@@ -428,29 +428,61 @@
             class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all">
         </div>
 
-        <!-- Grid: Disciplina y Fecha -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label for="form-discipline" class="block font-display font-bold text-sm text-primary mb-2">
-              Disciplina <span class="text-secondary">*</span>
-            </label>
-            <select id="form-discipline" name="discipline"
-              class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all cursor-pointer">
-              <option value="Ruta">Ruta</option>
-              <option value="MTB">MTB</option>
-              <option value="Gravel">Gravel</option>
-              <option value="Pista">Pista</option>
-              <option value="BMX">BMX</option>
-              <option value="Virtual">Virtual</option>
-            </select>
+        <!-- Grid: Disciplina y Fecha / Duración Multi-Día -->
+        <div class="space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label for="form-discipline" class="block font-display font-bold text-sm text-primary mb-2">
+                Disciplina <span class="text-secondary">*</span>
+              </label>
+              <select id="form-discipline" name="discipline"
+                class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all cursor-pointer">
+                <option value="Ruta">Ruta</option>
+                <option value="MTB">MTB</option>
+                <option value="Gravel">Gravel</option>
+                <option value="Pista">Pista</option>
+                <option value="BMX">BMX</option>
+                <option value="Virtual">Virtual</option>
+              </select>
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <label for="form-date" class="block font-display font-bold text-sm text-primary">
+                  Fecha de Inicio <span class="text-secondary">*</span>
+                </label>
+                <label class="inline-flex items-center gap-1.5 cursor-pointer text-xs font-bold text-primary select-none">
+                  <input type="checkbox" id="form-is-multiday" name="isMultiDay" class="w-4 h-4 text-primary rounded border-outline-variant focus:ring-primary">
+                  <span>¿Más de 1 día?</span>
+                </label>
+              </div>
+
+              <!-- Fecha Unica -->
+              <div id="form-single-date-container">
+                <input type="date" id="form-date" name="date"
+                  class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all cursor-pointer">
+              </div>
+
+              <!-- Rango de Fechas Inicio -->
+              <div id="form-start-date-container" class="hidden">
+                <input type="date" id="form-start-date" name="startDate"
+                  class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all cursor-pointer">
+              </div>
+            </div>
           </div>
 
-          <div>
-            <label for="form-date" class="block font-display font-bold text-sm text-primary mb-2">
-              Fecha del Evento <span class="text-secondary">*</span>
-            </label>
-            <input type="date" id="form-date" name="date"
-              class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all cursor-pointer">
+          <!-- Campo Oculto para Fecha Término Multi-Día -->
+          <div id="form-end-date-container" class="hidden bg-purple-50/70 p-4 rounded-2xl border border-purple-200 space-y-2">
+            <div class="flex items-center justify-between">
+              <label for="form-end-date" class="block font-display font-bold text-xs text-purple-950 uppercase tracking-wider">
+                Fecha de Término de la Vuelta / Etapas <span class="text-secondary">*</span>
+              </label>
+              <span id="form-duration-badge" class="text-xs font-black text-purple-900 bg-purple-200/80 px-2.5 py-0.5 rounded-full">
+                Multi-Día
+              </span>
+            </div>
+            <input type="date" id="form-end-date" name="endDate"
+              class="w-full px-4 py-2.5 rounded-xl bg-white border border-purple-300 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-purple-600 transition-all cursor-pointer">
           </div>
         </div>
 
@@ -709,27 +741,61 @@
           <input type="text" id="edit-form-name" name="name" required placeholder="Ej: Gran Fondo Andes Challenge 2026"
             class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all">
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label for="edit-form-discipline" class="block font-display font-bold text-sm text-primary mb-2">
-              Disciplina <span class="text-secondary">*</span>
-            </label>
-            <select id="edit-form-discipline" name="discipline" required
-              class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all cursor-pointer">
-              <option value="Ruta">Ruta</option>
-              <option value="MTB">MTB</option>
-              <option value="Gravel">Gravel</option>
-              <option value="Pista">Pista</option>
-              <option value="BMX">BMX</option>
-              <option value="Virtual">Virtual</option>
-            </select>
+        <!-- Grid: Disciplina y Fecha / Duración Multi-Día (Edición) -->
+        <div class="space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label for="edit-form-discipline" class="block font-display font-bold text-sm text-primary mb-2">
+                Disciplina <span class="text-secondary">*</span>
+              </label>
+              <select id="edit-form-discipline" name="discipline" required
+                class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all cursor-pointer">
+                <option value="Ruta">Ruta</option>
+                <option value="MTB">MTB</option>
+                <option value="Gravel">Gravel</option>
+                <option value="Pista">Pista</option>
+                <option value="BMX">BMX</option>
+                <option value="Virtual">Virtual</option>
+              </select>
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <label for="edit-form-date" class="block font-display font-bold text-sm text-primary">
+                  Fecha de Inicio <span class="text-secondary">*</span>
+                </label>
+                <label class="inline-flex items-center gap-1.5 cursor-pointer text-xs font-bold text-primary select-none">
+                  <input type="checkbox" id="edit-form-is-multiday" name="isMultiDay" class="w-4 h-4 text-primary rounded border-outline-variant focus:ring-primary">
+                  <span>¿Más de 1 día?</span>
+                </label>
+              </div>
+
+              <!-- Fecha Unica -->
+              <div id="edit-form-single-date-container">
+                <input type="date" id="edit-form-date" name="date"
+                  class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all cursor-pointer">
+              </div>
+
+              <!-- Rango de Fechas Inicio -->
+              <div id="edit-form-start-date-container" class="hidden">
+                <input type="date" id="edit-form-start-date" name="startDate"
+                  class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all cursor-pointer">
+              </div>
+            </div>
           </div>
-          <div>
-            <label for="edit-form-date" class="block font-display font-bold text-sm text-primary mb-2">
-              Fecha del Evento <span class="text-secondary">*</span>
-            </label>
-            <input type="date" id="edit-form-date" name="date" required
-              class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all cursor-pointer">
+
+          <!-- Campo Oculto para Fecha Término Multi-Día -->
+          <div id="edit-form-end-date-container" class="hidden bg-purple-50/70 p-4 rounded-2xl border border-purple-200 space-y-2">
+            <div class="flex items-center justify-between">
+              <label for="edit-form-end-date" class="block font-display font-bold text-xs text-purple-950 uppercase tracking-wider">
+                Fecha de Término de la Vuelta / Etapas <span class="text-secondary">*</span>
+              </label>
+              <span id="edit-form-duration-badge" class="text-xs font-black text-purple-900 bg-purple-200/80 px-2.5 py-0.5 rounded-full">
+                Multi-Día
+              </span>
+            </div>
+            <input type="date" id="edit-form-end-date" name="endDate"
+              class="w-full px-4 py-2.5 rounded-xl bg-white border border-purple-300 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-purple-600 transition-all cursor-pointer">
           </div>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -847,7 +913,7 @@
   </div>
 
   <!-- Main JavaScript bundle (ESM con importmap para Supabase) -->
-  <script type="module" src="js/bundle.js?v=7"></script>
+  <script type="module" src="js/bundle.js?v=8"></script>
 
 </body>
 

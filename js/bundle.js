@@ -1487,11 +1487,20 @@ function validateRaceForm(data) {
   if (!VALID_DISCIPLINES.includes(discipline)) {
     errors.discipline = "Debe seleccionar una disciplina v\xE1lida (Ruta, MTB, Gravel, Pista, BMX, Virtual).";
   }
+  const isMultiDay = raw.isMultiDay === true || raw.isMultiDay === "on" || raw.isMultiDay === "true";
   const dateStr = typeof raw.date === "string" ? raw.date.trim() : "";
-  sanitizedData.date = dateStr;
+  const startDateStr = isMultiDay && typeof raw.startDate === "string" && raw.startDate.trim() !== "" ? raw.startDate.trim() : dateStr;
+  const endDateStr = isMultiDay && typeof raw.endDate === "string" && raw.endDate.trim() !== "" ? raw.endDate.trim() : startDateStr;
   const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-  if (!dateStr || !dateRegex.test(dateStr) || isNaN(Date.parse(dateStr))) {
-    errors.date = "La fecha debe tener un formato v\xE1lido (AAAA-MM-DD).";
+  sanitizedData.date = startDateStr || dateStr;
+  sanitizedData.startDate = startDateStr || dateStr;
+  sanitizedData.endDate = endDateStr || startDateStr || dateStr;
+  if (!sanitizedData.startDate || !dateRegex.test(sanitizedData.startDate) || isNaN(Date.parse(sanitizedData.startDate))) {
+    errors.date = "La fecha de inicio debe tener un formato v\xE1lido (AAAA-MM-DD).";
+  } else if (isMultiDay && (!sanitizedData.endDate || !dateRegex.test(sanitizedData.endDate) || isNaN(Date.parse(sanitizedData.endDate)))) {
+    errors.endDate = "La fecha de t\xE9rmino debe tener un formato v\xE1lido (AAAA-MM-DD).";
+  } else if (isMultiDay && sanitizedData.endDate < sanitizedData.startDate) {
+    errors.endDate = "La fecha de t\xE9rmino no puede ser anterior a la fecha de inicio.";
   }
   const region = sanitizeHTML(raw.region);
   sanitizedData.region = region;
@@ -1732,6 +1741,50 @@ function setupEventHandlers() {
       });
     }
   });
+  const isMultiDayCheck = document.getElementById("form-is-multiday");
+  if (isMultiDayCheck) {
+    isMultiDayCheck.addEventListener("change", (e) => {
+      const checked = e.target.checked;
+      const singleContainer = document.getElementById("form-single-date-container");
+      const startContainer = document.getElementById("form-start-date-container");
+      const endContainer = document.getElementById("form-end-date-container");
+      if (checked) {
+        if (singleContainer) singleContainer.classList.add("hidden");
+        if (startContainer) startContainer.classList.remove("hidden");
+        if (endContainer) endContainer.classList.remove("hidden");
+        const singleVal = document.getElementById("form-date")?.value;
+        if (singleVal && !document.getElementById("form-start-date")?.value) {
+          document.getElementById("form-start-date").value = singleVal;
+        }
+      } else {
+        if (singleContainer) singleContainer.classList.remove("hidden");
+        if (startContainer) startContainer.classList.add("hidden");
+        if (endContainer) endContainer.classList.add("hidden");
+      }
+    });
+  }
+  const editIsMultiDayCheck = document.getElementById("edit-form-is-multiday");
+  if (editIsMultiDayCheck) {
+    editIsMultiDayCheck.addEventListener("change", (e) => {
+      const checked = e.target.checked;
+      const singleContainer = document.getElementById("edit-form-single-date-container");
+      const startContainer = document.getElementById("edit-form-start-date-container");
+      const endContainer = document.getElementById("edit-form-end-date-container");
+      if (checked) {
+        if (singleContainer) singleContainer.classList.add("hidden");
+        if (startContainer) startContainer.classList.remove("hidden");
+        if (endContainer) endContainer.classList.remove("hidden");
+        const singleVal = document.getElementById("edit-form-date")?.value;
+        if (singleVal && !document.getElementById("edit-form-start-date")?.value) {
+          document.getElementById("edit-form-start-date").value = singleVal;
+        }
+      } else {
+        if (singleContainer) singleContainer.classList.remove("hidden");
+        if (startContainer) startContainer.classList.add("hidden");
+        if (endContainer) endContainer.classList.add("hidden");
+      }
+    });
+  }
   const searchInput = document.getElementById("search-input");
   if (searchInput) {
     searchInput.addEventListener("input", (e) => {
@@ -1919,10 +1972,17 @@ function setupEventHandlers() {
       const formData = new FormData(raceForm);
       const isFree = document.getElementById("form-is-free")?.checked || false;
       const dateStr = formData.get("date") || "";
+      const isMultiDay = document.getElementById("form-is-multiday")?.checked || false;
+      const startDateVal = document.getElementById("form-start-date")?.value || "";
+      const endDateVal = document.getElementById("form-end-date")?.value || "";
+      const singleDateVal = formData.get("date") || "";
       const rawFormData = {
         name: formData.get("name") || "",
         discipline: formData.get("discipline") || "",
-        date: dateStr,
+        isMultiDay,
+        date: isMultiDay ? startDateVal || singleDateVal : singleDateVal,
+        startDate: isMultiDay ? startDateVal || singleDateVal : singleDateVal,
+        endDate: isMultiDay ? endDateVal || startDateVal || singleDateVal : singleDateVal,
         region: formData.get("region") || "",
         organizador: formData.get("organizer") || "",
         organizer: formData.get("organizer") || "",
@@ -2198,10 +2258,17 @@ function setupEventHandlers() {
       }
       const isFree = document.getElementById("edit-form-is-free")?.checked || false;
       const formData = new FormData(editForm);
+      const isMultiDay = document.getElementById("edit-form-is-multiday")?.checked || false;
+      const startDateVal = document.getElementById("edit-form-start-date")?.value || "";
+      const endDateVal = document.getElementById("edit-form-end-date")?.value || "";
+      const singleDateVal = formData.get("date") || "";
       const rawFormData = {
         name: formData.get("name") || "",
         discipline: formData.get("discipline") || "",
-        date: formData.get("date") || "",
+        isMultiDay,
+        date: isMultiDay ? startDateVal || singleDateVal : singleDateVal,
+        startDate: isMultiDay ? startDateVal || singleDateVal : singleDateVal,
+        endDate: isMultiDay ? endDateVal || startDateVal || singleDateVal : singleDateVal,
         region: formData.get("region") || "",
         organizador: formData.get("organizer") || "",
         organizer: formData.get("organizer") || "",
@@ -2286,7 +2353,32 @@ async function openEditModal(raceId) {
   document.getElementById("edit-race-id").value = raceId;
   document.getElementById("edit-form-name").value = race.name || "";
   document.getElementById("edit-form-discipline").value = race.discipline || "Ruta";
-  document.getElementById("edit-form-date").value = race.date || "";
+  const startDate = race.startDate || race.fecha_inicio || race.date || "";
+  const endDate = race.endDate || race.fecha_fin || startDate;
+  const isMultiDay = !!(startDate && endDate && startDate !== endDate);
+  const isMultiDayCheck = document.getElementById("edit-form-is-multiday");
+  if (isMultiDayCheck) {
+    isMultiDayCheck.checked = isMultiDay;
+    const singleContainer = document.getElementById("edit-form-single-date-container");
+    const startContainer = document.getElementById("edit-form-start-date-container");
+    const endContainer = document.getElementById("edit-form-end-date-container");
+    if (isMultiDay) {
+      if (singleContainer) singleContainer.classList.add("hidden");
+      if (startContainer) startContainer.classList.remove("hidden");
+      if (endContainer) endContainer.classList.remove("hidden");
+    } else {
+      if (singleContainer) singleContainer.classList.remove("hidden");
+      if (startContainer) startContainer.classList.add("hidden");
+      if (endContainer) endContainer.classList.add("hidden");
+    }
+  }
+  document.getElementById("edit-form-date").value = startDate;
+  if (document.getElementById("edit-form-start-date")) {
+    document.getElementById("edit-form-start-date").value = startDate;
+  }
+  if (document.getElementById("edit-form-end-date")) {
+    document.getElementById("edit-form-end-date").value = endDate;
+  }
   document.getElementById("edit-form-city").value = race.city || "";
   document.getElementById("edit-form-distance").value = race.distance || "";
   document.getElementById("edit-form-elevation").value = race.elevation || "";
@@ -2324,10 +2416,14 @@ async function initApp() {
   if (regionSelectContainer) {
     renderRegionSelect(regionSelectContainer, REGIONS_CHILE, currentRegion);
   }
-  const formRegionSelect = document.getElementById("edit-form-region") || document.getElementById("form-region");
-  if (formRegionSelect) {
-    const filterRegions = REGIONS_CHILE.filter((r) => r !== "Todas las regiones");
-    renderRegionSelect(formRegionSelect, filterRegions, filterRegions[0]);
+  const filterRegions = REGIONS_CHILE.filter((r) => r !== "Todas las regiones");
+  const publishRegionSelect = document.getElementById("form-region");
+  if (publishRegionSelect) {
+    renderRegionSelect(publishRegionSelect, filterRegions, filterRegions[0]);
+  }
+  const editRegionSelect = document.getElementById("edit-form-region");
+  if (editRegionSelect) {
+    renderRegionSelect(editRegionSelect, filterRegions, filterRegions[0]);
   }
   const disciplineChipsContainer = document.getElementById("discipline-chips");
   if (disciplineChipsContainer) {
