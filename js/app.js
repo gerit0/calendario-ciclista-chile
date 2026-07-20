@@ -4,7 +4,7 @@
  */
 
 import { REGIONS_CHILE } from './data.js';
-import { getAllRaces, getBookmarkedIds, toggleBookmark, isBookmarked, saveCustomRace, saveRace } from './storage.js';
+import { getAllRaces, getBookmarkedIds, toggleBookmark, isBookmarked, saveCustomRace, saveRace, deleteRace, updateRace } from './storage.js';
 import { renderDisciplineChips, renderRegionSelect, renderRaceCards, renderDetailView, switchView, renderPendingRaces } from './ui.js';
 import { validateRaceForm } from './validation.js';
 import { 
@@ -13,9 +13,7 @@ import {
   getCurrentUser, 
   checkIsAdmin, 
   fetchPendingRacesSupabase, 
-  updateRaceStatusSupabase, 
-  deleteRaceSupabase, 
-  updateRaceSupabase 
+  updateRaceStatusSupabase
 } from './supabase.js';
 
 // 2. Estado de la Aplicación
@@ -814,7 +812,7 @@ function setupEventHandlers() {
       }
 
       clearFormErrors(editForm);
-      const res = await updateRaceSupabase(raceId, validationResult.sanitizedData);
+      const res = await updateRace(raceId, validationResult.sanitizedData);
       if (res.success) {
         showNotificationToast("💾 Cambios guardados con éxito.");
         if (editModal) editModal.classList.add('hidden');
@@ -937,7 +935,7 @@ export async function handleDeleteRace(raceId) {
   const confirmed = confirm("⚠️ ¿Estás seguro de que deseas eliminar esta carrera de forma permanente? Esta acción no se puede deshacer.");
   if (!confirmed) return;
 
-  const res = await deleteRaceSupabase(raceId);
+  const res = await deleteRace(raceId);
   if (res.success) {
     showNotificationToast("🗑️ Carrera eliminada con éxito.");
     switchView('calendar');

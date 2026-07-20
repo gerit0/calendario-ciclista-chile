@@ -397,43 +397,6 @@ async function updateRaceStatusSupabase(raceId, status) {
     return { success: false, error: err.message || err };
   }
 }
-async function deleteRaceSupabase(raceId) {
-  const client = getSupabase();
-  if (!client) return { success: false, error: "Supabase no est\xE1 configurado." };
-  try {
-    const { error } = await client.from("carreras").delete().eq("id", raceId);
-    if (error) throw error;
-    return { success: true };
-  } catch (err) {
-    console.error("Error al eliminar carrera de Supabase:", err);
-    return { success: false, error: err.message || err };
-  }
-}
-async function updateRaceSupabase(raceId, raceData) {
-  const client = getSupabase();
-  if (!client) return { success: false, error: "Supabase no est\xE1 configurado." };
-  try {
-    const payload = {
-      nombre: raceData.name || raceData.nombre,
-      fecha: raceData.date || raceData.fecha,
-      disciplina: raceData.discipline || raceData.disciplina,
-      region: raceData.region,
-      ubicacion: raceData.city || raceData.ubicacion,
-      organizador: raceData.organizer || raceData.organizador,
-      link_inscripcion: raceData.registrationUrl || raceData.link_inscripcion,
-      categoria: Array.isArray(raceData.categories) ? raceData.categories.join(", ") : raceData.categoria || raceData.categories,
-      precio: raceData.price != null ? Number(raceData.price) : 0,
-      hero_image: raceData.heroImage || raceData.hero_image,
-      descripcion: raceData.description || raceData.descripcion
-    };
-    const { error } = await client.from("carreras").update(payload).eq("id", raceId);
-    if (error) throw error;
-    return { success: true };
-  } catch (err) {
-    console.error("Error al actualizar carrera en Supabase:", err);
-    return { success: false, error: err.message || err };
-  }
-}
 
 // js/storage.js
 var BOOKMARKS_KEY = "calendariociclista_bookmarks";
@@ -502,7 +465,16 @@ async function getAllRaces() {
     }
   }
   const customRaces = getCustomRaces();
-  const combined = [...supabaseRaces, ...customRaces, ...INITIAL_RACES];
+  const DELETED_INITIAL_KEY = "calendariociclista_deleted_initial_races";
+  let deletedInitialIds = [];
+  try {
+    const deletedStr = localStorage.getItem(DELETED_INITIAL_KEY);
+    if (deletedStr) deletedInitialIds = JSON.parse(deletedStr);
+  } catch (err) {
+    console.error("Error leyendo deleted_initial_races:", err);
+  }
+  const filteredInitial = INITIAL_RACES.filter((r) => !deletedInitialIds.includes(r.id));
+  const combined = [...supabaseRaces, ...customRaces, ...filteredInitial];
   const seenIds = /* @__PURE__ */ new Set();
   const uniqueRaces = [];
   for (const race of combined) {
@@ -527,6 +499,74 @@ async function saveRace(newRace) {
   }
   const savedLocal = saveCustomRace(newRace);
   return { success: true, source: "localStorage", data: savedLocal };
+}
+async function deleteRace(raceId) {
+  if (!raceId) return { success: false, error: "ID de carrera inv\xE1lido" };
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  const isUUID = uuidRegex.test(raceId);
+  if (isUUID && isSupabaseConfigured()) {
+    try {
+      const res = await deleteRaceSupabase(raceId);
+      if (res.success) return { success: true, source: "supabase" };
+      return { success: false, error: res.error };
+    } catch (err) {
+      return { success: false, error: err.message || err };
+    }
+  }
+  const customRaces = getCustomRaces();
+  const updatedCustom = customRaces.filter((r) => r.id !== raceId);
+  if (customRaces.length !== updatedCustom.length) {
+    try {
+      localStorage.setItem(CUSTOM_RACES_KEY, JSON.stringify(updatedCustom));
+      return { success: true, source: "localStorage" };
+    } catch (err) {
+      return { success: false, error: "Error al actualizar localStorage: " + err.message };
+    }
+  }
+  const DELETED_INITIAL_KEY = "calendariociclista_deleted_initial_races";
+  try {
+    const deletedStr = localStorage.getItem(DELETED_INITIAL_KEY);
+    const deletedIds = deletedStr ? JSON.parse(deletedStr) : [];
+    if (!deletedIds.includes(raceId)) {
+      deletedIds.push(raceId);
+      localStorage.setItem(DELETED_INITIAL_KEY, JSON.stringify(deletedIds));
+    }
+    return { success: true, source: "localStorage_initial" };
+  } catch (err) {
+    return { success: false, error: "Error al eliminar carrera inicial localmente: " + err.message };
+  }
+}
+async function updateRace(raceId, raceData) {
+  if (!raceId) return { success: false, error: "ID de carrera inv\xE1lido" };
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  const isUUID = uuidRegex.test(raceId);
+  if (isUUID && isSupabaseConfigured()) {
+    try {
+      const res = await updateRaceSupabase(raceId, raceData);
+      if (res.success) return { success: true, source: "supabase" };
+      return { success: false, error: res.error };
+    } catch (err) {
+      return { success: false, error: err.message || err };
+    }
+  }
+  const customRaces = getCustomRaces();
+  const existingIndex = customRaces.findIndex((r) => r.id === raceId);
+  let updatedRace = { ...raceData, id: raceId };
+  if (raceData.categories && typeof raceData.categories === "string") {
+    updatedRace.categories = raceData.categories.split(",").map((c) => c.trim()).filter(Boolean);
+  }
+  if (existingIndex >= 0) {
+    customRaces[existingIndex] = { ...customRaces[existingIndex], ...updatedRace };
+  } else {
+    const original = INITIAL_RACES.find((r) => r.id === raceId) || {};
+    customRaces.unshift({ ...original, ...updatedRace });
+  }
+  try {
+    localStorage.setItem(CUSTOM_RACES_KEY, JSON.stringify(customRaces));
+    return { success: true, source: "localStorage" };
+  } catch (err) {
+    return { success: false, error: "Error al actualizar localStorage: " + err.message };
+  }
 }
 
 // js/ui.js
@@ -1732,7 +1772,7 @@ function setupEventHandlers() {
         return;
       }
       clearFormErrors(editForm);
-      const res = await updateRaceSupabase(raceId, validationResult.sanitizedData);
+      const res = await updateRace(raceId, validationResult.sanitizedData);
       if (res.success) {
         showNotificationToast("\u{1F4BE} Cambios guardados con \xE9xito.");
         if (editModal) editModal.classList.add("hidden");
@@ -1818,7 +1858,7 @@ async function openEditModal(raceId) {
 async function handleDeleteRace(raceId) {
   const confirmed = confirm("\u26A0\uFE0F \xBFEst\xE1s seguro de que deseas eliminar esta carrera de forma permanente? Esta acci\xF3n no se puede deshacer.");
   if (!confirmed) return;
-  const res = await deleteRaceSupabase(raceId);
+  const res = await deleteRace(raceId);
   if (res.success) {
     showNotificationToast("\u{1F5D1}\uFE0F Carrera eliminada con \xE9xito.");
     switchView("calendar");
