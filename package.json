@@ -4,7 +4,6 @@
   "description": "Calendario Nacional de Ciclismo Chile – Plataforma open para Gran Fondo, MTB, Gravel y más.",
   "private": true,
   "scripts": {
-    "build": "npx esbuild js/app.js --bundle --outfile=js/bundle.js --format=esm --platform=browser --external:@supabase/supabase-js",
     "dev": "npx serve . -p 3000",
     "test": "node qa_test_runner.js"
   },
