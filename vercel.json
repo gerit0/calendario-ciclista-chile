@@ -18,11 +18,8 @@
       "destination": "/api/seo?id=:id*"
     },
     {
-      "source": "/:path*",
-      "destination": "/index.html",
-      "missing": [
-        { "type": "file" }
-      ]
+      "source": "/((?!js/|api/).*)",
+      "destination": "/index.html"
     }
   ],
   "headers": [
