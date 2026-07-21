@@ -5,6 +5,7 @@
 
 import { initRouter, navigateTo } from './router.js';
 import { REGIONS_CHILE } from './data.js';
+import { buildGoogleCalendarUrl, downloadICSFile } from './calendar-export.js';
 import { getAllRaces, getBookmarkedIds, toggleBookmark, isBookmarked, saveCustomRace, saveRace, deleteRace, updateRace } from './storage.js';
 import { 
   renderDisciplineChips, 
@@ -29,7 +30,6 @@ import {
   updateRaceStatusSupabase,
   uploadRaceImageSupabase
 } from './supabase.js';
-import { generateICSContent, buildGoogleCalendarUrl, downloadICS } from './calendar-export.js';
 
 // 2. Estado de la Aplicación
 let currentDiscipline = "Todas";
@@ -453,102 +453,10 @@ function setupImageUploadHandlers() {
 }
 
 /**
- * Configura el manejo del dropdown "Añadir al calendario" via delegación de eventos.
- */
-function setupCalendarExportHandlers() {
-  // Cierra todos los dropdowns abiertos
-  function closeAllCalDropdowns() {
-    document.querySelectorAll('.cal-export-dropdown').forEach(d => {
-      d.classList.add('hidden');
-    });
-    document.querySelectorAll('.cal-chevron').forEach(c => {
-      c.style.transform = '';
-    });
-    document.querySelectorAll('.btn-cal-export').forEach(b => {
-      b.setAttribute('aria-expanded', 'false');
-    });
-  }
-
-  // Toggle del dropdown al hacer click en el botón principal
-  document.addEventListener('click', async (e) => {
-    // Toggle botón de exportar
-    const exportBtn = e.target.closest('.btn-cal-export');
-    if (exportBtn) {
-      e.stopPropagation();
-      const wrapper = exportBtn.closest('.cal-export-wrapper');
-      const dropdown = wrapper?.querySelector('.cal-export-dropdown');
-      const chevron = exportBtn.querySelector('.cal-chevron');
-      if (!dropdown) return;
-
-      const isOpen = !dropdown.classList.contains('hidden');
-
-      // Cerrar todos los demás primero
-      closeAllCalDropdowns();
-
-      if (!isOpen) {
-        dropdown.classList.remove('hidden');
-        if (chevron) chevron.style.transform = 'rotate(180deg)';
-        exportBtn.setAttribute('aria-expanded', 'true');
-      }
-      return;
-    }
-
-    // Manejo de opciones del dropdown
-    const option = e.target.closest('.cal-option');
-    if (option) {
-      e.stopPropagation();
-      const raceId = option.dataset.raceId;
-      closeAllCalDropdowns();
-
-      // Obtener datos de la carrera
-      let race = null;
-      if (isSupabaseConfigured()) {
-        race = await fetchRaceByIdSupabase(raceId);
-      }
-      if (!race) {
-        const races = await getAllRaces();
-        race = races.find(r => String(r.id) === String(raceId));
-      }
-      if (!race) {
-        showNotificationToast('⚠️ No se pudieron obtener los datos de la carrera.');
-        return;
-      }
-
-      if (option.classList.contains('cal-google')) {
-        const url = buildGoogleCalendarUrl(race);
-        window.open(url, '_blank', 'noopener,noreferrer');
-        showNotificationToast('📅 Abriendo Google Calendar...');
-      } else if (option.classList.contains('cal-apple') || option.classList.contains('cal-outlook')) {
-        const ics = generateICSContent(race);
-        const safeName = (race.name || 'carrera').replace(/[^a-z0-9]/gi, '_').toLowerCase();
-        downloadICS(ics, safeName);
-        showNotificationToast('📥 Descargando archivo .ics...');
-      } else if (option.classList.contains('cal-copy')) {
-        const dateText = race.displayDate || race.date || race.startDate || race.fecha_inicio || '';
-        const textToCopy = `${race.name} — ${dateText}${race.city ? ', ' + race.city : ''}`;
-        try {
-          await navigator.clipboard.writeText(textToCopy);
-          showNotificationToast('📋 Fecha copiada al portapapeles');
-        } catch {
-          showNotificationToast('⚠️ No se pudo copiar al portapapeles');
-        }
-      }
-      return;
-    }
-
-    // Click fuera: cerrar todo
-    if (!e.target.closest('.cal-export-wrapper')) {
-      closeAllCalDropdowns();
-    }
-  });
-}
-
-/**
  * 4. Configuración de Event Handlers e Interactividad
  */
 function setupEventHandlers() {
   setupImageUploadHandlers();
-  setupCalendarExportHandlers();
 
   // Selector de Modo de Vista (Tarjetas, Mes, Semana, Día)
   const viewModes = ['cards', 'month', 'week', 'day'];
@@ -770,8 +678,13 @@ function setupEventHandlers() {
         return;
       }
 
+      // Disparador o Acción de Calendario (ignorar para navegación a detalle)
+      if (e.target.closest('[data-calendar-trigger], [data-calendar-action]')) {
+        return;
+      }
+
       // Ver detalle ([data-race-id] o .btn-view-detail)
-      const detailBtn = e.target.closest('[data-race-id]');
+      const detailBtn = e.target.closest('[data-race-id], .btn-view-detail');
       if (detailBtn) {
         const raceId = detailBtn.getAttribute('data-race-id');
         if (raceId) {
@@ -823,6 +736,68 @@ function setupEventHandlers() {
       }
     });
   }
+
+  // Escuchadores globales para desplegables y acciones de "Añadir a mi calendario"
+  document.addEventListener('click', async (e) => {
+    // 1. Toggle del menú desplegable [data-calendar-trigger]
+    const triggerBtn = e.target.closest('[data-calendar-trigger]');
+    if (triggerBtn) {
+      e.stopPropagation();
+      const raceId = triggerBtn.getAttribute('data-calendar-trigger');
+      const dropdown = document.getElementById(`calendar-dropdown-${raceId}`);
+
+      // Cerrar cualquier otro menú de calendario abierto
+      document.querySelectorAll('.calendar-dropdown-menu').forEach(menu => {
+        if (menu !== dropdown) menu.classList.add('hidden');
+      });
+
+      if (dropdown) {
+        dropdown.classList.toggle('hidden');
+      }
+      return;
+    }
+
+    // 2. Ejecutar acción de exportación [data-calendar-action]
+    const actionBtn = e.target.closest('[data-calendar-action]');
+    if (actionBtn) {
+      e.stopPropagation();
+      const action = actionBtn.getAttribute('data-calendar-action');
+      const raceId = actionBtn.getAttribute('data-race-id');
+
+      // Ocultar menú
+      const dropdown = document.getElementById(`calendar-dropdown-${raceId}`);
+      if (dropdown) dropdown.classList.add('hidden');
+
+      const races = await getAllRaces();
+      const race = races.find(r => String(r.id) === String(raceId));
+      if (!race) return;
+
+      if (action === 'google') {
+        const url = buildGoogleCalendarUrl(race);
+        window.open(url, '_blank', 'noopener,noreferrer');
+      } else if (action === 'apple' || action === 'outlook') {
+        downloadICSFile(race);
+        showNotificationToast('📆 Descargando archivo .ics de calendario...');
+      } else if (action === 'copy') {
+        const dateText = race.displayDate || race.date;
+        const fullText = `${race.name || race.nombre} — ${dateText} en ${race.city || race.ubicacion || race.region}`;
+        try {
+          await navigator.clipboard.writeText(fullText);
+          showNotificationToast('📋 Fecha copiada al portapapeles');
+        } catch (err) {
+          showNotificationToast('📋 Fecha del evento: ' + dateText);
+        }
+      }
+      return;
+    }
+
+    // 3. Clic fuera: cerrar menús desplegables abiertos
+    if (!e.target.closest('.calendar-dropdown-menu')) {
+      document.querySelectorAll('.calendar-dropdown-menu').forEach(menu => {
+        menu.classList.add('hidden');
+      });
+    }
+  });
 
   // Envío del formulario #race-form
   const raceForm = document.getElementById('race-form');

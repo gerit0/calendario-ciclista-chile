@@ -278,6 +278,114 @@ var init_data = __esm({
   }
 });
 
+// js/calendar-export.js
+function formatDateForICS(dateStr) {
+  if (!dateStr) return "";
+  const clean = String(dateStr).trim().split("T")[0].replace(/-/g, "");
+  return clean;
+}
+function calculateEndDateICS(startDateStr, endDateStr) {
+  const startClean = (startDateStr || "").trim().split("T")[0];
+  const endClean = (endDateStr || startClean).trim().split("T")[0];
+  if (!endClean) return "";
+  const parts = endClean.split("-").map(Number);
+  if (parts.length < 3 || isNaN(parts[0]) || isNaN(parts[1]) || isNaN(parts[2])) return "";
+  const d = new Date(parts[0], parts[1] - 1, parts[2] + 1);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}${month}${day}`;
+}
+function generateICSContent(race) {
+  if (!race) return "";
+  const title = race.name || race.nombre || "Carrera de Ciclismo";
+  const startStr = formatDateForICS(race.startDate || race.fecha_inicio || race.date || race.fecha);
+  const endStr = calculateEndDateICS(
+    race.startDate || race.fecha_inicio || race.date || race.fecha,
+    race.endDate || race.fecha_fin
+  );
+  const city = race.city || race.ubicacion || "";
+  const region = race.region || "";
+  const location = [city, region].filter(Boolean).join(", ") || "Chile";
+  const discipline = race.discipline || race.disciplina || "Ciclismo";
+  const dist = race.distance || race.distancia || "N/A";
+  const elev = race.elevation || race.desnivel || "N/A";
+  const rawDesc = race.description || race.descripcion || "";
+  const fullDesc = `Disciplina: ${discipline}
+Distancia: ${dist} | Desnivel: ${elev}
+${rawDesc}
+
+M\xE1s informaci\xF3n en CalendarioCiclista Chile: https://calendariociclista.vercel.app/evento/${race.id}`;
+  const escapeICS = (str) => String(str || "").replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\n/g, "\\n");
+  return [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//CalendarioCiclista Chile//NONSGML v1.0//ES",
+    "CALSCALE:GREGORIAN",
+    "METHOD:PUBLISH",
+    "BEGIN:VEVENT",
+    `UID:carrera-${race.id}@calendariociclista.vercel.app`,
+    `DTSTAMP:${formatDateForICS((/* @__PURE__ */ new Date()).toISOString())}T000000Z`,
+    `DTSTART;VALUE=DATE:${startStr}`,
+    `DTEND;VALUE=DATE:${endStr}`,
+    `SUMMARY:${escapeICS(title)}`,
+    `DESCRIPTION:${escapeICS(fullDesc)}`,
+    `LOCATION:${escapeICS(location)}`,
+    `URL:https://calendariociclista.vercel.app/evento/${race.id}`,
+    "STATUS:CONFIRMED",
+    "END:VEVENT",
+    "END:VCALENDAR"
+  ].join("\r\n");
+}
+function buildGoogleCalendarUrl(race) {
+  if (!race) return "#";
+  const title = race.name || race.nombre || "Carrera de Ciclismo";
+  const startStr = formatDateForICS(race.startDate || race.fecha_inicio || race.date || race.fecha);
+  const endStr = calculateEndDateICS(
+    race.startDate || race.fecha_inicio || race.date || race.fecha,
+    race.endDate || race.fecha_fin
+  );
+  const city = race.city || race.ubicacion || "";
+  const region = race.region || "";
+  const location = [city, region].filter(Boolean).join(", ") || "Chile";
+  const discipline = race.discipline || race.disciplina || "Ciclismo";
+  const dist = race.distance || race.distancia || "N/A";
+  const elev = race.elevation || race.desnivel || "N/A";
+  const rawDesc = race.description || race.descripcion || "";
+  const details = `Disciplina: ${discipline}
+Distancia: ${dist} | Desnivel: ${elev}
+${rawDesc}
+
+M\xE1s informaci\xF3n: https://calendariociclista.vercel.app/evento/${race.id}`;
+  const baseUrl = "https://calendar.google.com/calendar/render";
+  const params = new URLSearchParams({
+    action: "TEMPLATE",
+    text: title,
+    dates: `${startStr}/${endStr}`,
+    details,
+    location
+  });
+  return `${baseUrl}?${params.toString()}`;
+}
+function downloadICSFile(race) {
+  const content = generateICSContent(race);
+  if (!content) return;
+  const blob = new Blob([content], { type: "text/calendar;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  const safeName = (race.name || race.nombre || "carrera").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  link.href = url;
+  link.download = `${safeName}.ics`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+var init_calendar_export = __esm({
+  "js/calendar-export.js"() {
+  }
+});
+
 // js/supabase.js
 import { createClient } from "@supabase/supabase-js";
 function getCredentials() {
@@ -718,182 +826,6 @@ var init_storage = __esm({
   }
 });
 
-// js/calendar-export.js
-function toICSDate(dateStr) {
-  if (!dateStr) return "";
-  return dateStr.replace(/-/g, "").split("T")[0];
-}
-function escapeICS(str) {
-  if (!str) return "";
-  return String(str).replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\n/g, "\\n").replace(/\r/g, "");
-}
-function generateICSContent(race) {
-  const startStr = (race.startDate || race.fecha_inicio || race.date || "").split("T")[0].trim();
-  const endStr = (race.endDate || race.fecha_fin || startStr).split("T")[0].trim();
-  const dtstart = toICSDate(startStr);
-  let dtend = dtstart;
-  if (endStr && endStr !== startStr) {
-    dtend = toICSDate(endStr);
-  } else {
-    const d = /* @__PURE__ */ new Date(startStr + "T00:00:00");
-    d.setDate(d.getDate() + 1);
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    dtend = `${y}${m}${day}`;
-  }
-  const name = escapeICS(race.name || "Carrera de Ciclismo");
-  const location = escapeICS([race.city, race.region].filter(Boolean).join(", "));
-  const description = escapeICS(
-    [
-      race.description || "",
-      race.registrationUrl ? `Inscripci\xF3n: ${race.registrationUrl}` : "",
-      `Disciplina: ${race.discipline || ""}`,
-      race.distance ? `Distancia: ${race.distance}` : "",
-      race.elevation ? `Desnivel: ${race.elevation}` : ""
-    ].filter(Boolean).join("\n")
-  );
-  const uid = `race-${race.id}@calendariociclista.vercel.app`;
-  const now = (/* @__PURE__ */ new Date()).toISOString().replace(/[-:.]/g, "").slice(0, 15) + "Z";
-  return [
-    "BEGIN:VCALENDAR",
-    "VERSION:2.0",
-    "PRODID:-//CalendarioCiclista Chile//ES",
-    "CALSCALE:GREGORIAN",
-    "METHOD:PUBLISH",
-    "BEGIN:VEVENT",
-    `UID:${uid}`,
-    `DTSTAMP:${now}`,
-    `DTSTART;VALUE=DATE:${dtstart}`,
-    `DTEND;VALUE=DATE:${dtend}`,
-    `SUMMARY:${name}`,
-    `LOCATION:${location}`,
-    `DESCRIPTION:${description}`,
-    `URL:https://calendariociclista.vercel.app/evento/${race.id}`,
-    "END:VEVENT",
-    "END:VCALENDAR"
-  ].join("\r\n");
-}
-function buildGoogleCalendarUrl(race) {
-  const startStr = (race.startDate || race.fecha_inicio || race.date || "").split("T")[0].trim();
-  const endStr = (race.endDate || race.fecha_fin || startStr).split("T")[0].trim();
-  const dtstart = toICSDate(startStr);
-  let dtend = dtstart;
-  if (endStr && endStr !== startStr) {
-    dtend = toICSDate(endStr);
-  } else {
-    const d = /* @__PURE__ */ new Date(startStr + "T00:00:00");
-    d.setDate(d.getDate() + 1);
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    dtend = `${y}${m}${day}`;
-  }
-  const params = new URLSearchParams({
-    action: "TEMPLATE",
-    text: race.name || "Carrera de Ciclismo",
-    dates: `${dtstart}/${dtend}`,
-    location: [race.city, race.region].filter(Boolean).join(", "),
-    details: [
-      race.description || "",
-      race.registrationUrl ? `
-Inscripci\xF3n: ${race.registrationUrl}` : ""
-    ].filter(Boolean).join("")
-  });
-  return `https://calendar.google.com/calendar/render?${params.toString()}`;
-}
-function downloadICS(icsContent, filename = "evento") {
-  const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `${filename}.ics`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(url), 1e3);
-}
-function renderCalendarButtonHTML(raceId, context = "card") {
-  const isDetail = context === "detail";
-  const btnClass = isDetail ? "px-4 py-2.5 rounded-xl bg-surface-container border border-outline-variant/50 text-primary font-display font-bold text-sm flex items-center gap-2 hover:bg-surface-container-high transition-all shadow-sm" : "w-full py-2.5 rounded-xl bg-surface-container border border-outline-variant/40 text-primary font-display font-bold text-xs flex items-center justify-center gap-1.5 hover:bg-surface-container-high transition-all";
-  return `
-    <div class="relative cal-export-wrapper" data-race-id="${raceId}">
-      <button
-        type="button"
-        class="btn-cal-export ${btnClass}"
-        aria-haspopup="true"
-        aria-expanded="false"
-        aria-label="A\xF1adir al calendario"
-      >
-        <span class="material-symbols-outlined ${isDetail ? "text-base" : "text-sm"}">event</span>
-        <span>${isDetail ? "A\xF1adir al calendario" : "Al calendario"}</span>
-        <span class="material-symbols-outlined ${isDetail ? "text-sm" : "text-xs"} transition-transform duration-200 cal-chevron">expand_more</span>
-      </button>
-
-      <!-- Dropdown menu -->
-      <div
-        class="cal-export-dropdown hidden absolute ${isDetail ? "right-0" : "left-0 right-0"} bottom-full mb-2 bg-white rounded-2xl border border-outline-variant/40 shadow-xl z-50 overflow-hidden min-w-[220px]"
-        role="menu"
-      >
-        <div class="p-1.5 space-y-0.5">
-          <button type="button" class="cal-option cal-google w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-container text-left transition-colors" role="menuitem" data-race-id="${raceId}">
-            <span class="w-7 h-7 rounded-lg bg-[#4285F4]/10 flex items-center justify-center flex-shrink-0">
-              <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none">
-                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
-                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-              </svg>
-            </span>
-            <div>
-              <p class="font-display font-bold text-sm text-primary">Google Calendar</p>
-              <p class="text-xs text-outline">Abre en nueva pesta\xF1a</p>
-            </div>
-          </button>
-
-          <button type="button" class="cal-option cal-apple w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-container text-left transition-colors" role="menuitem" data-race-id="${raceId}">
-            <span class="w-7 h-7 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
-              <span class="material-symbols-outlined text-base text-gray-700">calendar_month</span>
-            </span>
-            <div>
-              <p class="font-display font-bold text-sm text-primary">Apple Calendar</p>
-              <p class="text-xs text-outline">Descarga archivo .ics</p>
-            </div>
-          </button>
-
-          <button type="button" class="cal-option cal-outlook w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-container text-left transition-colors" role="menuitem" data-race-id="${raceId}">
-            <span class="w-7 h-7 rounded-lg bg-[#0078D4]/10 flex items-center justify-center flex-shrink-0">
-              <svg viewBox="0 0 24 24" class="w-4 h-4" fill="#0078D4">
-                <path d="M7.88 12.04q0 .45-.11.87-.1.41-.33.74-.22.33-.58.52-.37.2-.87.2t-.85-.2q-.35-.21-.57-.55-.22-.33-.33-.75-.1-.42-.1-.86t.1-.87q.1-.43.34-.76.22-.34.59-.54.36-.2.87-.2t.86.2q.35.21.57.55.22.34.31.77.1.43.1.88zM24 12v9.38q0 .46-.33.8-.33.32-.8.32H7.13q-.46 0-.8-.33-.32-.33-.32-.8V18H1q-.41 0-.7-.3-.3-.29-.3-.7V7q0-.41.3-.7Q.58 6 1 6h6.5V2.55q0-.44.3-.75.3-.3.75-.3h12.9q.44 0 .75.3.3.3.3.75V10.85l1.24.72q.06.04.06.1zm-2 1.3l-3.44-2V9.45l-8.42 4.9v7.08h11.86zm-7.3-5.19l3.44-2.01-3.44-2.01-3.44 2.01zm-8.56 1.7l.5.3V15.45q.37.16.71.43.33.27.55.62.23.35.35.75.12.4.12.84 0 .55-.19.99-.19.45-.53.77-.34.32-.8.5-.45.16-.97.16-.55 0-1-.17-.44-.18-.76-.5-.32-.3-.49-.72-.18-.42-.18-.93 0-.42.11-.83.11-.4.33-.74.23-.33.57-.56.34-.22.75-.3l.01-7.41-4.3-2.55v9.17H2.28V8.26z"/>
-              </svg>
-            </span>
-            <div>
-              <p class="font-display font-bold text-sm text-primary">Outlook</p>
-              <p class="text-xs text-outline">Descarga archivo .ics</p>
-            </div>
-          </button>
-
-          <div class="border-t border-outline-variant/30 my-1"></div>
-
-          <button type="button" class="cal-option cal-copy w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-container text-left transition-colors" role="menuitem" data-race-id="${raceId}">
-            <span class="w-7 h-7 rounded-lg bg-tertiary-fixed/30 flex items-center justify-center flex-shrink-0">
-              <span class="material-symbols-outlined text-base text-primary">content_copy</span>
-            </span>
-            <div>
-              <p class="font-display font-bold text-sm text-primary">Copiar fecha</p>
-              <p class="text-xs text-outline">Copia al portapapeles</p>
-            </div>
-          </button>
-        </div>
-      </div>
-    </div>
-  `;
-}
-var init_calendar_export = __esm({
-  "js/calendar-export.js"() {
-  }
-});
-
 // js/ui.js
 function parseLocalDate(dateStr) {
   if (!dateStr || typeof dateStr !== "string") return null;
@@ -1148,7 +1080,39 @@ function renderRaceCards(container, races = [], isAdmin2 = false) {
               Ver Detalle
               <span class="material-symbols-outlined text-base">arrow_forward</span>
             </button>
-            ${renderCalendarButtonHTML(race.id, "card")}
+
+            <!-- Dropdown A\xF1adir a mi calendario -->
+            <div class="relative inline-block w-full">
+              <button 
+                type="button" 
+                data-calendar-trigger="${race.id}" 
+                class="w-full bg-surface-container hover:bg-surface-container-high text-primary font-display font-bold text-xs py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 transition-colors border border-outline-variant/50"
+                aria-expanded="false"
+              >
+                <span class="material-symbols-outlined text-sm">calendar_add_on</span>
+                A\xF1adir a mi calendario
+                <span class="material-symbols-outlined text-xs">expand_more</span>
+              </button>
+
+              <div 
+                id="calendar-dropdown-${race.id}" 
+                class="calendar-dropdown-menu hidden absolute left-0 right-0 bottom-full mb-2 bg-white rounded-2xl shadow-xl border border-outline-variant/40 p-1.5 z-50 animate-fadeIn"
+              >
+                <button type="button" data-calendar-action="google" data-race-id="${race.id}" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-primary hover:bg-surface-container flex items-center gap-2 transition-colors">
+                  <span class="text-base">\u{1F4C5}</span> Google Calendar
+                </button>
+                <button type="button" data-calendar-action="apple" data-race-id="${race.id}" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-primary hover:bg-surface-container flex items-center gap-2 transition-colors">
+                  <span class="text-base">\u{1F34E}</span> Apple Calendar (.ics)
+                </button>
+                <button type="button" data-calendar-action="outlook" data-race-id="${race.id}" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-primary hover:bg-surface-container flex items-center gap-2 transition-colors">
+                  <span class="text-base">\u{1F4C6}</span> Outlook (.ics)
+                </button>
+                <button type="button" data-calendar-action="copy" data-race-id="${race.id}" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-primary hover:bg-surface-container flex items-center gap-2 transition-colors border-t border-outline-variant/30 mt-1 pt-2">
+                  <span class="material-symbols-outlined text-sm text-outline">content_copy</span> Copiar Fecha
+                </button>
+              </div>
+            </div>
+
             ${isAdmin2 ? `
             <div class="flex gap-2 w-full pt-1">
               <button type="button" data-edit-id="${race.id}" class="flex-grow py-2.5 rounded-xl bg-surface-container border border-outline-variant/60 text-primary font-bold text-xs hover:bg-surface-container-high transition-colors flex items-center justify-center gap-1">
@@ -1210,7 +1174,6 @@ function renderDetailView(container, race, isAdmin2 = false) {
             </span>
             ${bookmarked ? "Guardada en Agenda" : "Guardar en Agenda"}
           </button>
-          ${renderCalendarButtonHTML(race.id, "detail")}
         </div>
       </div>
 
@@ -1338,6 +1301,38 @@ function renderDetailView(container, race, isAdmin2 = false) {
               Ir a Formulario de Inscripci\xF3n
               <span class="material-symbols-outlined text-xl">open_in_new</span>
             </a>
+
+            <!-- Dropdown A\xF1adir a mi calendario (Vista Detalle) -->
+            <div class="relative inline-block w-full pt-1">
+              <button 
+                type="button" 
+                data-calendar-trigger="${race.id}" 
+                class="w-full bg-surface-container hover:bg-surface-container-high text-primary font-display font-bold text-sm py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors border border-outline-variant/50 shadow-sm"
+                aria-expanded="false"
+              >
+                <span class="material-symbols-outlined text-base">calendar_add_on</span>
+                A\xF1adir a mi calendario
+                <span class="material-symbols-outlined text-sm">expand_more</span>
+              </button>
+
+              <div 
+                id="calendar-dropdown-${race.id}" 
+                class="calendar-dropdown-menu hidden absolute left-0 right-0 bottom-full mb-2 bg-white rounded-2xl shadow-xl border border-outline-variant/40 p-2 z-50 animate-fadeIn"
+              >
+                <button type="button" data-calendar-action="google" data-race-id="${race.id}" class="w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold text-primary hover:bg-surface-container flex items-center gap-2 transition-colors">
+                  <span class="text-base">\u{1F4C5}</span> Google Calendar
+                </button>
+                <button type="button" data-calendar-action="apple" data-race-id="${race.id}" class="w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold text-primary hover:bg-surface-container flex items-center gap-2 transition-colors">
+                  <span class="text-base">\u{1F34E}</span> Apple Calendar (.ics)
+                </button>
+                <button type="button" data-calendar-action="outlook" data-race-id="${race.id}" class="w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold text-primary hover:bg-surface-container flex items-center gap-2 transition-colors">
+                  <span class="text-base">\u{1F4C6}</span> Outlook (.ics)
+                </button>
+                <button type="button" data-calendar-action="copy" data-race-id="${race.id}" class="w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold text-primary hover:bg-surface-container flex items-center gap-2 transition-colors border-t border-outline-variant/30 mt-1 pt-2">
+                  <span class="material-symbols-outlined text-sm text-outline">content_copy</span> Copiar Fecha
+                </button>
+              </div>
+            </div>
 
             <p class="text-[11px] text-center text-outline leading-tight">
               Ser\xE1s redirigido al sitio web oficial del organizador para completar tu registro.
@@ -1762,7 +1757,6 @@ var DISCIPLINES;
 var init_ui = __esm({
   "js/ui.js"() {
     init_storage();
-    init_calendar_export();
     DISCIPLINES = ["Todas", "Ruta", "MTB", "Gravel", "Pista", "BMX", "Virtual"];
   }
 });
@@ -2678,81 +2672,8 @@ function setupImageUploadHandlers() {
     "btn-remove-edit-image"
   );
 }
-function setupCalendarExportHandlers() {
-  function closeAllCalDropdowns() {
-    document.querySelectorAll(".cal-export-dropdown").forEach((d) => {
-      d.classList.add("hidden");
-    });
-    document.querySelectorAll(".cal-chevron").forEach((c) => {
-      c.style.transform = "";
-    });
-    document.querySelectorAll(".btn-cal-export").forEach((b) => {
-      b.setAttribute("aria-expanded", "false");
-    });
-  }
-  document.addEventListener("click", async (e) => {
-    const exportBtn = e.target.closest(".btn-cal-export");
-    if (exportBtn) {
-      e.stopPropagation();
-      const wrapper = exportBtn.closest(".cal-export-wrapper");
-      const dropdown = wrapper?.querySelector(".cal-export-dropdown");
-      const chevron = exportBtn.querySelector(".cal-chevron");
-      if (!dropdown) return;
-      const isOpen = !dropdown.classList.contains("hidden");
-      closeAllCalDropdowns();
-      if (!isOpen) {
-        dropdown.classList.remove("hidden");
-        if (chevron) chevron.style.transform = "rotate(180deg)";
-        exportBtn.setAttribute("aria-expanded", "true");
-      }
-      return;
-    }
-    const option = e.target.closest(".cal-option");
-    if (option) {
-      e.stopPropagation();
-      const raceId = option.dataset.raceId;
-      closeAllCalDropdowns();
-      let race = null;
-      if (isSupabaseConfigured()) {
-        race = await fetchRaceByIdSupabase(raceId);
-      }
-      if (!race) {
-        const races = await getAllRaces();
-        race = races.find((r) => String(r.id) === String(raceId));
-      }
-      if (!race) {
-        showNotificationToast("\u26A0\uFE0F No se pudieron obtener los datos de la carrera.");
-        return;
-      }
-      if (option.classList.contains("cal-google")) {
-        const url = buildGoogleCalendarUrl(race);
-        window.open(url, "_blank", "noopener,noreferrer");
-        showNotificationToast("\u{1F4C5} Abriendo Google Calendar...");
-      } else if (option.classList.contains("cal-apple") || option.classList.contains("cal-outlook")) {
-        const ics = generateICSContent(race);
-        const safeName = (race.name || "carrera").replace(/[^a-z0-9]/gi, "_").toLowerCase();
-        downloadICS(ics, safeName);
-        showNotificationToast("\u{1F4E5} Descargando archivo .ics...");
-      } else if (option.classList.contains("cal-copy")) {
-        const dateText = race.displayDate || race.date || race.startDate || race.fecha_inicio || "";
-        const textToCopy = `${race.name} \u2014 ${dateText}${race.city ? ", " + race.city : ""}`;
-        try {
-          await navigator.clipboard.writeText(textToCopy);
-          showNotificationToast("\u{1F4CB} Fecha copiada al portapapeles");
-        } catch {
-          showNotificationToast("\u26A0\uFE0F No se pudo copiar al portapapeles");
-        }
-      }
-      return;
-    }
-    if (!e.target.closest(".cal-export-wrapper")) {
-      closeAllCalDropdowns();
-    }
-  });
-}
 function setupEventHandlers() {
   setupImageUploadHandlers();
-  setupCalendarExportHandlers();
   const viewModes = ["cards", "month", "week", "day"];
   viewModes.forEach((mode) => {
     const btn = document.getElementById(`btn-view-${mode}`);
@@ -2937,7 +2858,10 @@ function setupEventHandlers() {
         handleDeleteRace(raceId);
         return;
       }
-      const detailBtn = e.target.closest("[data-race-id]");
+      if (e.target.closest("[data-calendar-trigger], [data-calendar-action]")) {
+        return;
+      }
+      const detailBtn = e.target.closest("[data-race-id], .btn-view-detail");
       if (detailBtn) {
         const raceId = detailBtn.getAttribute("data-race-id");
         if (raceId) {
@@ -2982,6 +2906,54 @@ function setupEventHandlers() {
       }
     });
   }
+  document.addEventListener("click", async (e) => {
+    const triggerBtn = e.target.closest("[data-calendar-trigger]");
+    if (triggerBtn) {
+      e.stopPropagation();
+      const raceId = triggerBtn.getAttribute("data-calendar-trigger");
+      const dropdown = document.getElementById(`calendar-dropdown-${raceId}`);
+      document.querySelectorAll(".calendar-dropdown-menu").forEach((menu) => {
+        if (menu !== dropdown) menu.classList.add("hidden");
+      });
+      if (dropdown) {
+        dropdown.classList.toggle("hidden");
+      }
+      return;
+    }
+    const actionBtn = e.target.closest("[data-calendar-action]");
+    if (actionBtn) {
+      e.stopPropagation();
+      const action = actionBtn.getAttribute("data-calendar-action");
+      const raceId = actionBtn.getAttribute("data-race-id");
+      const dropdown = document.getElementById(`calendar-dropdown-${raceId}`);
+      if (dropdown) dropdown.classList.add("hidden");
+      const races = await getAllRaces();
+      const race = races.find((r) => String(r.id) === String(raceId));
+      if (!race) return;
+      if (action === "google") {
+        const url = buildGoogleCalendarUrl(race);
+        window.open(url, "_blank", "noopener,noreferrer");
+      } else if (action === "apple" || action === "outlook") {
+        downloadICSFile(race);
+        showNotificationToast("\u{1F4C6} Descargando archivo .ics de calendario...");
+      } else if (action === "copy") {
+        const dateText = race.displayDate || race.date;
+        const fullText = `${race.name || race.nombre} \u2014 ${dateText} en ${race.city || race.ubicacion || race.region}`;
+        try {
+          await navigator.clipboard.writeText(fullText);
+          showNotificationToast("\u{1F4CB} Fecha copiada al portapapeles");
+        } catch (err) {
+          showNotificationToast("\u{1F4CB} Fecha del evento: " + dateText);
+        }
+      }
+      return;
+    }
+    if (!e.target.closest(".calendar-dropdown-menu")) {
+      document.querySelectorAll(".calendar-dropdown-menu").forEach((menu) => {
+        menu.classList.add("hidden");
+      });
+    }
+  });
   const raceForm = document.getElementById("race-form");
   if (raceForm) {
     raceForm.noValidate = true;
@@ -3527,11 +3499,11 @@ var init_app = __esm({
   "js/app.js"() {
     init_router();
     init_data();
+    init_calendar_export();
     init_storage();
     init_ui();
     init_validation();
     init_supabase();
-    init_calendar_export();
     currentDiscipline = "Todas";
     currentRegion = "Todas las regiones";
     currentMonth = "Todos";
