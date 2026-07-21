@@ -353,6 +353,11 @@ async function createPendingRaceSupabase(raceData) {
       console.error("Error al insertar carrera pendiente en Supabase:", error);
       return { success: false, error: error.message || error };
     }
+    fetch("/api/notify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    }).catch((err) => console.warn("Notificaci\xF3n de correo omitida o no disponible:", err));
     return {
       success: true,
       data: data && data.length > 0 ? data[0] : null

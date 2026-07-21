@@ -20,5 +20,8 @@
     "@supabase/supabase-js": "^2.110.7",
     "axios": "^1.18.1",
     "puppeteer-core": "^25.3.0"
+  },
+  "dependencies": {
+    "nodemailer": "^9.0.3"
   }
 }

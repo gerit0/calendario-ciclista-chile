@@ -236,6 +236,13 @@ export async function createPendingRaceSupabase(raceData) {
       return { success: false, error: error.message || error };
     }
 
+    // Disparar notificación por correo en segundo plano (no bloqueante)
+    fetch('/api/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).catch(err => console.warn('Notificación de correo omitida o no disponible:', err));
+
     return {
       success: true,
       data: (data && data.length > 0) ? data[0] : null
