@@ -637,10 +637,10 @@ export function renderPendingRaces(container, races = []) {
         </div>
         <p class="text-xs text-gray-600 line-clamp-3">${race.description}</p>
         <div class="pt-4 border-t border-outline-variant/30 grid grid-cols-2 gap-2">
-          <button type="button" data-approve-id="${race.id}" class="py-2.5 rounded-xl bg-emerald-600 text-white font-display font-bold text-xs hover:bg-emerald-700 transition-colors flex items-center justify-center gap-1 shadow-sm">
+          <button type="button" data-id="${race.id}" data-approve-id="${race.id}" class="btn-approve-race py-2.5 rounded-xl bg-emerald-600 text-white font-display font-bold text-xs hover:bg-emerald-700 transition-colors flex items-center justify-center gap-1 shadow-sm">
             <span class="material-symbols-outlined text-sm">check_circle</span> Aprobar
           </button>
-          <button type="button" data-reject-id="${race.id}" class="py-2.5 rounded-xl bg-red-600 text-white font-display font-bold text-xs hover:bg-red-700 transition-colors flex items-center justify-center gap-1 shadow-sm">
+          <button type="button" data-id="${race.id}" data-reject-id="${race.id}" class="btn-reject-race py-2.5 rounded-xl bg-red-600 text-white font-display font-bold text-xs hover:bg-red-700 transition-colors flex items-center justify-center gap-1 shadow-sm">
             <span class="material-symbols-outlined text-sm">cancel</span> Rechazar
           </button>
         </div>

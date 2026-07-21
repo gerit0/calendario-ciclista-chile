@@ -1221,10 +1221,10 @@ function renderPendingRaces(container, races = []) {
         </div>
         <p class="text-xs text-gray-600 line-clamp-3">${race.description}</p>
         <div class="pt-4 border-t border-outline-variant/30 grid grid-cols-2 gap-2">
-          <button type="button" data-approve-id="${race.id}" class="py-2.5 rounded-xl bg-emerald-600 text-white font-display font-bold text-xs hover:bg-emerald-700 transition-colors flex items-center justify-center gap-1 shadow-sm">
+          <button type="button" data-id="${race.id}" data-approve-id="${race.id}" class="btn-approve-race py-2.5 rounded-xl bg-emerald-600 text-white font-display font-bold text-xs hover:bg-emerald-700 transition-colors flex items-center justify-center gap-1 shadow-sm">
             <span class="material-symbols-outlined text-sm">check_circle</span> Aprobar
           </button>
-          <button type="button" data-reject-id="${race.id}" class="py-2.5 rounded-xl bg-red-600 text-white font-display font-bold text-xs hover:bg-red-700 transition-colors flex items-center justify-center gap-1 shadow-sm">
+          <button type="button" data-id="${race.id}" data-reject-id="${race.id}" class="btn-reject-race py-2.5 rounded-xl bg-red-600 text-white font-display font-bold text-xs hover:bg-red-700 transition-colors flex items-center justify-center gap-1 shadow-sm">
             <span class="material-symbols-outlined text-sm">cancel</span> Rechazar
           </button>
         </div>
@@ -2060,9 +2060,9 @@ async function loadPendingRacesList() {
 function bindPendingRaceActionEvents() {
   const container = document.getElementById("pending-races-list");
   if (!container) return;
-  container.querySelectorAll(".btn-approve-race").forEach((btn) => {
+  container.querySelectorAll(".btn-approve-race, [data-approve-id]").forEach((btn) => {
     btn.addEventListener("click", async (e) => {
-      const raceId = e.currentTarget.dataset.id;
+      const raceId = btn.getAttribute("data-id") || btn.getAttribute("data-approve-id") || btn.dataset.id;
       if (!raceId) return;
       btn.disabled = true;
       btn.textContent = "Aprobando...";
@@ -2071,15 +2071,16 @@ function bindPendingRaceActionEvents() {
         showNotificationToast("\u2705 Carrera aprobada con \xE9xito. Ahora es visible en el calendario p\xFAblico.");
         await loadPendingRacesList();
       } else {
-        alert("Error al aprobar la carrera: " + res.error);
+        const errorMsg = res.error?.message || (typeof res.error === "string" ? res.error : JSON.stringify(res.error));
+        alert("Error al aprobar la carrera: " + errorMsg);
         btn.disabled = false;
         btn.textContent = "Aprobar";
       }
     });
   });
-  container.querySelectorAll(".btn-reject-race").forEach((btn) => {
+  container.querySelectorAll(".btn-reject-race, [data-reject-id]").forEach((btn) => {
     btn.addEventListener("click", async (e) => {
-      const raceId = e.currentTarget.dataset.id;
+      const raceId = btn.getAttribute("data-id") || btn.getAttribute("data-reject-id") || btn.dataset.id;
       if (!raceId) return;
       if (!confirm("\xBFEst\xE1s seguro de que deseas rechazar esta propuesta?")) return;
       btn.disabled = true;
@@ -2089,7 +2090,8 @@ function bindPendingRaceActionEvents() {
         showNotificationToast("\u{1F6AB} Carrera rechazada.");
         await loadPendingRacesList();
       } else {
-        alert("Error al rechazar la carrera: " + res.error);
+        const errorMsg = res.error?.message || (typeof res.error === "string" ? res.error : JSON.stringify(res.error));
+        alert("Error al rechazar la carrera: " + errorMsg);
         btn.disabled = false;
         btn.textContent = "Rechazar";
       }

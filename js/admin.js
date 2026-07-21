@@ -422,9 +422,9 @@ function bindPendingRaceActionEvents() {
   const container = document.getElementById('pending-races-list');
   if (!container) return;
 
-  container.querySelectorAll('.btn-approve-race').forEach(btn => {
+  container.querySelectorAll('.btn-approve-race, [data-approve-id]').forEach(btn => {
     btn.addEventListener('click', async (e) => {
-      const raceId = e.currentTarget.dataset.id;
+      const raceId = btn.getAttribute('data-id') || btn.getAttribute('data-approve-id') || btn.dataset.id;
       if (!raceId) return;
       btn.disabled = true;
       btn.textContent = 'Aprobando...';
@@ -433,16 +433,17 @@ function bindPendingRaceActionEvents() {
         showNotificationToast('✅ Carrera aprobada con éxito. Ahora es visible en el calendario público.');
         await loadPendingRacesList();
       } else {
-        alert('Error al aprobar la carrera: ' + res.error);
+        const errorMsg = res.error?.message || (typeof res.error === 'string' ? res.error : JSON.stringify(res.error));
+        alert('Error al aprobar la carrera: ' + errorMsg);
         btn.disabled = false;
         btn.textContent = 'Aprobar';
       }
     });
   });
 
-  container.querySelectorAll('.btn-reject-race').forEach(btn => {
+  container.querySelectorAll('.btn-reject-race, [data-reject-id]').forEach(btn => {
     btn.addEventListener('click', async (e) => {
-      const raceId = e.currentTarget.dataset.id;
+      const raceId = btn.getAttribute('data-id') || btn.getAttribute('data-reject-id') || btn.dataset.id;
       if (!raceId) return;
       if (!confirm('¿Estás seguro de que deseas rechazar esta propuesta?')) return;
       btn.disabled = true;
@@ -452,7 +453,8 @@ function bindPendingRaceActionEvents() {
         showNotificationToast('🚫 Carrera rechazada.');
         await loadPendingRacesList();
       } else {
-        alert('Error al rechazar la carrera: ' + res.error);
+        const errorMsg = res.error?.message || (typeof res.error === 'string' ? res.error : JSON.stringify(res.error));
+        alert('Error al rechazar la carrera: ' + errorMsg);
         btn.disabled = false;
         btn.textContent = 'Rechazar';
       }
