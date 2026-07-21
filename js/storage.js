@@ -3,7 +3,13 @@
  */
 
 import { INITIAL_RACES } from './data.js';
-import { isSupabaseConfigured, fetchApprovedRacesSupabase, createPendingRaceSupabase } from './supabase.js';
+import { 
+  isSupabaseConfigured, 
+  fetchApprovedRacesSupabase, 
+  createPendingRaceSupabase,
+  deleteRaceSupabase,
+  updateRaceSupabase
+} from './supabase.js';
 
 export const BOOKMARKS_KEY = 'calendariociclista_bookmarks';
 export const CUSTOM_RACES_KEY = 'calendariociclista_custom_races';

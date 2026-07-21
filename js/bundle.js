@@ -460,6 +460,54 @@ async function updateRaceStatusSupabase(raceId, status) {
     return { success: false, error: err.message || err };
   }
 }
+async function deleteRaceSupabase(raceId) {
+  const client = getSupabase();
+  if (!client) return { success: false, error: "Supabase no est\xE1 configurado." };
+  try {
+    const { error } = await client.from("carreras").delete().eq("id", raceId);
+    if (error) throw error;
+    return { success: true };
+  } catch (err) {
+    console.error("Error al eliminar carrera de Supabase:", err);
+    return { success: false, error: err.message || err };
+  }
+}
+async function updateRaceSupabase(raceId, raceData) {
+  const client = getSupabase();
+  if (!client) return { success: false, error: "Supabase no est\xE1 configurado." };
+  try {
+    const rawUrl = raceData.registrationUrl || raceData.link_inscripcion || null;
+    const cleanUrl = rawUrl && typeof rawUrl === "string" && rawUrl.trim() !== "#" && /^https?:\/\//i.test(rawUrl.trim()) ? rawUrl.trim() : null;
+    const payload = {
+      nombre: raceData.name || raceData.nombre,
+      fecha: raceData.date || raceData.fecha,
+      disciplina: raceData.discipline || raceData.disciplina,
+      region: raceData.region,
+      ubicacion: raceData.city || raceData.ubicacion,
+      distancia: raceData.distance || raceData.distancia || null,
+      desnivel: raceData.elevation || raceData.desnivel || null,
+      organizador: raceData.organizer || raceData.organizador,
+      link_inscripcion: cleanUrl,
+      categoria: Array.isArray(raceData.categories) ? raceData.categories.join(", ") : raceData.categoria || raceData.categories,
+      precio: raceData.price != null ? Number(raceData.price) : 0,
+      hero_image: raceData.heroImage || raceData.hero_image,
+      descripcion: raceData.description || raceData.descripcion
+    };
+    let { error } = await client.from("carreras").update(payload).eq("id", raceId);
+    if (error && (error.code === "PGRST204" || String(error.message || error).includes("column"))) {
+      const fallbackPayload = { ...payload };
+      delete fallbackPayload.distancia;
+      delete fallbackPayload.desnivel;
+      const retryRes = await client.from("carreras").update(fallbackPayload).eq("id", raceId);
+      error = retryRes.error;
+    }
+    if (error) throw error;
+    return { success: true };
+  } catch (err) {
+    console.error("Error al actualizar carrera en Supabase:", err);
+    return { success: false, error: err.message || err };
+  }
+}
 async function uploadRaceImageSupabase(file) {
   const client = getSupabase();
   if (!client) return { success: false, error: "Supabase no est\xE1 configurado." };
