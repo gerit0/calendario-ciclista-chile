@@ -184,6 +184,8 @@ export async function createPendingRaceSupabase(raceData) {
       disciplina: raceData.disciplina || raceData.discipline,
       region: raceData.region || null,
       ubicacion: raceData.ubicacion || raceData.city || null,
+      distancia: raceData.distancia || raceData.distance || null,
+      desnivel: raceData.desnivel || raceData.elevation || null,
       organizador: raceData.organizador || raceData.organizer || null,
       link_inscripcion: raceData.link_inscripcion || raceData.registrationUrl || null,
       categoria: Array.isArray(raceData.categories) 
@@ -391,6 +393,8 @@ export async function updateRaceSupabase(raceId, raceData) {
       disciplina: raceData.discipline || raceData.disciplina,
       region: raceData.region,
       ubicacion: raceData.city || raceData.ubicacion,
+      distancia: raceData.distance || raceData.distancia || null,
+      desnivel: raceData.elevation || raceData.desnivel || null,
       organizador: raceData.organizer || raceData.organizador,
       link_inscripcion: raceData.registrationUrl || raceData.link_inscripcion,
       categoria: Array.isArray(raceData.categories) 

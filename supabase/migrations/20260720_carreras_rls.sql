@@ -8,6 +8,8 @@ CREATE TABLE IF NOT EXISTS public.carreras (
     disciplina TEXT NOT NULL CHECK (disciplina IN ('Ruta', 'MTB', 'Gravel', 'Pista', 'BMX', 'Virtual')),
     region TEXT,
     ubicacion TEXT,
+    distancia TEXT,
+    desnivel TEXT,
     organizador TEXT,
     link_inscripcion TEXT CHECK (link_inscripcion IS NULL OR link_inscripcion ~* '^https?://[^\s/$.?#].[^\s]*$'),
     categoria TEXT,
@@ -93,3 +95,7 @@ ON public.usuarios_admin
 FOR SELECT
 TO authenticated
 USING (user_id = auth.uid());
+
+-- Asegurar presencia de columnas distancia y desnivel
+ALTER TABLE public.carreras ADD COLUMN IF NOT EXISTS distancia TEXT;
+ALTER TABLE public.carreras ADD COLUMN IF NOT EXISTS desnivel TEXT;
