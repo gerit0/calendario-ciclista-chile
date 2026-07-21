@@ -4,7 +4,6 @@
  */
 
 import { isBookmarked } from './storage.js';
-import { renderCalendarButtonHTML } from './calendar-export.js';
 
 /**
  * Parsea una cadena de fecha YYYY-MM-DD a objeto Date a las 00:00:00 hora local
@@ -342,7 +341,39 @@ export function renderRaceCards(container, races = [], isAdmin = false) {
               Ver Detalle
               <span class="material-symbols-outlined text-base">arrow_forward</span>
             </button>
-            ${renderCalendarButtonHTML(race.id, 'card')}
+
+            <!-- Dropdown Añadir a mi calendario -->
+            <div class="relative inline-block w-full">
+              <button 
+                type="button" 
+                data-calendar-trigger="${race.id}" 
+                class="w-full bg-surface-container hover:bg-surface-container-high text-primary font-display font-bold text-xs py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 transition-colors border border-outline-variant/50"
+                aria-expanded="false"
+              >
+                <span class="material-symbols-outlined text-sm">calendar_add_on</span>
+                Añadir a mi calendario
+                <span class="material-symbols-outlined text-xs">expand_more</span>
+              </button>
+
+              <div 
+                id="calendar-dropdown-${race.id}" 
+                class="calendar-dropdown-menu hidden absolute left-0 right-0 bottom-full mb-2 bg-white rounded-2xl shadow-xl border border-outline-variant/40 p-1.5 z-50 animate-fadeIn"
+              >
+                <button type="button" data-calendar-action="google" data-race-id="${race.id}" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-primary hover:bg-surface-container flex items-center gap-2 transition-colors">
+                  <span class="text-base">📅</span> Google Calendar
+                </button>
+                <button type="button" data-calendar-action="apple" data-race-id="${race.id}" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-primary hover:bg-surface-container flex items-center gap-2 transition-colors">
+                  <span class="text-base">🍎</span> Apple Calendar (.ics)
+                </button>
+                <button type="button" data-calendar-action="outlook" data-race-id="${race.id}" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-primary hover:bg-surface-container flex items-center gap-2 transition-colors">
+                  <span class="text-base">📆</span> Outlook (.ics)
+                </button>
+                <button type="button" data-calendar-action="copy" data-race-id="${race.id}" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-primary hover:bg-surface-container flex items-center gap-2 transition-colors border-t border-outline-variant/30 mt-1 pt-2">
+                  <span class="material-symbols-outlined text-sm text-outline">content_copy</span> Copiar Fecha
+                </button>
+              </div>
+            </div>
+
             ${isAdmin ? `
             <div class="flex gap-2 w-full pt-1">
               <button type="button" data-edit-id="${race.id}" class="flex-grow py-2.5 rounded-xl bg-surface-container border border-outline-variant/60 text-primary font-bold text-xs hover:bg-surface-container-high transition-colors flex items-center justify-center gap-1">
@@ -415,7 +446,6 @@ export function renderDetailView(container, race, isAdmin = false) {
             </span>
             ${bookmarked ? 'Guardada en Agenda' : 'Guardar en Agenda'}
           </button>
-          ${renderCalendarButtonHTML(race.id, 'detail')}
         </div>
       </div>
 
@@ -543,6 +573,38 @@ export function renderDetailView(container, race, isAdmin = false) {
               Ir a Formulario de Inscripción
               <span class="material-symbols-outlined text-xl">open_in_new</span>
             </a>
+
+            <!-- Dropdown Añadir a mi calendario (Vista Detalle) -->
+            <div class="relative inline-block w-full pt-1">
+              <button 
+                type="button" 
+                data-calendar-trigger="${race.id}" 
+                class="w-full bg-surface-container hover:bg-surface-container-high text-primary font-display font-bold text-sm py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors border border-outline-variant/50 shadow-sm"
+                aria-expanded="false"
+              >
+                <span class="material-symbols-outlined text-base">calendar_add_on</span>
+                Añadir a mi calendario
+                <span class="material-symbols-outlined text-sm">expand_more</span>
+              </button>
+
+              <div 
+                id="calendar-dropdown-${race.id}" 
+                class="calendar-dropdown-menu hidden absolute left-0 right-0 bottom-full mb-2 bg-white rounded-2xl shadow-xl border border-outline-variant/40 p-2 z-50 animate-fadeIn"
+              >
+                <button type="button" data-calendar-action="google" data-race-id="${race.id}" class="w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold text-primary hover:bg-surface-container flex items-center gap-2 transition-colors">
+                  <span class="text-base">📅</span> Google Calendar
+                </button>
+                <button type="button" data-calendar-action="apple" data-race-id="${race.id}" class="w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold text-primary hover:bg-surface-container flex items-center gap-2 transition-colors">
+                  <span class="text-base">🍎</span> Apple Calendar (.ics)
+                </button>
+                <button type="button" data-calendar-action="outlook" data-race-id="${race.id}" class="w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold text-primary hover:bg-surface-container flex items-center gap-2 transition-colors">
+                  <span class="text-base">📆</span> Outlook (.ics)
+                </button>
+                <button type="button" data-calendar-action="copy" data-race-id="${race.id}" class="w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold text-primary hover:bg-surface-container flex items-center gap-2 transition-colors border-t border-outline-variant/30 mt-1 pt-2">
+                  <span class="material-symbols-outlined text-sm text-outline">content_copy</span> Copiar Fecha
+                </button>
+              </div>
+            </div>
 
             <p class="text-[11px] text-center text-outline leading-tight">
               Serás redirigido al sitio web oficial del organizador para completar tu registro.
