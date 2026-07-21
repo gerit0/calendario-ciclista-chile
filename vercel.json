@@ -1,5 +1,4 @@
 {
-  "cleanUrls": true,
   "redirects": [
     {
       "source": "/(.*)",
@@ -19,15 +18,7 @@
       "destination": "/api/seo?id=:id*"
     },
     {
-      "source": "/agenda",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/publicar",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/admin",
+      "source": "/:path*",
       "destination": "/index.html"
     }
   ],
