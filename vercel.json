@@ -19,7 +19,7 @@
       "destination": "/api/seo?id=:id*"
     },
     {
-      "source": "/((?!api/).*)",
+      "source": "/:path*",
       "destination": "/index.html"
     }
   ],
