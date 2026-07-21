@@ -18,15 +18,7 @@
       "destination": "/api/seo?id=:id*"
     },
     {
-      "source": "/js/bundle.js",
-      "destination": "/js/bundle.js"
-    },
-    {
-      "source": "/_bundle.js",
-      "destination": "/_bundle.js"
-    },
-    {
-      "source": "/:path*",
+      "source": "/((?!api/|.*\\..*).*)",
       "destination": "/index.html"
     }
   ],
