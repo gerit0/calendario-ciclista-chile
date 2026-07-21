@@ -18,6 +18,10 @@
       "destination": "/api/seo?id=:id*"
     },
     {
+      "source": "/js/bundle.js",
+      "destination": "/js/bundle.js"
+    },
+    {
       "source": "/:path*",
       "destination": "/index.html"
     }
