@@ -4,6 +4,7 @@
  */
 
 import { isBookmarked } from './storage.js';
+import { renderCalendarButtonHTML } from './calendar-export.js';
 
 /**
  * Parsea una cadena de fecha YYYY-MM-DD a objeto Date a las 00:00:00 hora local
@@ -341,6 +342,7 @@ export function renderRaceCards(container, races = [], isAdmin = false) {
               Ver Detalle
               <span class="material-symbols-outlined text-base">arrow_forward</span>
             </button>
+            ${renderCalendarButtonHTML(race.id, 'card')}
             ${isAdmin ? `
             <div class="flex gap-2 w-full pt-1">
               <button type="button" data-edit-id="${race.id}" class="flex-grow py-2.5 rounded-xl bg-surface-container border border-outline-variant/60 text-primary font-bold text-xs hover:bg-surface-container-high transition-colors flex items-center justify-center gap-1">
@@ -413,6 +415,7 @@ export function renderDetailView(container, race, isAdmin = false) {
             </span>
             ${bookmarked ? 'Guardada en Agenda' : 'Guardar en Agenda'}
           </button>
+          ${renderCalendarButtonHTML(race.id, 'detail')}
         </div>
       </div>
 
