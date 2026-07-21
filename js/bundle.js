@@ -1,211 +1,285 @@
-// js/data.js
-var REGIONS_CHILE = [
-  "Todas las regiones",
-  "Regi\xF3n de Arica y Parinacota",
-  "Regi\xF3n de Tarapac\xE1",
-  "Regi\xF3n de Antofagasta",
-  "Regi\xF3n de Atacama",
-  "Regi\xF3n de Coquimbo",
-  "Regi\xF3n de Valpara\xEDso",
-  "Regi\xF3n Metropolitana de Santiago",
-  "Regi\xF3n del Libertador General Bernardo O'Higgins",
-  "Regi\xF3n del Maule",
-  "Regi\xF3n de \xD1uble",
-  "Regi\xF3n del Biob\xEDo",
-  "Regi\xF3n de La Araucan\xEDa",
-  "Regi\xF3n de Los R\xEDos",
-  "Regi\xF3n de Los Lagos",
-  "Regi\xF3n de Ays\xE9n del General Carlos Ib\xE1\xF1ez del Campo",
-  "Regi\xF3n de Magallanes y de la Ant\xE1rtica Chilena"
-];
-var INITIAL_RACES = [
-  {
-    id: "race-001",
-    name: "Gran Fondo Valle del Elqui",
-    discipline: "Ruta",
-    date: "2026-10-15",
-    startDate: "2026-10-15",
-    endDate: "2026-10-15",
-    month: "Octubre",
-    displayDate: "15 de Octubre, 2026",
-    region: "Regi\xF3n de Coquimbo",
-    city: "Vicu\xF1a",
-    distance: "120 km",
-    elevation: "1850 m",
-    price: 35e3,
-    isFree: false,
-    status: "Inscripciones Abiertas",
-    organizer: "Club Ciclismo Coquimbo",
-    registrationUrl: "https://ejemplo.cl/registro/gf-elqui",
-    heroImage: "https://images.unsplash.com/photo-1541625602330-2277a4c46182?auto=format&fit=crop&w=1200&q=80",
-    description: "Una imperdible competencia de gran fondo recorriendo los imponentes paisajes astron\xF3micos y vi\xF1edos del Valle del Elqui con llegada en altitud.",
-    categories: ["Elite", "Master A", "Master B", "Master C", "Amateur", "Damas Elite", "Damas Master"],
-    participants: 340
-  },
-  {
-    id: "race-002",
-    name: "Desaf\xEDo Transandes MTB Chilo\xE9",
-    discipline: "MTB",
-    date: "2026-11-20",
-    startDate: "2026-11-20",
-    endDate: "2026-11-22",
-    month: "Noviembre",
-    displayDate: "20 - 22 de Noviembre, 2026",
-    region: "Regi\xF3n de Los Lagos",
-    city: "Castro",
-    distance: "85 km",
-    elevation: "2400 m",
-    price: 45e3,
-    isFree: false,
-    status: "Inscripciones Abiertas",
-    organizer: "Austral Bike Chile",
-    registrationUrl: "https://ejemplo.cl/registro/transandes-chiloe",
-    heroImage: "https://images.unsplash.com/photo-1517649763962-0c623266010b?auto=format&fit=crop&w=1200&q=80",
-    description: "Tres d\xEDas de puro XCM cruzando los bosques nativos, palafitos y senderos ancestrales de la m\xEDtica Isla Grande de Chilo\xE9.",
-    categories: ["Pro Elite", "Varones A", "Varones B", "Damas Pro", "Duplas Mixtas"],
-    participants: 210
-  },
-  {
-    id: "race-003",
-    name: "Gravel Pac\xEDfico Central",
-    discipline: "Gravel",
-    date: "2026-09-05",
-    startDate: "2026-09-05",
-    endDate: "2026-09-05",
-    month: "Septiembre",
-    displayDate: "5 de Septiembre, 2026",
-    region: "Regi\xF3n de Valpara\xEDso",
-    city: "Zapallar",
-    distance: "105 km",
-    elevation: "1400 m",
-    price: 28e3,
-    isFree: false,
-    status: "Pr\xF3ximamente",
-    organizer: "Gravel Chile Club",
-    registrationUrl: "https://ejemplo.cl/registro/gravel-pacifico",
-    heroImage: "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=1200&q=80",
-    description: "Aventura costera por caminos rurales de tierra, huertos de paltos y acantilados sobre el Oc\xE9ano Pac\xEDfico.",
-    categories: ["Gravel Open", "Gravel Master", "Gravel Damas", "E-Bike Gravel"],
-    participants: 180
-  },
-  {
-    id: "race-004",
-    name: "Copa Pista Vel\xF3dromo Pe\xF1alol\xE9n",
-    discipline: "Pista",
-    date: "2026-08-12",
-    startDate: "2026-08-12",
-    endDate: "2026-08-12",
-    month: "Agosto",
-    displayDate: "12 de Agosto, 2026",
-    region: "Regi\xF3n Metropolitana de Santiago",
-    city: "Pe\xF1alol\xE9n",
-    distance: "20 km",
-    elevation: "0 m",
-    price: 0,
-    isFree: true,
-    status: "Inscripciones Abiertas",
-    organizer: "Federaci\xF3n Nacional de Ciclismo",
-    registrationUrl: "https://ejemplo.cl/registro/copa-pista-penalolen",
-    heroImage: "https://images.unsplash.com/photo-1507035895480-2b3156c31fc8?auto=format&fit=crop&w=1200&q=80",
-    description: "Competencia de velocidad, persecuci\xF3n y prueba de eliminaci\xF3n en la madera bajo techo del Vel\xF3dromo de Pe\xF1alol\xE9n.",
-    categories: ["Junior", "Sub-23", "Elite Varones", "Elite Damas"],
-    participants: 95
-  },
-  {
-    id: "race-005",
-    name: "Nacional BMX Racing \xD1u\xF1oa",
-    discipline: "BMX",
-    date: "2026-10-28",
-    startDate: "2026-10-28",
-    endDate: "2026-10-28",
-    month: "Octubre",
-    displayDate: "28 de Octubre, 2026",
-    region: "Regi\xF3n Metropolitana de Santiago",
-    city: "\xD1u\xF1oa",
-    distance: "400 m",
-    elevation: "5 m",
-    price: 15e3,
-    isFree: false,
-    status: "Inscripciones Abiertas",
-    organizer: "BMX Chile Federation",
-    registrationUrl: "https://ejemplo.cl/registro/nacional-bmx",
-    heroImage: "https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1200&q=80",
-    description: "Fecha clasificatoria nacional de BMX Racing con arranques explosivos en el partido t\xE9cnico del Estadio Nacional.",
-    categories: ["Challenger 7-8", "Challenger 13-14", "Junior", "Elite Pro"],
-    participants: 150
-  },
-  {
-    id: "race-006",
-    name: "Chile Zwift Virtual League - Fecha 4",
-    discipline: "Virtual",
-    date: "2026-08-30",
-    startDate: "2026-08-30",
-    endDate: "2026-08-30",
-    month: "Agosto",
-    displayDate: "30 de Agosto, 2026",
-    region: "Todas las regiones",
-    city: "Online (Zwift)",
-    distance: "45 km",
-    elevation: "650 m",
-    price: 0,
-    isFree: true,
-    status: "Inscripciones Abiertas",
-    organizer: "E-Sports Cycling Chile",
-    registrationUrl: "https://ejemplo.cl/registro/zwift-chile-f4",
-    heroImage: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&w=1200&q=80",
-    description: "Competencia virtual oficial sincr\xF3nica por potencia e-cycling con transmisi\xF3n en vivo y r\xE1nkings acumulativos.",
-    categories: ["Cat A (+4.0 W/kg)", "Cat B (3.2-3.9 W/kg)", "Cat C (2.5-3.1 W/kg)", "Damas Open"],
-    participants: 420
-  },
-  {
-    id: "race-007",
-    name: "Ascenso Farellones Challenge",
-    discipline: "Ruta",
-    date: "2026-11-08",
-    month: "Noviembre",
-    displayDate: "8 de Noviembre, 2026",
-    region: "Regi\xF3n Metropolitana de Santiago",
-    city: "Lo Barnechea",
-    distance: "32 km",
-    elevation: "1980 m",
-    price: 32e3,
-    isFree: false,
-    status: "Cupos Agotados",
-    organizer: "Andes Cycling Promotions",
-    registrationUrl: "https://ejemplo.cl/registro/ascenso-farellones",
-    heroImage: "https://images.unsplash.com/photo-1517649763962-0c623266010b?auto=format&fit=crop&w=1200&q=80",
-    description: "El m\xEDtico desaf\xEDo de 40 curvas desde la curva 0 hasta Farellones. La escalada en ruta m\xE1s emblem\xE1tica de la capital.",
-    categories: ["Elite", "Master A", "Master B", "Master C", "Damas", "Cicloturismo"],
-    participants: 600
-  },
-  {
-    id: "race-008",
-    name: "Epic Araucan\xEDa MTB Marathon",
-    discipline: "MTB",
-    date: "2026-12-05",
-    month: "Diciembre",
-    displayDate: "5 de Diciembre, 2026",
-    region: "Regi\xF3n de La Araucan\xEDa",
-    city: "Puc\xF3n",
-    distance: "70 km",
-    elevation: "2100 m",
-    price: 38e3,
-    isFree: false,
-    status: "Pr\xF3ximamente",
-    organizer: "Volcano Bike Race",
-    registrationUrl: "https://ejemplo.cl/registro/epic-araucania",
-    heroImage: "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=1200&q=80",
-    description: "Ruta volc\xE1nica a los pies del Volc\xE1n Villarrica, sorteando arena volc\xE1nica, senderos de araucarias y lechos de r\xEDos.",
-    categories: ["XCM Elite", "XCM Master", "XCM Damas", "XCO Promocional"],
-    participants: 280
+var __defProp = Object.defineProperty;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __esm = (fn, res, err) => function __init() {
+  if (err) throw err[0];
+  try {
+    return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
+  } catch (e) {
+    throw err = [e], e;
   }
-];
+};
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+
+// js/router.js
+function parseCurrentRoute() {
+  const path = window.location.pathname || "/";
+  if (path === "/" || path === "" || path === "/index.html") {
+    return { viewName: "calendar", params: {}, path: "/" };
+  }
+  if (path === "/agenda" || path === "/agenda/") {
+    return { viewName: "agenda", params: {}, path: "/agenda" };
+  }
+  if (path === "/publicar" || path === "/publicar/") {
+    return { viewName: "register", params: {}, path: "/publicar" };
+  }
+  if (path === "/admin" || path === "/admin/") {
+    return { viewName: "admin-panel", params: {}, path: "/admin" };
+  }
+  const eventMatch = path.match(/^\/evento\/([^/]+)/);
+  if (eventMatch) {
+    return { viewName: "detail", params: { id: eventMatch[1] }, path };
+  }
+  return { viewName: "calendar", params: {}, path: "/" };
+}
+function navigateTo(path, state = {}) {
+  if (window.location.pathname !== path) {
+    window.history.pushState(state, "", path);
+  }
+  if (typeof routeChangeCallback === "function") {
+    routeChangeCallback(parseCurrentRoute());
+  }
+}
+function initRouter(onRouteChanged) {
+  routeChangeCallback = onRouteChanged;
+  window.addEventListener("popstate", () => {
+    if (typeof routeChangeCallback === "function") {
+      routeChangeCallback(parseCurrentRoute());
+    }
+  });
+  document.addEventListener("click", (e) => {
+    const anchor = e.target.closest("a");
+    if (!anchor) return;
+    const href = anchor.getAttribute("href");
+    if (!href) return;
+    if (href.startsWith("/") && !href.startsWith("//") && !anchor.hasAttribute("target") && !anchor.hasAttribute("download")) {
+      e.preventDefault();
+      navigateTo(href);
+    }
+  });
+  if (typeof routeChangeCallback === "function") {
+    routeChangeCallback(parseCurrentRoute());
+  }
+}
+var routeChangeCallback;
+var init_router = __esm({
+  "js/router.js"() {
+    routeChangeCallback = null;
+  }
+});
+
+// js/data.js
+var REGIONS_CHILE, INITIAL_RACES;
+var init_data = __esm({
+  "js/data.js"() {
+    REGIONS_CHILE = [
+      "Todas las regiones",
+      "Regi\xF3n de Arica y Parinacota",
+      "Regi\xF3n de Tarapac\xE1",
+      "Regi\xF3n de Antofagasta",
+      "Regi\xF3n de Atacama",
+      "Regi\xF3n de Coquimbo",
+      "Regi\xF3n de Valpara\xEDso",
+      "Regi\xF3n Metropolitana de Santiago",
+      "Regi\xF3n del Libertador General Bernardo O'Higgins",
+      "Regi\xF3n del Maule",
+      "Regi\xF3n de \xD1uble",
+      "Regi\xF3n del Biob\xEDo",
+      "Regi\xF3n de La Araucan\xEDa",
+      "Regi\xF3n de Los R\xEDos",
+      "Regi\xF3n de Los Lagos",
+      "Regi\xF3n de Ays\xE9n del General Carlos Ib\xE1\xF1ez del Campo",
+      "Regi\xF3n de Magallanes y de la Ant\xE1rtica Chilena"
+    ];
+    INITIAL_RACES = [
+      {
+        id: "race-001",
+        name: "Gran Fondo Valle del Elqui",
+        discipline: "Ruta",
+        date: "2026-10-15",
+        startDate: "2026-10-15",
+        endDate: "2026-10-15",
+        month: "Octubre",
+        displayDate: "15 de Octubre, 2026",
+        region: "Regi\xF3n de Coquimbo",
+        city: "Vicu\xF1a",
+        distance: "120 km",
+        elevation: "1850 m",
+        price: 35e3,
+        isFree: false,
+        status: "Inscripciones Abiertas",
+        organizer: "Club Ciclismo Coquimbo",
+        registrationUrl: "https://ejemplo.cl/registro/gf-elqui",
+        heroImage: "https://images.unsplash.com/photo-1541625602330-2277a4c46182?auto=format&fit=crop&w=1200&q=80",
+        description: "Una imperdible competencia de gran fondo recorriendo los imponentes paisajes astron\xF3micos y vi\xF1edos del Valle del Elqui con llegada en altitud.",
+        categories: ["Elite", "Master A", "Master B", "Master C", "Amateur", "Damas Elite", "Damas Master"],
+        participants: 340
+      },
+      {
+        id: "race-002",
+        name: "Desaf\xEDo Transandes MTB Chilo\xE9",
+        discipline: "MTB",
+        date: "2026-11-20",
+        startDate: "2026-11-20",
+        endDate: "2026-11-22",
+        month: "Noviembre",
+        displayDate: "20 - 22 de Noviembre, 2026",
+        region: "Regi\xF3n de Los Lagos",
+        city: "Castro",
+        distance: "85 km",
+        elevation: "2400 m",
+        price: 45e3,
+        isFree: false,
+        status: "Inscripciones Abiertas",
+        organizer: "Austral Bike Chile",
+        registrationUrl: "https://ejemplo.cl/registro/transandes-chiloe",
+        heroImage: "https://images.unsplash.com/photo-1517649763962-0c623266010b?auto=format&fit=crop&w=1200&q=80",
+        description: "Tres d\xEDas de puro XCM cruzando los bosques nativos, palafitos y senderos ancestrales de la m\xEDtica Isla Grande de Chilo\xE9.",
+        categories: ["Pro Elite", "Varones A", "Varones B", "Damas Pro", "Duplas Mixtas"],
+        participants: 210
+      },
+      {
+        id: "race-003",
+        name: "Gravel Pac\xEDfico Central",
+        discipline: "Gravel",
+        date: "2026-09-05",
+        startDate: "2026-09-05",
+        endDate: "2026-09-05",
+        month: "Septiembre",
+        displayDate: "5 de Septiembre, 2026",
+        region: "Regi\xF3n de Valpara\xEDso",
+        city: "Zapallar",
+        distance: "105 km",
+        elevation: "1400 m",
+        price: 28e3,
+        isFree: false,
+        status: "Pr\xF3ximamente",
+        organizer: "Gravel Chile Club",
+        registrationUrl: "https://ejemplo.cl/registro/gravel-pacifico",
+        heroImage: "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=1200&q=80",
+        description: "Aventura costera por caminos rurales de tierra, huertos de paltos y acantilados sobre el Oc\xE9ano Pac\xEDfico.",
+        categories: ["Gravel Open", "Gravel Master", "Gravel Damas", "E-Bike Gravel"],
+        participants: 180
+      },
+      {
+        id: "race-004",
+        name: "Copa Pista Vel\xF3dromo Pe\xF1alol\xE9n",
+        discipline: "Pista",
+        date: "2026-08-12",
+        startDate: "2026-08-12",
+        endDate: "2026-08-12",
+        month: "Agosto",
+        displayDate: "12 de Agosto, 2026",
+        region: "Regi\xF3n Metropolitana de Santiago",
+        city: "Pe\xF1alol\xE9n",
+        distance: "20 km",
+        elevation: "0 m",
+        price: 0,
+        isFree: true,
+        status: "Inscripciones Abiertas",
+        organizer: "Federaci\xF3n Nacional de Ciclismo",
+        registrationUrl: "https://ejemplo.cl/registro/copa-pista-penalolen",
+        heroImage: "https://images.unsplash.com/photo-1507035895480-2b3156c31fc8?auto=format&fit=crop&w=1200&q=80",
+        description: "Competencia de velocidad, persecuci\xF3n y prueba de eliminaci\xF3n en la madera bajo techo del Vel\xF3dromo de Pe\xF1alol\xE9n.",
+        categories: ["Junior", "Sub-23", "Elite Varones", "Elite Damas"],
+        participants: 95
+      },
+      {
+        id: "race-005",
+        name: "Nacional BMX Racing \xD1u\xF1oa",
+        discipline: "BMX",
+        date: "2026-10-28",
+        startDate: "2026-10-28",
+        endDate: "2026-10-28",
+        month: "Octubre",
+        displayDate: "28 de Octubre, 2026",
+        region: "Regi\xF3n Metropolitana de Santiago",
+        city: "\xD1u\xF1oa",
+        distance: "400 m",
+        elevation: "5 m",
+        price: 15e3,
+        isFree: false,
+        status: "Inscripciones Abiertas",
+        organizer: "BMX Chile Federation",
+        registrationUrl: "https://ejemplo.cl/registro/nacional-bmx",
+        heroImage: "https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1200&q=80",
+        description: "Fecha clasificatoria nacional de BMX Racing con arranques explosivos en el partido t\xE9cnico del Estadio Nacional.",
+        categories: ["Challenger 7-8", "Challenger 13-14", "Junior", "Elite Pro"],
+        participants: 150
+      },
+      {
+        id: "race-006",
+        name: "Chile Zwift Virtual League - Fecha 4",
+        discipline: "Virtual",
+        date: "2026-08-30",
+        startDate: "2026-08-30",
+        endDate: "2026-08-30",
+        month: "Agosto",
+        displayDate: "30 de Agosto, 2026",
+        region: "Todas las regiones",
+        city: "Online (Zwift)",
+        distance: "45 km",
+        elevation: "650 m",
+        price: 0,
+        isFree: true,
+        status: "Inscripciones Abiertas",
+        organizer: "E-Sports Cycling Chile",
+        registrationUrl: "https://ejemplo.cl/registro/zwift-chile-f4",
+        heroImage: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&w=1200&q=80",
+        description: "Competencia virtual oficial sincr\xF3nica por potencia e-cycling con transmisi\xF3n en vivo y r\xE1nkings acumulativos.",
+        categories: ["Cat A (+4.0 W/kg)", "Cat B (3.2-3.9 W/kg)", "Cat C (2.5-3.1 W/kg)", "Damas Open"],
+        participants: 420
+      },
+      {
+        id: "race-007",
+        name: "Ascenso Farellones Challenge",
+        discipline: "Ruta",
+        date: "2026-11-08",
+        month: "Noviembre",
+        displayDate: "8 de Noviembre, 2026",
+        region: "Regi\xF3n Metropolitana de Santiago",
+        city: "Lo Barnechea",
+        distance: "32 km",
+        elevation: "1980 m",
+        price: 32e3,
+        isFree: false,
+        status: "Cupos Agotados",
+        organizer: "Andes Cycling Promotions",
+        registrationUrl: "https://ejemplo.cl/registro/ascenso-farellones",
+        heroImage: "https://images.unsplash.com/photo-1517649763962-0c623266010b?auto=format&fit=crop&w=1200&q=80",
+        description: "El m\xEDtico desaf\xEDo de 40 curvas desde la curva 0 hasta Farellones. La escalada en ruta m\xE1s emblem\xE1tica de la capital.",
+        categories: ["Elite", "Master A", "Master B", "Master C", "Damas", "Cicloturismo"],
+        participants: 600
+      },
+      {
+        id: "race-008",
+        name: "Epic Araucan\xEDa MTB Marathon",
+        discipline: "MTB",
+        date: "2026-12-05",
+        month: "Diciembre",
+        displayDate: "5 de Diciembre, 2026",
+        region: "Regi\xF3n de La Araucan\xEDa",
+        city: "Puc\xF3n",
+        distance: "70 km",
+        elevation: "2100 m",
+        price: 38e3,
+        isFree: false,
+        status: "Pr\xF3ximamente",
+        organizer: "Volcano Bike Race",
+        registrationUrl: "https://ejemplo.cl/registro/epic-araucania",
+        heroImage: "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=1200&q=80",
+        description: "Ruta volc\xE1nica a los pies del Volc\xE1n Villarrica, sorteando arena volc\xE1nica, senderos de araucarias y lechos de r\xEDos.",
+        categories: ["XCM Elite", "XCM Master", "XCM Damas", "XCO Promocional"],
+        participants: 280
+      }
+    ];
+  }
+});
 
 // js/supabase.js
 import { createClient } from "@supabase/supabase-js";
-var DEFAULT_URL = "";
-var DEFAULT_ANON_KEY = "";
-var supabaseInstance = null;
 function getCredentials() {
   const url = typeof window !== "undefined" && window.SUPABASE_URL ? String(window.SUPABASE_URL).trim() : DEFAULT_URL;
   const key = typeof window !== "undefined" && window.SUPABASE_ANON_KEY ? String(window.SUPABASE_ANON_KEY).trim() : DEFAULT_ANON_KEY;
@@ -440,10 +514,16 @@ async function uploadRaceImageSupabase(file) {
     return { success: false, error: err.message || err };
   }
 }
+var DEFAULT_URL, DEFAULT_ANON_KEY, supabaseInstance;
+var init_supabase = __esm({
+  "js/supabase.js"() {
+    DEFAULT_URL = "";
+    DEFAULT_ANON_KEY = "";
+    supabaseInstance = null;
+  }
+});
 
 // js/storage.js
-var BOOKMARKS_KEY = "calendariociclista_bookmarks";
-var CUSTOM_RACES_KEY = "calendariociclista_custom_races";
 function getBookmarkedIds() {
   try {
     const data = localStorage.getItem(BOOKMARKS_KEY);
@@ -611,6 +691,15 @@ async function updateRace(raceId, raceData) {
     return { success: false, error: "Error al actualizar localStorage: " + err.message };
   }
 }
+var BOOKMARKS_KEY, CUSTOM_RACES_KEY;
+var init_storage = __esm({
+  "js/storage.js"() {
+    init_data();
+    init_supabase();
+    BOOKMARKS_KEY = "calendariociclista_bookmarks";
+    CUSTOM_RACES_KEY = "calendariociclista_custom_races";
+  }
+});
 
 // js/ui.js
 function parseLocalDate(dateStr) {
@@ -666,7 +755,6 @@ function getRaceDayProgress(race, currentDate) {
   const currentDay = Math.round(diffTime / (1e3 * 60 * 60 * 24)) + 1;
   return `D\xEDa ${currentDay} de ${durationInfo.duracionDias}`;
 }
-var DISCIPLINES = ["Todas", "Ruta", "MTB", "Gravel", "Pista", "BMX", "Virtual"];
 function formatPrice(price, isFree) {
   if (isFree || !price || price === 0) {
     return "Gratis";
@@ -1475,9 +1563,15 @@ function renderDayGrid(container, races = [], referenceDate = /* @__PURE__ */ ne
   `;
   container.innerHTML = html;
 }
+var DISCIPLINES;
+var init_ui = __esm({
+  "js/ui.js"() {
+    init_storage();
+    DISCIPLINES = ["Todas", "Ruta", "MTB", "Gravel", "Pista", "BMX", "Virtual"];
+  }
+});
 
 // js/validation.js
-var VALID_DISCIPLINES = ["Ruta", "MTB", "Gravel", "Pista", "BMX", "Virtual"];
 function sanitizeHTML(str) {
   if (typeof str !== "string") return "";
   const map = {
@@ -1574,16 +1668,501 @@ function validateRaceForm(data) {
     sanitizedData
   };
 }
+var VALID_DISCIPLINES;
+var init_validation = __esm({
+  "js/validation.js"() {
+    VALID_DISCIPLINES = ["Ruta", "MTB", "Gravel", "Pista", "BMX", "Virtual"];
+  }
+});
+
+// js/admin.js
+var admin_exports = {};
+__export(admin_exports, {
+  ensureAdminElementsMounted: () => ensureAdminElementsMounted,
+  loadPendingRacesList: () => loadPendingRacesList,
+  openEditModal: () => openEditModal,
+  openLoginModal: () => openLoginModal,
+  setAuthChangeCallback: () => setAuthChangeCallback
+});
+function setAuthChangeCallback(cb) {
+  onAuthChangeCallback = cb;
+}
+function ensureAdminElementsMounted() {
+  if (isMounted) return;
+  if (!document.getElementById("view-admin-panel")) {
+    const main = document.querySelector("main");
+    if (main) {
+      const adminSection = document.createElement("section");
+      adminSection.id = "view-admin-panel";
+      adminSection.className = "hidden space-y-8";
+      adminSection.innerHTML = `
+        <div class="flex items-center justify-between border-b border-outline-variant/30 pb-4">
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-display font-black text-primary flex items-center gap-2">
+              <span class="material-symbols-outlined text-3xl text-secondary">admin_panel_settings</span>
+              Panel de Moderaci\xF3n
+            </h1>
+            <p class="text-outline text-sm">Gestiona y aprueba las propuestas de carreras recibidas.</p>
+          </div>
+          <div id="admin-session-badge" class="px-4 py-2 rounded-xl bg-surface-container border border-outline-variant/40 flex items-center gap-2 text-xs font-bold">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            Sesi\xF3n Activa
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="font-display font-bold text-lg text-primary">Propuestas Pendientes (<span id="pending-count">0</span>)</h3>
+          
+          <div id="pending-races-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Pending race items populated dynamically -->
+          </div>
+        </div>
+      `;
+      main.appendChild(adminSection);
+    }
+  }
+  if (!document.getElementById("login-modal")) {
+    const loginDiv = document.createElement("div");
+    loginDiv.id = "login-modal";
+    loginDiv.className = "hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn";
+    loginDiv.innerHTML = `
+      <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full border border-outline-variant/40 shadow-2xl relative space-y-6">
+        <button id="btn-close-login" class="absolute top-4 right-4 text-outline hover:text-primary transition-colors p-1 rounded-lg hover:bg-surface-container">
+          <span class="material-symbols-outlined text-2xl">close</span>
+        </button>
+        <div class="text-center space-y-2">
+          <div class="w-12 h-12 rounded-2xl bg-secondary/10 text-secondary flex items-center justify-center mx-auto shadow-sm">
+            <span class="material-symbols-outlined text-3xl">lock_open</span>
+          </div>
+          <h3 class="font-display font-black text-2xl text-primary">Ingreso Admin</h3>
+          <p class="text-xs text-outline leading-tight">Inicia sesi\xF3n con tus credenciales de Supabase para habilitar la edici\xF3n de carreras.</p>
+        </div>
+        <form id="login-form" class="space-y-4">
+          <div id="login-error-container" class="hidden p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-700 text-xs font-semibold flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-base">error</span>
+            <span id="login-error-msg">Credenciales incorrectas</span>
+          </div>
+          <div class="space-y-1">
+            <label for="login-email" class="block font-display font-bold text-xs text-primary">Correo Electr\xF3nico</label>
+            <input type="email" id="login-email" required placeholder="admin@calendariociclista.cl"
+              class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all">
+          </div>
+          <div class="space-y-1">
+            <label for="login-password" class="block font-display font-bold text-xs text-primary">Contrase\xF1a</label>
+            <input type="password" id="login-password" required placeholder="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022"
+              class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all">
+          </div>
+          <button type="submit" id="btn-submit-login" class="w-full py-3.5 rounded-xl bg-primary text-white font-display font-bold text-sm hover:bg-black transition-all active:scale-[0.98] shadow-md flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined text-base">login</span>
+            Iniciar Sesi\xF3n
+          </button>
+        </form>
+      </div>
+    `;
+    document.body.appendChild(loginDiv);
+  }
+  if (!document.getElementById("edit-modal")) {
+    const editDiv = document.createElement("div");
+    editDiv.id = "edit-modal";
+    editDiv.className = "hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto";
+    editDiv.innerHTML = `
+      <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-3xl w-full border border-outline-variant/40 shadow-2xl my-8 relative space-y-6 max-h-[90vh] overflow-y-auto">
+        <button id="btn-close-edit" class="absolute top-4 right-4 text-outline hover:text-primary transition-colors p-1 rounded-lg hover:bg-surface-container">
+          <span class="material-symbols-outlined text-2xl">close</span>
+        </button>
+        <div class="flex items-center gap-3 border-b border-outline-variant/30 pb-4">
+          <div class="w-10 h-10 rounded-xl bg-[#d8ef00] text-primary flex items-center justify-center font-bold">
+            <span class="material-symbols-outlined text-xl">edit</span>
+          </div>
+          <div>
+            <h3 class="font-display font-black text-2xl text-primary">Editar Carrera</h3>
+            <p class="text-xs text-outline">Modifica los detalles del evento seleccionado.</p>
+          </div>
+        </div>
+        <form id="edit-form" class="space-y-6">
+          <input type="hidden" id="edit-race-id">
+          <div>
+            <label for="edit-form-name" class="block font-display font-bold text-sm text-primary mb-2">
+              Nombre de la Carrera <span class="text-secondary">*</span>
+            </label>
+            <input type="text" id="edit-form-name" name="name" required placeholder="Ej: Gran Fondo Andes Challenge 2026"
+              class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all">
+          </div>
+          <div class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="edit-form-discipline" class="block font-display font-bold text-sm text-primary mb-2">
+                  Disciplina <span class="text-secondary">*</span>
+                </label>
+                <select id="edit-form-discipline" name="discipline" required
+                  class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all cursor-pointer">
+                  <option value="Ruta">Ruta</option>
+                  <option value="MTB">MTB</option>
+                  <option value="Gravel">Gravel</option>
+                  <option value="Pista">Pista</option>
+                  <option value="BMX">BMX</option>
+                  <option value="Virtual">Virtual</option>
+                </select>
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <label for="edit-form-date" class="block font-display font-bold text-sm text-primary">
+                    Fecha de Inicio <span class="text-secondary">*</span>
+                  </label>
+                  <label class="inline-flex items-center gap-1.5 cursor-pointer text-xs font-bold text-primary select-none">
+                    <input type="checkbox" id="edit-form-is-multiday" name="isMultiDay" class="w-4 h-4 text-primary rounded border-outline-variant focus:ring-primary">
+                    <span>\xBFM\xE1s de 1 d\xEDa?</span>
+                  </label>
+                </div>
+
+                <div id="edit-form-single-date-container">
+                  <input type="date" id="edit-form-date" name="date"
+                    class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all cursor-pointer">
+                </div>
+
+                <div id="edit-form-start-date-container" class="hidden">
+                  <input type="date" id="edit-form-start-date" name="startDate"
+                    class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all cursor-pointer">
+                </div>
+              </div>
+            </div>
+
+            <div id="edit-form-end-date-container" class="hidden bg-purple-50/70 p-4 rounded-2xl border border-purple-200 space-y-2">
+              <div class="flex items-center justify-between">
+                <label for="edit-form-end-date" class="block font-display font-bold text-xs text-purple-950 uppercase tracking-wider">
+                  Fecha de T\xE9rmino de la Vuelta / Etapas <span class="text-secondary">*</span>
+                </label>
+                <span id="edit-form-duration-badge" class="text-xs font-black text-purple-900 bg-purple-200/80 px-2.5 py-0.5 rounded-full">
+                  Multi-D\xEDa
+                </span>
+              </div>
+              <input type="date" id="edit-form-end-date" name="endDate"
+                class="w-full px-4 py-2.5 rounded-xl bg-white border border-purple-300 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-purple-600 transition-all cursor-pointer">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label for="edit-form-region" class="block font-display font-bold text-sm text-primary mb-2">
+                Regi\xF3n <span class="text-secondary">*</span>
+              </label>
+              <select id="edit-form-region" name="region" required
+                class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all cursor-pointer">
+              </select>
+            </div>
+            <div>
+              <label for="edit-form-city" class="block font-display font-bold text-sm text-primary mb-2">
+                Ciudad / Comuna <span class="text-secondary">*</span>
+              </label>
+              <input type="text" id="edit-form-city" name="city" required placeholder="Ej: Puc\xF3n"
+                class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all">
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label for="edit-form-distance" class="block font-display font-bold text-sm text-primary mb-2">
+                Distancia (km) <span class="text-secondary">*</span>
+              </label>
+              <input type="text" id="edit-form-distance" name="distance" required placeholder="Ej: 120 km"
+                class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all">
+            </div>
+            <div>
+              <label for="edit-form-elevation" class="block font-display font-bold text-sm text-primary mb-2">
+                Desnivel Acumulado (m)
+              </label>
+              <input type="text" id="edit-form-elevation" name="elevation" placeholder="Ej: 1850 m"
+                class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all">
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
+            <div>
+              <label for="edit-form-price" class="block font-display font-bold text-sm text-primary mb-2">
+                Precio Inscripci\xF3n ($ CLP)
+              </label>
+              <input type="number" id="edit-form-price" name="price" min="0" step="1000" placeholder="Ej: 35000"
+                class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all">
+            </div>
+            <div class="flex items-center h-12">
+              <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" id="edit-form-is-free" name="isFree"
+                  class="w-5 h-5 rounded text-primary focus:ring-primary border-outline-variant">
+                <span class="font-display font-bold text-sm text-primary">\xBFEvento Gratuito?</span>
+              </label>
+            </div>
+            <div>
+              <label for="edit-form-status" class="block font-display font-bold text-sm text-primary mb-2">
+                Estado de Inscripci\xF3n
+              </label>
+              <select id="edit-form-status" name="status"
+                class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all cursor-pointer">
+                <option value="Inscripciones Abiertas">Inscripciones Abiertas</option>
+                <option value="\xDAltimos Cupos">\xDAltimos Cupos</option>
+                <option value="Pr\xF3ximamente">Pr\xF3ximamente</option>
+                <option value="Cupos Agotados">Cupos Agotados</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label for="edit-form-organizer" class="block font-display font-bold text-sm text-primary mb-2">
+                Organizador <span class="text-secondary">*</span>
+              </label>
+              <input type="text" id="edit-form-organizer" name="organizer" required placeholder="Ej: Club Ciclismo Chile"
+                class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all">
+            </div>
+            <div>
+              <label for="edit-form-url" class="block font-display font-bold text-sm text-primary mb-2">
+                Link de Inscripci\xF3n / Sitio Web <span class="text-secondary">*</span>
+              </label>
+              <input type="text" id="edit-form-url" name="registrationUrl" required placeholder="https://ejemplo.cl/registro"
+                class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all">
+            </div>
+          </div>
+          <div class="space-y-2">
+            <label class="block font-display font-bold text-sm text-primary">
+              Imagen de Portada <span class="text-xs text-outline/80 font-normal">(Opcional)</span>
+            </label>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div id="edit-form-upload-zone" class="border-2 border-dashed border-outline-variant/60 hover:border-primary/50 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 transition-colors cursor-pointer bg-surface-container-low/20 min-h-[120px] select-none text-center">
+                <span class="material-symbols-outlined text-outline text-3xl">add_a_photo</span>
+                <span class="text-xs font-bold text-outline">Arrastra una imagen o haz clic aqu\xED</span>
+                <span class="text-[10px] text-outline/60">JPG, PNG (Max 5MB)</span>
+                <input type="file" id="edit-form-image-file" accept="image/*" class="hidden">
+              </div>
+
+              <div class="flex flex-col justify-between gap-3">
+                <div>
+                  <span class="text-xs font-bold text-outline block mb-1">O ingresa un enlace web:</span>
+                  <input type="text" id="edit-form-image" name="heroImage" placeholder="https://images.unsplash.com/..."
+                    class="w-full px-4 py-2.5 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all">
+                </div>
+                <div id="edit-form-image-preview-container" class="hidden h-[70px] rounded-xl overflow-hidden border border-outline-variant/40 relative bg-surface-container-low">
+                  <img id="edit-form-image-preview" src="" class="w-full h-full object-cover">
+                  <button type="button" id="btn-remove-edit-image" class="absolute top-1 right-1 w-6 h-6 rounded-full bg-primary/80 text-white flex items-center justify-center font-bold text-[10px] hover:bg-primary transition-all active:scale-90">\u2715</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <label for="edit-form-categories" class="block font-display font-bold text-sm text-primary mb-2">
+              Categor\xEDas (separadas por comas)
+            </label>
+            <input type="text" id="edit-form-categories" name="categories" placeholder="Ej: Elite, Master A, Master B, Damas"
+              class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all">
+          </div>
+          <div>
+            <label for="edit-form-description" class="block font-display font-bold text-sm text-primary mb-2">
+              Descripci\xF3n del Evento <span class="text-secondary">*</span>
+            </label>
+            <textarea id="edit-form-description" name="description" rows="4" required
+              placeholder="Describe la ruta, puntos de hidrataci\xF3n, premios, etc..."
+              class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all"></textarea>
+          </div>
+          <div class="pt-4 flex justify-end gap-4 border-t border-outline-variant/30">
+            <button type="button" id="btn-cancel-edit"
+              class="px-6 py-3 rounded-xl bg-surface-container text-primary font-display font-bold text-sm hover:bg-surface-container-high transition-colors">
+              Cancelar
+            </button>
+            <button type="submit" id="btn-save-edit"
+              class="px-8 py-3 rounded-xl bg-secondary text-white font-display font-bold text-sm hover:brightness-105 active:scale-95 transition-all shadow-md flex items-center gap-2">
+              <span class="material-symbols-outlined text-lg">save</span>
+              Guardar Cambios
+            </button>
+          </div>
+        </form>
+      </div>
+    `;
+    document.body.appendChild(editDiv);
+    const editRegionSelect = document.getElementById("edit-form-region");
+    if (editRegionSelect && REGIONS_CHILE) {
+      editRegionSelect.innerHTML = REGIONS_CHILE.filter((r) => r !== "Todas las regiones").map((r) => `<option value="${r}">${r}</option>`).join("");
+    }
+  }
+  isMounted = true;
+  bindAdminEvents();
+}
+function openLoginModal() {
+  ensureAdminElementsMounted();
+  const loginModal = document.getElementById("login-modal");
+  const errorContainer = document.getElementById("login-error-container");
+  if (errorContainer) errorContainer.classList.add("hidden");
+  document.getElementById("login-form")?.reset();
+  if (loginModal) loginModal.classList.remove("hidden");
+}
+function openEditModal(race) {
+  if (!race) return;
+  ensureAdminElementsMounted();
+  const editModal = document.getElementById("edit-modal");
+  document.getElementById("edit-race-id").value = race.id || "";
+  document.getElementById("edit-form-name").value = race.name || "";
+  document.getElementById("edit-form-discipline").value = race.discipline || "Ruta";
+  const isMultiDay = !!race.endDate && race.endDate !== race.date;
+  const isMultiCheckbox = document.getElementById("edit-form-is-multiday");
+  if (isMultiCheckbox) {
+    isMultiCheckbox.checked = isMultiDay;
+    toggleEditMultiDay(isMultiDay);
+  }
+  if (isMultiDay) {
+    document.getElementById("edit-form-start-date").value = race.date || race.startDate || "";
+    document.getElementById("edit-form-end-date").value = race.endDate || "";
+  } else {
+    document.getElementById("edit-form-date").value = race.date || "";
+  }
+  document.getElementById("edit-form-region").value = race.region || REGIONS_CHILE[0];
+  document.getElementById("edit-form-city").value = race.city || "";
+  document.getElementById("edit-form-distance").value = race.distance || "";
+  document.getElementById("edit-form-elevation").value = race.elevation || "";
+  document.getElementById("edit-form-price").value = race.price || 0;
+  document.getElementById("edit-form-is-free").checked = !!race.isFree;
+  document.getElementById("edit-form-status").value = race.status || "Inscripciones Abiertas";
+  document.getElementById("edit-form-organizer").value = race.organizer || race.organizador || "";
+  document.getElementById("edit-form-url").value = race.registrationUrl || "";
+  document.getElementById("edit-form-image").value = race.heroImage || "";
+  document.getElementById("edit-form-categories").value = Array.isArray(race.categories) ? race.categories.join(", ") : race.categories || "";
+  document.getElementById("edit-form-description").value = race.description || "";
+  if (editModal) editModal.classList.remove("hidden");
+}
+function toggleEditMultiDay(show) {
+  const singleContainer = document.getElementById("edit-form-single-date-container");
+  const startContainer = document.getElementById("edit-form-start-date-container");
+  const endContainer = document.getElementById("edit-form-end-date-container");
+  if (show) {
+    if (singleContainer) singleContainer.classList.add("hidden");
+    if (startContainer) startContainer.classList.remove("hidden");
+    if (endContainer) endContainer.classList.remove("hidden");
+  } else {
+    if (singleContainer) singleContainer.classList.remove("hidden");
+    if (startContainer) startContainer.classList.add("hidden");
+    if (endContainer) endContainer.classList.add("hidden");
+  }
+}
+async function loadPendingRacesList() {
+  ensureAdminElementsMounted();
+  const container = document.getElementById("pending-races-list");
+  const countEl = document.getElementById("pending-count");
+  if (!container) return;
+  const res = await fetchPendingRacesSupabase();
+  if (res.success) {
+    if (countEl) countEl.textContent = res.data.length;
+    renderPendingRaces(container, res.data);
+    bindPendingRaceActionEvents();
+  } else {
+    if (countEl) countEl.textContent = "0";
+    container.innerHTML = `<p class="col-span-full text-center text-red-500 font-bold">Error al cargar propuestas: ${res.error}</p>`;
+  }
+}
+function bindPendingRaceActionEvents() {
+  const container = document.getElementById("pending-races-list");
+  if (!container) return;
+  container.querySelectorAll(".btn-approve-race").forEach((btn) => {
+    btn.addEventListener("click", async (e) => {
+      const raceId = e.currentTarget.dataset.id;
+      if (!raceId) return;
+      btn.disabled = true;
+      btn.textContent = "Aprobando...";
+      const res = await updateRaceStatusSupabase(raceId, "aprobada");
+      if (res.success) {
+        showNotificationToast("\u2705 Carrera aprobada con \xE9xito. Ahora es visible en el calendario p\xFAblico.");
+        await loadPendingRacesList();
+      } else {
+        alert("Error al aprobar la carrera: " + res.error);
+        btn.disabled = false;
+        btn.textContent = "Aprobar";
+      }
+    });
+  });
+  container.querySelectorAll(".btn-reject-race").forEach((btn) => {
+    btn.addEventListener("click", async (e) => {
+      const raceId = e.currentTarget.dataset.id;
+      if (!raceId) return;
+      if (!confirm("\xBFEst\xE1s seguro de que deseas rechazar esta propuesta?")) return;
+      btn.disabled = true;
+      btn.textContent = "Rechazando...";
+      const res = await updateRaceStatusSupabase(raceId, "rechazada");
+      if (res.success) {
+        showNotificationToast("\u{1F6AB} Carrera rechazada.");
+        await loadPendingRacesList();
+      } else {
+        alert("Error al rechazar la carrera: " + res.error);
+        btn.disabled = false;
+        btn.textContent = "Rechazar";
+      }
+    });
+  });
+}
+function bindAdminEvents() {
+  const closeLoginBtn = document.getElementById("btn-close-login");
+  if (closeLoginBtn) {
+    closeLoginBtn.addEventListener("click", () => {
+      document.getElementById("login-modal")?.classList.add("hidden");
+    });
+  }
+  const loginForm = document.getElementById("login-form");
+  if (loginForm) {
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("login-email")?.value || "";
+      const password = document.getElementById("login-password")?.value || "";
+      const submitBtn = document.getElementById("btn-submit-login");
+      const errorContainer = document.getElementById("login-error-container");
+      const errorMsgEl = document.getElementById("login-error-msg");
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.classList.add("opacity-50");
+      }
+      const res = await loginAdmin(email, password);
+      if (res.success && res.user) {
+        const checkAdmin = await checkIsAdmin(res.user.id);
+        if (checkAdmin) {
+          isAdminState = true;
+          if (typeof onAuthChangeCallback === "function") onAuthChangeCallback(true);
+          document.getElementById("login-modal")?.classList.add("hidden");
+          showNotificationToast("\u{1F513} \xA1Sesi\xF3n iniciada con \xE9xito! Has ingresado como Administrador del sistema.");
+        } else {
+          await logoutAdmin();
+          isAdminState = false;
+          if (typeof onAuthChangeCallback === "function") onAuthChangeCallback(false);
+          if (errorContainer && errorMsgEl) {
+            errorMsgEl.textContent = "Acceso denegado: El usuario no es administrador.";
+            errorContainer.classList.remove("hidden");
+          }
+        }
+      } else {
+        if (errorContainer && errorMsgEl) {
+          errorMsgEl.textContent = res.error || "Credenciales incorrectas o problema de conexi\xF3n.";
+          errorContainer.classList.remove("hidden");
+        }
+      }
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove("opacity-50");
+      }
+    });
+  }
+  const closeEditBtn = document.getElementById("btn-close-edit");
+  if (closeEditBtn) {
+    closeEditBtn.addEventListener("click", () => {
+      document.getElementById("edit-modal")?.classList.add("hidden");
+    });
+  }
+}
+var isMounted, isAdminState, onAuthChangeCallback;
+var init_admin = __esm({
+  "js/admin.js"() {
+    init_supabase();
+    init_data();
+    init_storage();
+    init_ui();
+    init_app();
+    init_validation();
+    isMounted = false;
+    isAdminState = false;
+    onAuthChangeCallback = null;
+  }
+});
 
 // js/app.js
-var currentDiscipline = "Todas";
-var currentRegion = "Todas las regiones";
-var currentMonth = "Todos";
-var searchQuery = "";
-var activeTab = "all";
-var activeViewMode = "cards";
-var currentRaceId = null;
-var isAdmin = false;
 function clearFormErrors(form) {
   if (!form) return;
   form.querySelectorAll(".field-error-msg").forEach((el) => el.remove());
@@ -2006,9 +2585,7 @@ function setupEventHandlers() {
     if (elem) {
       elem.addEventListener("click", (e) => {
         e.preventDefault();
-        activeTab = "all";
-        switchView("calendar");
-        updateCalendar();
+        navigateTo("/");
       });
     }
   });
@@ -2017,9 +2594,7 @@ function setupEventHandlers() {
     if (elem) {
       elem.addEventListener("click", (e) => {
         e.preventDefault();
-        activeTab = "my-calendar";
-        switchView("agenda");
-        updateCalendar();
+        navigateTo("/agenda");
       });
     }
   });
@@ -2028,7 +2603,7 @@ function setupEventHandlers() {
     if (elem) {
       elem.addEventListener("click", (e) => {
         e.preventDefault();
-        switchView("register");
+        navigateTo("/publicar");
       });
     }
   });
@@ -2037,9 +2612,7 @@ function setupEventHandlers() {
     if (elem) {
       elem.addEventListener("click", (e) => {
         e.preventDefault();
-        activeTab = "all";
-        switchView("calendar");
-        updateCalendar();
+        navigateTo("/");
       });
     }
   });
@@ -2081,7 +2654,7 @@ function setupEventHandlers() {
       if (editBtn) {
         e.stopPropagation();
         const raceId = editBtn.getAttribute("data-edit-id");
-        openEditModal(raceId);
+        openEditModal2(raceId);
         return;
       }
       const deleteBtn = e.target.closest("[data-delete-id]");
@@ -2094,13 +2667,8 @@ function setupEventHandlers() {
       const detailBtn = e.target.closest("[data-race-id]");
       if (detailBtn) {
         const raceId = detailBtn.getAttribute("data-race-id");
-        const races = await getAllRaces();
-        const race = races.find((r) => r.id === raceId);
-        if (race) {
-          currentRaceId = raceId;
-          const detailContainer2 = document.getElementById("detail-content");
-          renderDetailView(detailContainer2, race, isAdmin);
-          switchView("detail");
+        if (raceId) {
+          navigateTo(`/evento/${raceId}`);
         }
       }
     });
@@ -2110,14 +2678,16 @@ function setupEventHandlers() {
     detailContainer.addEventListener("click", async (e) => {
       const backBtn = e.target.closest("#btn-back-to-calendar");
       if (backBtn) {
-        switchView("calendar");
-        await updateCalendar();
+        navigateTo("/");
         return;
       }
       const editBtn = e.target.closest("[data-edit-id]");
       if (editBtn) {
         const raceId = editBtn.getAttribute("data-edit-id");
-        openEditModal(raceId);
+        const { openEditModal: openEditModal3 } = await Promise.resolve().then(() => (init_admin(), admin_exports));
+        const races = await getAllRaces();
+        const race = races.find((r) => String(r.id) === String(raceId));
+        if (race) openEditModal3(race);
         return;
       }
       const deleteBtn = e.target.closest("[data-delete-id]");
@@ -2311,64 +2881,18 @@ function setupEventHandlers() {
   openLoginBtns.forEach((id) => {
     const el = document.getElementById(id);
     if (el) {
-      el.addEventListener("click", (e) => {
+      el.addEventListener("click", async (e) => {
         e.preventDefault();
-        const errorContainer = document.getElementById("login-error-container");
-        if (errorContainer) errorContainer.classList.add("hidden");
-        document.getElementById("login-form")?.reset();
-        if (loginModal) loginModal.classList.remove("hidden");
+        const { openLoginModal: openLoginModal2, setAuthChangeCallback: setAuthChangeCallback2 } = await Promise.resolve().then(() => (init_admin(), admin_exports));
+        setAuthChangeCallback2((loggedIn) => {
+          isAdmin = loggedIn;
+          updateAuthUI();
+          if (loggedIn) updateCalendar();
+        });
+        openLoginModal2();
       });
     }
   });
-  const closeLoginBtn = document.getElementById("btn-close-login");
-  if (closeLoginBtn) {
-    closeLoginBtn.addEventListener("click", () => {
-      if (loginModal) loginModal.classList.add("hidden");
-    });
-  }
-  const loginForm = document.getElementById("login-form");
-  if (loginForm) {
-    loginForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const email = document.getElementById("login-email")?.value || "";
-      const password = document.getElementById("login-password")?.value || "";
-      const submitBtn = document.getElementById("btn-submit-login");
-      const errorContainer = document.getElementById("login-error-container");
-      const errorMsgEl = document.getElementById("login-error-msg");
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.classList.add("opacity-50");
-      }
-      const res = await loginAdmin(email, password);
-      if (res.success && res.user) {
-        const checkAdmin = await checkIsAdmin(res.user.id);
-        if (checkAdmin) {
-          isAdmin = true;
-          updateAuthUI();
-          if (loginModal) loginModal.classList.add("hidden");
-          showNotificationToast("\u{1F513} \xA1Sesi\xF3n iniciada con \xE9xito! Has ingresado como Administrador del sistema.");
-          await updateCalendar();
-        } else {
-          await logoutAdmin();
-          isAdmin = false;
-          updateAuthUI();
-          if (errorContainer && errorMsgEl) {
-            errorMsgEl.textContent = "Acceso denegado: El usuario no es administrador.";
-            errorContainer.classList.remove("hidden");
-          }
-        }
-      } else {
-        if (errorContainer && errorMsgEl) {
-          errorMsgEl.textContent = res.error || "Credenciales incorrectas o problema de conexi\xF3n.";
-          errorContainer.classList.remove("hidden");
-        }
-      }
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.classList.remove("opacity-50");
-      }
-    });
-  }
   const logoutBtns = ["nav-admin-logout", "mobile-nav-admin-logout"];
   logoutBtns.forEach((id) => {
     const el = document.getElementById(id);
@@ -2379,7 +2903,7 @@ function setupEventHandlers() {
         if (res.success) {
           isAdmin = false;
           updateAuthUI();
-          switchView("calendar");
+          navigateTo("/");
           showNotificationToast("\u{1F512} Sesi\xF3n de administrador cerrada.");
           await updateCalendar();
         }
@@ -2390,10 +2914,9 @@ function setupEventHandlers() {
   adminPanelBtns.forEach((id) => {
     const el = document.getElementById(id);
     if (el) {
-      el.addEventListener("click", async (e) => {
+      el.addEventListener("click", (e) => {
         e.preventDefault();
-        switchView("admin-panel");
-        await loadPendingRacesList();
+        navigateTo("/admin");
       });
     }
   });
@@ -2419,7 +2942,7 @@ function setupEventHandlers() {
         const res = await updateRaceStatusSupabase(id, "aprobada");
         if (res.success) {
           showNotificationToast("\u2705 Carrera aprobada con \xE9xito. Ya es visible en el calendario.");
-          await loadPendingRacesList();
+          await loadPendingRacesList2();
           await updateCalendar();
         } else {
           showNotificationToast("\u26A0\uFE0F No se pudo aprobar la carrera: " + res.error);
@@ -2434,7 +2957,7 @@ function setupEventHandlers() {
         const res = await updateRaceStatusSupabase(id, "rechazada");
         if (res.success) {
           showNotificationToast("\u274C Propuesta rechazada.");
-          await loadPendingRacesList();
+          await loadPendingRacesList2();
           await updateCalendar();
         } else {
           showNotificationToast("\u26A0\uFE0F No se pudo rechazar la carrera: " + res.error);
@@ -2534,7 +3057,7 @@ function updateAuthUI() {
     }
   });
 }
-async function loadPendingRacesList() {
+async function loadPendingRacesList2() {
   const container = document.getElementById("pending-races-list");
   const countEl = document.getElementById("pending-count");
   if (!container) return;
@@ -2542,7 +3065,7 @@ async function loadPendingRacesList() {
   if (countEl) countEl.textContent = pending.length;
   renderPendingRaces(container, pending);
 }
-async function openEditModal(raceId) {
+async function openEditModal2(raceId) {
   const editModal = document.getElementById("edit-modal");
   if (!editModal) return;
   const races = await getAllRaces();
@@ -2643,19 +3166,88 @@ async function initApp() {
     isAdmin = false;
   }
   updateAuthUI();
-  await updateCalendar();
+  initRouter(async (route) => {
+    const { viewName, params } = route;
+    const urlParams = new URLSearchParams(window.location.search);
+    const discParam = urlParams.get("disciplina");
+    if (discParam) {
+      currentDiscipline = discParam;
+      const disciplineChipsContainer2 = document.getElementById("discipline-chips");
+      if (disciplineChipsContainer2) {
+        renderDisciplineChips(disciplineChipsContainer2, currentDiscipline);
+      }
+    }
+    if (viewName === "admin-panel") {
+      const { ensureAdminElementsMounted: ensureAdminElementsMounted2, loadPendingRacesList: loadPendingRacesList3, openLoginModal: openLoginModal2 } = await Promise.resolve().then(() => (init_admin(), admin_exports));
+      ensureAdminElementsMounted2();
+      if (!isAdmin) {
+        openLoginModal2();
+        navigateTo("/");
+        return;
+      }
+      switchView("admin-panel");
+      await loadPendingRacesList3();
+      return;
+    }
+    if (viewName === "detail" && params.id) {
+      const races = await getAllRaces();
+      const race = races.find((r) => String(r.id) === String(params.id));
+      if (race) {
+        currentRaceId = race.id;
+        const detailContainer = document.getElementById("detail-content");
+        if (detailContainer) {
+          renderDetailView(detailContainer, race, isAdmin);
+        }
+        switchView("detail");
+        return;
+      }
+    }
+    if (viewName === "agenda") {
+      activeTab = "my-calendar";
+      switchView("agenda");
+      await updateCalendar();
+      return;
+    }
+    if (viewName === "register") {
+      switchView("register");
+      return;
+    }
+    activeTab = "all";
+    switchView("calendar");
+    await updateCalendar();
+  });
 }
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", initApp);
-} else {
-  initApp();
-}
+var currentDiscipline, currentRegion, currentMonth, searchQuery, activeTab, activeViewMode, currentRaceId, isAdmin;
+var init_app = __esm({
+  "js/app.js"() {
+    init_router();
+    init_data();
+    init_storage();
+    init_ui();
+    init_validation();
+    init_supabase();
+    currentDiscipline = "Todas";
+    currentRegion = "Todas las regiones";
+    currentMonth = "Todos";
+    searchQuery = "";
+    activeTab = "all";
+    activeViewMode = "cards";
+    currentRaceId = null;
+    isAdmin = false;
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initApp);
+    } else {
+      initApp();
+    }
+  }
+});
+init_app();
 export {
   clearFormErrors,
   getFilteredRaces,
   handleDeleteRace,
-  loadPendingRacesList,
-  openEditModal,
+  loadPendingRacesList2 as loadPendingRacesList,
+  openEditModal2 as openEditModal,
   renderFormErrors,
   renderSkeletons,
   showNotificationToast,

@@ -3,6 +3,7 @@
  * Gestiona el estado global, filtrado de carreras, manejo de eventos DOM e inicialización SPA.
  */
 
+import { initRouter, navigateTo } from './router.js';
 import { REGIONS_CHILE } from './data.js';
 import { getAllRaces, getBookmarkedIds, toggleBookmark, isBookmarked, saveCustomRace, saveRace, deleteRace, updateRace } from './storage.js';
 import { 
@@ -579,9 +580,7 @@ function setupEventHandlers() {
     if (elem) {
       elem.addEventListener('click', (e) => {
         e.preventDefault();
-        activeTab = 'all';
-        switchView('calendar');
-        updateCalendar();
+        navigateTo('/');
       });
     }
   });
@@ -591,9 +590,7 @@ function setupEventHandlers() {
     if (elem) {
       elem.addEventListener('click', (e) => {
         e.preventDefault();
-        activeTab = 'my-calendar';
-        switchView('agenda');
-        updateCalendar();
+        navigateTo('/agenda');
       });
     }
   });
@@ -603,7 +600,7 @@ function setupEventHandlers() {
     if (elem) {
       elem.addEventListener('click', (e) => {
         e.preventDefault();
-        switchView('register');
+        navigateTo('/publicar');
       });
     }
   });
@@ -613,9 +610,7 @@ function setupEventHandlers() {
     if (elem) {
       elem.addEventListener('click', (e) => {
         e.preventDefault();
-        activeTab = 'all';
-        switchView('calendar');
-        updateCalendar();
+        navigateTo('/');
       });
     }
   });
@@ -684,13 +679,8 @@ function setupEventHandlers() {
       const detailBtn = e.target.closest('[data-race-id]');
       if (detailBtn) {
         const raceId = detailBtn.getAttribute('data-race-id');
-        const races = await getAllRaces();
-        const race = races.find(r => r.id === raceId);
-        if (race) {
-          currentRaceId = raceId;
-          const detailContainer = document.getElementById('detail-content');
-          renderDetailView(detailContainer, race, isAdmin);
-          switchView('detail');
+        if (raceId) {
+          navigateTo(`/evento/${raceId}`);
         }
       }
     });
@@ -702,8 +692,7 @@ function setupEventHandlers() {
     detailContainer.addEventListener('click', async (e) => {
       const backBtn = e.target.closest('#btn-back-to-calendar');
       if (backBtn) {
-        switchView('calendar');
-        await updateCalendar();
+        navigateTo('/');
         return;
       }
 
@@ -711,7 +700,10 @@ function setupEventHandlers() {
       const editBtn = e.target.closest('[data-edit-id]');
       if (editBtn) {
         const raceId = editBtn.getAttribute('data-edit-id');
-        openEditModal(raceId);
+        const { openEditModal } = await import('./admin.js');
+        const races = await getAllRaces();
+        const race = races.find(r => String(r.id) === String(raceId));
+        if (race) openEditModal(race);
         return;
       }
 
@@ -941,76 +933,23 @@ function setupEventHandlers() {
   const loginModal = document.getElementById('login-modal');
   const editModal = document.getElementById('edit-modal');
 
-  // Open login modal
+  // Open login modal (Lazy loading)
   const openLoginBtns = ['nav-admin-login', 'mobile-nav-admin-login'];
   openLoginBtns.forEach(id => {
     const el = document.getElementById(id);
     if (el) {
-      el.addEventListener('click', (e) => {
+      el.addEventListener('click', async (e) => {
         e.preventDefault();
-        const errorContainer = document.getElementById('login-error-container');
-        if (errorContainer) errorContainer.classList.add('hidden');
-        document.getElementById('login-form')?.reset();
-        if (loginModal) loginModal.classList.remove('hidden');
+        const { openLoginModal, setAuthChangeCallback } = await import('./admin.js');
+        setAuthChangeCallback((loggedIn) => {
+          isAdmin = loggedIn;
+          updateAuthUI();
+          if (loggedIn) updateCalendar();
+        });
+        openLoginModal();
       });
     }
   });
-
-  // Close login modal
-  const closeLoginBtn = document.getElementById('btn-close-login');
-  if (closeLoginBtn) {
-    closeLoginBtn.addEventListener('click', () => {
-      if (loginModal) loginModal.classList.add('hidden');
-    });
-  }
-
-  // Handle Login Form Submit
-  const loginForm = document.getElementById('login-form');
-  if (loginForm) {
-    loginForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('login-email')?.value || '';
-      const password = document.getElementById('login-password')?.value || '';
-      const submitBtn = document.getElementById('btn-submit-login');
-      const errorContainer = document.getElementById('login-error-container');
-      const errorMsgEl = document.getElementById('login-error-msg');
-
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.classList.add('opacity-50');
-      }
-
-      const res = await loginAdmin(email, password);
-      if (res.success && res.user) {
-        const checkAdmin = await checkIsAdmin(res.user.id);
-        if (checkAdmin) {
-          isAdmin = true;
-          updateAuthUI();
-          if (loginModal) loginModal.classList.add('hidden');
-          showNotificationToast("🔓 ¡Sesión iniciada con éxito! Has ingresado como Administrador del sistema.");
-          await updateCalendar();
-        } else {
-          await logoutAdmin();
-          isAdmin = false;
-          updateAuthUI();
-          if (errorContainer && errorMsgEl) {
-            errorMsgEl.textContent = "Acceso denegado: El usuario no es administrador.";
-            errorContainer.classList.remove('hidden');
-          }
-        }
-      } else {
-        if (errorContainer && errorMsgEl) {
-          errorMsgEl.textContent = res.error || "Credenciales incorrectas o problema de conexión.";
-          errorContainer.classList.remove('hidden');
-        }
-      }
-
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.classList.remove('opacity-50');
-      }
-    });
-  }
 
   // Handle Admin Logout
   const logoutBtns = ['nav-admin-logout', 'mobile-nav-admin-logout'];
@@ -1023,7 +962,7 @@ function setupEventHandlers() {
         if (res.success) {
           isAdmin = false;
           updateAuthUI();
-          switchView('calendar');
+          navigateTo('/');
           showNotificationToast("🔒 Sesión de administrador cerrada.");
           await updateCalendar();
         }
@@ -1036,10 +975,9 @@ function setupEventHandlers() {
   adminPanelBtns.forEach(id => {
     const el = document.getElementById(id);
     if (el) {
-      el.addEventListener('click', async (e) => {
+      el.addEventListener('click', (e) => {
         e.preventDefault();
-        switchView('admin-panel');
-        await loadPendingRacesList();
+        navigateTo('/admin');
       });
     }
   });
@@ -1356,7 +1294,65 @@ async function initApp() {
   }
   updateAuthUI();
 
-  await updateCalendar();
+  // Inicializar Enrutador History API
+  initRouter(async (route) => {
+    const { viewName, params } = route;
+
+    // Parse query params (ej: ?disciplina=Ruta)
+    const urlParams = new URLSearchParams(window.location.search);
+    const discParam = urlParams.get('disciplina');
+    if (discParam) {
+      currentDiscipline = discParam;
+      const disciplineChipsContainer = document.getElementById('discipline-chips');
+      if (disciplineChipsContainer) {
+        renderDisciplineChips(disciplineChipsContainer, currentDiscipline);
+      }
+    }
+
+    if (viewName === 'admin-panel') {
+      const { ensureAdminElementsMounted, loadPendingRacesList, openLoginModal } = await import('./admin.js');
+      ensureAdminElementsMounted();
+      if (!isAdmin) {
+        openLoginModal();
+        navigateTo('/');
+        return;
+      }
+      switchView('admin-panel');
+      await loadPendingRacesList();
+      return;
+    }
+
+    if (viewName === 'detail' && params.id) {
+      const races = await getAllRaces();
+      const race = races.find(r => String(r.id) === String(params.id));
+      if (race) {
+        currentRaceId = race.id;
+        const detailContainer = document.getElementById('detail-content');
+        if (detailContainer) {
+          renderDetailView(detailContainer, race, isAdmin);
+        }
+        switchView('detail');
+        return;
+      }
+    }
+
+    if (viewName === 'agenda') {
+      activeTab = 'my-calendar';
+      switchView('agenda');
+      await updateCalendar();
+      return;
+    }
+
+    if (viewName === 'register') {
+      switchView('register');
+      return;
+    }
+
+    // Default view: calendar
+    activeTab = 'all';
+    switchView('calendar');
+    await updateCalendar();
+  });
 }
 
 if (document.readyState === 'loading') {

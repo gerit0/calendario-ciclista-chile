@@ -7,6 +7,18 @@
     "dev": "npx serve . -p 3000",
     "test": "node qa_test_runner.js"
   },
-  "keywords": ["ciclismo", "chile", "calendario", "ruta", "mtb", "gravel"],
-  "license": "UNLICENSED"
+  "keywords": [
+    "ciclismo",
+    "chile",
+    "calendario",
+    "ruta",
+    "mtb",
+    "gravel"
+  ],
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "@supabase/supabase-js": "^2.110.7",
+    "axios": "^1.18.1",
+    "puppeteer-core": "^25.3.0"
+  }
 }
