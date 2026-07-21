@@ -206,12 +206,23 @@ module.exports = async (req, res) => {
       image = race.hero_image || race.heroImage;
     }
 
-    // SSR: Ocultar sección de calendario y mostrar sección de detalle con el contenido pre-renderizado
-    html = html.replace('<section id="view-calendar">', '<section id="view-calendar" class="hidden">');
-    html = html.replace('<section id="view-detail" class="hidden">', '<section id="view-detail">');
-    
+    // SSR: inject inline styles to show detail view and hide calendar
+    // Using inline style overrides so they work regardless of Tailwind classes
+    html = html.replace(
+      /<section\s+id="view-calendar"([^>]*)>/,
+      '<section id="view-calendar"$1 style="display:none !important">'
+    );
+    html = html.replace(
+      /<section\s+id="view-detail"([^>]*)>/,
+      (m, attrs) => `<section id="view-detail"${attrs.replace(/\bhidden\b/g, '')} style="display:block !important">`
+    );
+
     const detailHtml = renderDetailHtmlSSR(race);
-    html = html.replace('<div id="detail-content"></div>', `<div id="detail-content">${detailHtml}</div>`);
+    // Replace the content of #detail-content (may have comments/whitespace inside)
+    html = html.replace(
+      /<div\s+id="detail-content"[^>]*>[\s\S]*?<\/div>/,
+      `<div id="detail-content">${detailHtml}</div>`
+    );
   }
 
   // Limpiar etiquetas meta de head existentes para evitar duplicados con los genéricos
