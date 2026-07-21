@@ -955,7 +955,7 @@ function setupEventHandlers() {
         status: 'Pendiente',
         organizer: sanitizedData.organizador || sanitizedData.organizer || '',
         organizador: sanitizedData.organizador || sanitizedData.organizer || '',
-        registrationUrl: sanitizedData.registrationUrl || '#',
+        registrationUrl: sanitizedData.registrationUrl || '',
         heroImage: sanitizedData.heroImage || 'https://images.unsplash.com/photo-1541625602330-2277a4c46182?auto=format&fit=crop&w=1200&q=80',
         description: sanitizedData.description || '',
         categories: categoriesArray,
@@ -963,10 +963,13 @@ function setupEventHandlers() {
       };
 
       try {
-        await saveRace(newRace);
+        const saveRes = await saveRace(newRace);
+        if (saveRes && saveRes.success === false) {
+          throw new Error(saveRes.error?.message || saveRes.error || 'Error al guardar en la base de datos');
+        }
       } catch (saveErr) {
         console.error('Error al guardar la carrera:', saveErr);
-        showNotificationToast('⚠️ Ocurrió un error al guardar la carrera. Inténtalo de nuevo.');
+        showNotificationToast('⚠️ Error al publicar la carrera: ' + (saveErr.message || saveErr));
         if (submitBtn) {
           submitBtn.disabled = false;
           submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');

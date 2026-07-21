@@ -156,8 +156,13 @@ export async function saveRace(newRace) {
       if (res && res.success) {
         return { success: true, source: 'supabase', data: res.data };
       }
+      // Si Supabase responde con error explícito de inserción, retornar la falla
+      if (res && res.error) {
+        return { success: false, source: 'supabase', error: res.error };
+      }
     } catch (error) {
-      console.error('Error al enviar carrera a Supabase. Realizando fallback a localStorage:', error);
+      console.error('Error al enviar carrera a Supabase:', error);
+      return { success: false, source: 'supabase', error: error.message || error };
     }
   }
 

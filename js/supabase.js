@@ -202,6 +202,12 @@ export async function createPendingRaceSupabase(raceData) {
   }
 
   try {
+    // 1. Limpieza de link_inscripcion (debe ser null o comenzar con http:// / https://)
+    const rawUrl = raceData.link_inscripcion || raceData.registrationUrl || null;
+    const cleanUrl = (rawUrl && typeof rawUrl === 'string' && rawUrl.trim() !== '#' && /^https?:\/\//i.test(rawUrl.trim()))
+      ? rawUrl.trim()
+      : null;
+
     const payload = {
       nombre: raceData.nombre || raceData.name,
       fecha: raceData.fecha || raceData.date,
@@ -211,7 +217,7 @@ export async function createPendingRaceSupabase(raceData) {
       distancia: raceData.distancia || raceData.distance || null,
       desnivel: raceData.desnivel || raceData.elevation || null,
       organizador: raceData.organizador || raceData.organizer || null,
-      link_inscripcion: raceData.link_inscripcion || raceData.registrationUrl || null,
+      link_inscripcion: cleanUrl,
       categoria: Array.isArray(raceData.categories) 
         ? raceData.categories.join(', ') 
         : (raceData.categoria || raceData.categories || null),
@@ -229,7 +235,28 @@ export async function createPendingRaceSupabase(raceData) {
       setTimeout(() => reject(new Error('TIMEOUT_EXCEEDED')), 6000)
     );
 
-    const { data, error } = await Promise.race([insertPromise, timeoutPromise]);
+    let { data, error } = await Promise.race([insertPromise, timeoutPromise]);
+
+    // Fallback defensivo: si la tabla en Supabase no tiene aún las columnas distancia/desnivel en su caché de esquema
+    if (error && (error.code === 'PGRST204' || String(error.message || error).includes('column'))) {
+      console.warn('Reintentando inserción sin columnas de distancia/desnivel no disponibles en el esquema Supabase...');
+      const fallbackPayload = { ...payload };
+      delete fallbackPayload.distancia;
+      delete fallbackPayload.desnivel;
+
+      const distInfo = payload.distancia ? `Distancia: ${payload.distancia}` : '';
+      const elevInfo = payload.desnivel ? `Desnivel: ${payload.desnivel}` : '';
+      const specHeader = [distInfo, elevInfo].filter(Boolean).join(' | ');
+      if (specHeader) {
+        fallbackPayload.descripcion = fallbackPayload.descripcion 
+          ? `${specHeader}\n\n${fallbackPayload.descripcion}` 
+          : specHeader;
+      }
+
+      const retryRes = await client.from('carreras').insert([fallbackPayload]);
+      data = retryRes.data;
+      error = retryRes.error;
+    }
 
     if (error) {
       console.error('Error al insertar carrera pendiente en Supabase:', error);
@@ -249,7 +276,7 @@ export async function createPendingRaceSupabase(raceData) {
     };
   } catch (err) {
     console.error('Excepción al crear carrera pendiente en Supabase:', err);
-    throw err;
+    return { success: false, error: err.message || err };
   }
 }
 
@@ -418,6 +445,11 @@ export async function updateRaceSupabase(raceId, raceData) {
   if (!client) return { success: false, error: 'Supabase no está configurado.' };
 
   try {
+    const rawUrl = raceData.registrationUrl || raceData.link_inscripcion || null;
+    const cleanUrl = (rawUrl && typeof rawUrl === 'string' && rawUrl.trim() !== '#' && /^https?:\/\//i.test(rawUrl.trim()))
+      ? rawUrl.trim()
+      : null;
+
     const payload = {
       nombre: raceData.name || raceData.nombre,
       fecha: raceData.date || raceData.fecha,
@@ -427,7 +459,7 @@ export async function updateRaceSupabase(raceId, raceData) {
       distancia: raceData.distance || raceData.distancia || null,
       desnivel: raceData.elevation || raceData.desnivel || null,
       organizador: raceData.organizer || raceData.organizador,
-      link_inscripcion: raceData.registrationUrl || raceData.link_inscripcion,
+      link_inscripcion: cleanUrl,
       categoria: Array.isArray(raceData.categories) 
         ? raceData.categories.join(', ') 
         : (raceData.categoria || raceData.categories),
@@ -436,10 +468,18 @@ export async function updateRaceSupabase(raceId, raceData) {
       descripcion: raceData.description || raceData.descripcion
     };
 
-    const { error } = await client
+    let { error } = await client
       .from('carreras')
       .update(payload)
       .eq('id', raceId);
+
+    if (error && (error.code === 'PGRST204' || String(error.message || error).includes('column'))) {
+      const fallbackPayload = { ...payload };
+      delete fallbackPayload.distancia;
+      delete fallbackPayload.desnivel;
+      const retryRes = await client.from('carreras').update(fallbackPayload).eq('id', raceId);
+      error = retryRes.error;
+    }
 
     if (error) throw error;
     return { success: true };

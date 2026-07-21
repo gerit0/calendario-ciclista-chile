@@ -328,6 +328,8 @@ async function createPendingRaceSupabase(raceData) {
     };
   }
   try {
+    const rawUrl = raceData.link_inscripcion || raceData.registrationUrl || null;
+    const cleanUrl = rawUrl && typeof rawUrl === "string" && rawUrl.trim() !== "#" && /^https?:\/\//i.test(rawUrl.trim()) ? rawUrl.trim() : null;
     const payload = {
       nombre: raceData.nombre || raceData.name,
       fecha: raceData.fecha || raceData.date,
@@ -337,7 +339,7 @@ async function createPendingRaceSupabase(raceData) {
       distancia: raceData.distancia || raceData.distance || null,
       desnivel: raceData.desnivel || raceData.elevation || null,
       organizador: raceData.organizador || raceData.organizer || null,
-      link_inscripcion: raceData.link_inscripcion || raceData.registrationUrl || null,
+      link_inscripcion: cleanUrl,
       categoria: Array.isArray(raceData.categories) ? raceData.categories.join(", ") : raceData.categoria || raceData.categories || null,
       precio: raceData.precio != null ? raceData.precio : raceData.price != null ? raceData.price : 0,
       hero_image: raceData.hero_image || raceData.heroImage || null,
@@ -348,7 +350,24 @@ async function createPendingRaceSupabase(raceData) {
     const timeoutPromise = new Promise(
       (_, reject) => setTimeout(() => reject(new Error("TIMEOUT_EXCEEDED")), 6e3)
     );
-    const { data, error } = await Promise.race([insertPromise, timeoutPromise]);
+    let { data, error } = await Promise.race([insertPromise, timeoutPromise]);
+    if (error && (error.code === "PGRST204" || String(error.message || error).includes("column"))) {
+      console.warn("Reintentando inserci\xF3n sin columnas de distancia/desnivel no disponibles en el esquema Supabase...");
+      const fallbackPayload = { ...payload };
+      delete fallbackPayload.distancia;
+      delete fallbackPayload.desnivel;
+      const distInfo = payload.distancia ? `Distancia: ${payload.distancia}` : "";
+      const elevInfo = payload.desnivel ? `Desnivel: ${payload.desnivel}` : "";
+      const specHeader = [distInfo, elevInfo].filter(Boolean).join(" | ");
+      if (specHeader) {
+        fallbackPayload.descripcion = fallbackPayload.descripcion ? `${specHeader}
+
+${fallbackPayload.descripcion}` : specHeader;
+      }
+      const retryRes = await client.from("carreras").insert([fallbackPayload]);
+      data = retryRes.data;
+      error = retryRes.error;
+    }
     if (error) {
       console.error("Error al insertar carrera pendiente en Supabase:", error);
       return { success: false, error: error.message || error };
@@ -364,7 +383,7 @@ async function createPendingRaceSupabase(raceData) {
     };
   } catch (err) {
     console.error("Excepci\xF3n al crear carrera pendiente en Supabase:", err);
-    throw err;
+    return { success: false, error: err.message || err };
   }
 }
 async function loginAdmin(email, password) {
@@ -565,8 +584,12 @@ async function saveRace(newRace) {
       if (res && res.success) {
         return { success: true, source: "supabase", data: res.data };
       }
+      if (res && res.error) {
+        return { success: false, source: "supabase", error: res.error };
+      }
     } catch (error) {
-      console.error("Error al enviar carrera a Supabase. Realizando fallback a localStorage:", error);
+      console.error("Error al enviar carrera a Supabase:", error);
+      return { success: false, source: "supabase", error: error.message || error };
     }
   }
   const savedLocal = saveCustomRace(newRace);
@@ -2908,17 +2931,20 @@ function setupEventHandlers() {
         status: "Pendiente",
         organizer: sanitizedData.organizador || sanitizedData.organizer || "",
         organizador: sanitizedData.organizador || sanitizedData.organizer || "",
-        registrationUrl: sanitizedData.registrationUrl || "#",
+        registrationUrl: sanitizedData.registrationUrl || "",
         heroImage: sanitizedData.heroImage || "https://images.unsplash.com/photo-1541625602330-2277a4c46182?auto=format&fit=crop&w=1200&q=80",
         description: sanitizedData.description || "",
         categories: categoriesArray,
         participants: 1
       };
       try {
-        await saveRace(newRace);
+        const saveRes = await saveRace(newRace);
+        if (saveRes && saveRes.success === false) {
+          throw new Error(saveRes.error?.message || saveRes.error || "Error al guardar en la base de datos");
+        }
       } catch (saveErr) {
         console.error("Error al guardar la carrera:", saveErr);
-        showNotificationToast("\u26A0\uFE0F Ocurri\xF3 un error al guardar la carrera. Int\xE9ntalo de nuevo.");
+        showNotificationToast("\u26A0\uFE0F Error al publicar la carrera: " + (saveErr.message || saveErr));
         if (submitBtn) {
           submitBtn.disabled = false;
           submitBtn.classList.remove("opacity-50", "cursor-not-allowed");
