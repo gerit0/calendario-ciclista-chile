@@ -22,6 +22,10 @@
       "destination": "/js/bundle.js"
     },
     {
+      "source": "/_bundle.js",
+      "destination": "/_bundle.js"
+    },
+    {
       "source": "/:path*",
       "destination": "/index.html"
     }
