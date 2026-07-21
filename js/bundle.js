@@ -469,15 +469,18 @@ async function checkIsAdmin(userId) {
 }
 async function fetchPendingRacesSupabase() {
   const client = getSupabase();
-  if (!client) return [];
+  if (!client) return { success: false, error: "Supabase no est\xE1 configurado." };
   try {
     const { data, error } = await client.from("carreras").select("*").eq("estado", "pendiente").order("fecha", { ascending: true });
-    if (error) throw error;
-    if (!Array.isArray(data)) return [];
-    return data.map(mapSupabaseToFrontend);
+    if (error) {
+      console.error("Error al consultar carreras pendientes:", error);
+      return { success: false, error: error.message || String(error) };
+    }
+    if (!Array.isArray(data)) return { success: true, data: [] };
+    return { success: true, data: data.map(mapSupabaseToFrontend) };
   } catch (err) {
-    console.error("Error al consultar carreras pendientes:", err);
-    return [];
+    console.error("Excepci\xF3n al consultar carreras pendientes:", err);
+    return { success: false, error: err.message || String(err) };
   }
 }
 async function updateRaceStatusSupabase(raceId, status) {
@@ -2043,13 +2046,15 @@ async function loadPendingRacesList() {
   const countEl = document.getElementById("pending-count");
   if (!container) return;
   const res = await fetchPendingRacesSupabase();
-  if (res.success) {
-    if (countEl) countEl.textContent = res.data.length;
-    renderPendingRaces(container, res.data);
+  if (res && res.success) {
+    const pendingList = Array.isArray(res.data) ? res.data : [];
+    if (countEl) countEl.textContent = pendingList.length;
+    renderPendingRaces(container, pendingList);
     bindPendingRaceActionEvents();
   } else {
     if (countEl) countEl.textContent = "0";
-    container.innerHTML = `<p class="col-span-full text-center text-red-500 font-bold">Error al cargar propuestas: ${res.error}</p>`;
+    const errorMsg = res && res.error ? res.error.message || String(res.error) : "Error al conectar con la base de datos.";
+    container.innerHTML = `<p class="col-span-full text-center text-red-500 font-bold">Error al cargar propuestas: ${errorMsg}</p>`;
   }
 }
 function bindPendingRaceActionEvents() {
@@ -3061,7 +3066,8 @@ async function loadPendingRacesList2() {
   const container = document.getElementById("pending-races-list");
   const countEl = document.getElementById("pending-count");
   if (!container) return;
-  const pending = await fetchPendingRacesSupabase();
+  const res = await fetchPendingRacesSupabase();
+  const pending = Array.isArray(res) ? res : res && res.success ? res.data : [];
   if (countEl) countEl.textContent = pending.length;
   renderPendingRaces(container, pending);
 }

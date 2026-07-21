@@ -406,13 +406,15 @@ export async function loadPendingRacesList() {
   if (!container) return;
 
   const res = await fetchPendingRacesSupabase();
-  if (res.success) {
-    if (countEl) countEl.textContent = res.data.length;
-    renderPendingRaces(container, res.data);
+  if (res && res.success) {
+    const pendingList = Array.isArray(res.data) ? res.data : [];
+    if (countEl) countEl.textContent = pendingList.length;
+    renderPendingRaces(container, pendingList);
     bindPendingRaceActionEvents();
   } else {
     if (countEl) countEl.textContent = '0';
-    container.innerHTML = `<p class="col-span-full text-center text-red-500 font-bold">Error al cargar propuestas: ${res.error}</p>`;
+    const errorMsg = (res && res.error) ? (res.error.message || String(res.error)) : 'Error al conectar con la base de datos.';
+    container.innerHTML = `<p class="col-span-full text-center text-red-500 font-bold">Error al cargar propuestas: ${errorMsg}</p>`;
   }
 }
 

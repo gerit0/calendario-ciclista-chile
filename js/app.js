@@ -1151,7 +1151,8 @@ export async function loadPendingRacesList() {
   const countEl = document.getElementById('pending-count');
   if (!container) return;
 
-  const pending = await fetchPendingRacesSupabase();
+  const res = await fetchPendingRacesSupabase();
+  const pending = Array.isArray(res) ? res : (res && res.success ? res.data : []);
   if (countEl) countEl.textContent = pending.length;
   renderPendingRaces(container, pending);
 }

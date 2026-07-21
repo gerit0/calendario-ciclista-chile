@@ -304,7 +304,7 @@ export async function checkIsAdmin(userId) {
  */
 export async function fetchPendingRacesSupabase() {
   const client = getSupabase();
-  if (!client) return [];
+  if (!client) return { success: false, error: 'Supabase no está configurado.' };
 
   try {
     const { data, error } = await client
@@ -313,13 +313,17 @@ export async function fetchPendingRacesSupabase() {
       .eq('estado', 'pendiente')
       .order('fecha', { ascending: true });
 
-    if (error) throw error;
-    if (!Array.isArray(data)) return [];
+    if (error) {
+      console.error('Error al consultar carreras pendientes:', error);
+      return { success: false, error: error.message || String(error) };
+    }
 
-    return data.map(mapSupabaseToFrontend);
+    if (!Array.isArray(data)) return { success: true, data: [] };
+
+    return { success: true, data: data.map(mapSupabaseToFrontend) };
   } catch (err) {
-    console.error('Error al consultar carreras pendientes:', err);
-    return [];
+    console.error('Excepción al consultar carreras pendientes:', err);
+    return { success: false, error: err.message || String(err) };
   }
 }
 
