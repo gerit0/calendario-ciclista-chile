@@ -16,7 +16,7 @@
   "routes": [
     {
       "src": "/evento/(.*)",
-      "dest": "/api/seo.js?id=$1"
+      "dest": "/api/seo?id=$1"
     },
     {
       "handle": "filesystem"
