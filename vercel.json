@@ -19,7 +19,15 @@
       "destination": "/api/seo?id=:id*"
     },
     {
-      "source": "/:path*",
+      "source": "/agenda",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/publicar",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/admin",
       "destination": "/index.html"
     }
   ],
