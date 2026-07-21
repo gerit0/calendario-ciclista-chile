@@ -380,6 +380,18 @@ async function fetchApprovedRacesSupabase() {
     return [];
   }
 }
+async function fetchRaceByIdSupabase(id) {
+  const client = getSupabase();
+  if (!client || !id) return null;
+  try {
+    const { data, error } = await client.from("carreras").select("*").eq("id", id).maybeSingle();
+    if (error || !data) return null;
+    return mapSupabaseToFrontend(data);
+  } catch (err) {
+    console.error("Error al obtener carrera por ID en Supabase:", err);
+    return null;
+  }
+}
 async function createPendingRaceSupabase(raceData) {
   const client = getSupabase();
   if (!client) {
@@ -3201,7 +3213,10 @@ async function initApp() {
     }
     if (viewName === "detail" && params.id) {
       const races = await getAllRaces();
-      const race = races.find((r) => String(r.id) === String(params.id));
+      let race = races.find((r) => String(r.id) === String(params.id));
+      if (!race && isSupabaseConfigured()) {
+        race = await fetchRaceByIdSupabase(params.id);
+      }
       if (race) {
         currentRaceId = race.id;
         const detailContainer = document.getElementById("detail-content");

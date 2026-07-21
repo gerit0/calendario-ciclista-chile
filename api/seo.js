@@ -2,8 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const https = require('https');
 
-const SUPABASE_URL = 'https://oawjuhaykksksfuyptot.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9hd2p1aGF5a2tza3NmdXlwdG90Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDIwMDAwMDAsImV4cCI6MjA1NzU3NjAwMH0.placeholder';
+const SUPABASE_URL = 'https://mhzktzvxdmhanqkhhaqm.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1oemt0enZ4ZG1oYW5xa2hoYXFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ1NjAyMzMsImV4cCI6MjEwMDEzNjIzM30.WNC9F2xqRPk7Ry5Sxr53BloWaq1hZ09FDI7OItfQB8s';
 
 function fetchRaceFromSupabase(id) {
   return new Promise((resolve) => {

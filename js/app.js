@@ -24,6 +24,8 @@ import {
   getCurrentUser, 
   checkIsAdmin, 
   fetchPendingRacesSupabase, 
+  fetchRaceByIdSupabase,
+  isSupabaseConfigured,
   updateRaceStatusSupabase,
   uploadRaceImageSupabase
 } from './supabase.js';
@@ -1325,7 +1327,12 @@ async function initApp() {
 
     if (viewName === 'detail' && params.id) {
       const races = await getAllRaces();
-      const race = races.find(r => String(r.id) === String(params.id));
+      let race = races.find(r => String(r.id) === String(params.id));
+
+      if (!race && isSupabaseConfigured()) {
+        race = await fetchRaceByIdSupabase(params.id);
+      }
+
       if (race) {
         currentRaceId = race.id;
         const detailContainer = document.getElementById('detail-content');
