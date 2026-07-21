@@ -206,22 +206,20 @@ module.exports = async (req, res) => {
       image = race.hero_image || race.heroImage;
     }
 
-    // SSR: inject inline styles to show detail view and hide calendar
-    // Using inline style overrides so they work regardless of Tailwind classes
+    // SSR: inject inline styles using unique marker comments in index.html
     html = html.replace(
-      /<section\s+id="view-calendar"([^>]*)>/,
-      '<section id="view-calendar"$1 style="display:none !important">'
+      '<!--SSR_CALENDAR_SECTION-->\n    <section id="view-calendar" class="space-y-8">',
+      '<!--SSR_CALENDAR_SECTION-->\n    <section id="view-calendar" class="space-y-8" style="display:none !important">'
     );
     html = html.replace(
-      /<section\s+id="view-detail"([^>]*)>/,
-      (m, attrs) => `<section id="view-detail"${attrs.replace(/\bhidden\b/g, '')} style="display:block !important">`
+      '<!--SSR_DETAIL_SECTION-->\n    <section id="view-detail" class="hidden space-y-6">',
+      '<!--SSR_DETAIL_SECTION-->\n    <section id="view-detail" class="space-y-6" style="display:block !important">'
     );
 
     const detailHtml = renderDetailHtmlSSR(race);
-    // Replace the content of #detail-content (may have comments/whitespace inside)
     html = html.replace(
-      /<div\s+id="detail-content"[^>]*>[\s\S]*?<\/div>/,
-      `<div id="detail-content">${detailHtml}</div>`
+      '<div id="detail-content"><!--SSR_DETAIL_CONTENT-->',
+      `<div id="detail-content">${detailHtml}`
     );
   }
 
