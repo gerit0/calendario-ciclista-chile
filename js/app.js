@@ -1288,16 +1288,7 @@ async function initApp() {
 
   setupEventHandlers();
 
-  // Auth Check Inicial
-  const user = await getCurrentUser();
-  if (user) {
-    isAdmin = await checkIsAdmin(user.id);
-  } else {
-    isAdmin = false;
-  }
-  updateAuthUI();
-
-  // Inicializar Enrutador History API
+  // Inicializar Enrutador History API de forma inmediata
   initRouter(async (route) => {
     const { viewName, params } = route;
 
@@ -1326,20 +1317,52 @@ async function initApp() {
     }
 
     if (viewName === 'detail' && params.id) {
-      const races = await getAllRaces();
-      let race = races.find(r => String(r.id) === String(params.id));
+      // 1. Ocultar calendario e ir a la vista detalle con spinner de inmediato
+      switchView('detail');
+      const detailContainer = document.getElementById('detail-content');
+      if (detailContainer) {
+        detailContainer.innerHTML = `
+          <div class="py-24 text-center space-y-4">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent mx-auto"></div>
+            <p class="text-sm font-bold text-outline">Cargando detalles de la carrera...</p>
+          </div>
+        `;
+      }
 
-      if (!race && isSupabaseConfigured()) {
+      // 2. Consultar directamente Supabase por ID (respuesta instantánea)
+      let race = null;
+      if (isSupabaseConfigured()) {
         race = await fetchRaceByIdSupabase(params.id);
+      }
+
+      // 3. Fallback a carreras locales / iniciales si no está en Supabase
+      if (!race) {
+        const races = await getAllRaces();
+        race = races.find(r => String(r.id) === String(params.id));
       }
 
       if (race) {
         currentRaceId = race.id;
-        const detailContainer = document.getElementById('detail-content');
         if (detailContainer) {
           renderDetailView(detailContainer, race, isAdmin);
         }
-        switchView('detail');
+        return;
+      } else {
+        // Vista de error si la carrera no existe
+        if (detailContainer) {
+          detailContainer.innerHTML = `
+            <div class="py-16 text-center bg-white rounded-3xl border border-dashed border-outline-variant/60 p-8 space-y-4 max-w-lg mx-auto">
+              <div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mx-auto text-outline">
+                <span class="material-symbols-outlined text-4xl">search_off</span>
+              </div>
+              <h3 class="font-display font-bold text-xl text-primary">Carrera no encontrada</h3>
+              <p class="text-outline text-sm">El evento que buscas no existe o ha sido eliminado.</p>
+              <button type="button" onclick="window.history.pushState({}, '', '/'); window.dispatchEvent(new Event('popstate'));" class="px-6 py-2.5 rounded-xl bg-primary text-white font-display font-bold text-sm hover:bg-black transition-all">
+                Volver al Calendario
+              </button>
+            </div>
+          `;
+        }
         return;
       }
     }
@@ -1360,6 +1383,16 @@ async function initApp() {
     activeTab = 'all';
     switchView('calendar');
     await updateCalendar();
+  });
+
+  // Auth Check Inicial asíncrono en segundo plano
+  getCurrentUser().then(async (user) => {
+    if (user) {
+      isAdmin = await checkIsAdmin(user.id);
+      updateAuthUI();
+    }
+  }).catch(() => {
+    isAdmin = false;
   });
 }
 
