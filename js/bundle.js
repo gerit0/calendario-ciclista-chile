@@ -775,6 +775,40 @@ function getRaceDayProgress(race, currentDate) {
   const currentDay = Math.round(diffTime / (1e3 * 60 * 60 * 24)) + 1;
   return `D\xEDa ${currentDay} de ${durationInfo.duracionDias}`;
 }
+function getTodayChileDateStr() {
+  const now = /* @__PURE__ */ new Date();
+  const formatter = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Santiago",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  });
+  return formatter.format(now);
+}
+function getRaceTimeStatus(race, todayOverride) {
+  const durationInfo = detectRaceDuration(race);
+  const todayStr = todayOverride || getTodayChileDateStr();
+  const startStr = durationInfo.startDateStr || "";
+  const endStr = durationInfo.endDateStr || startStr;
+  let esFinalizada = false;
+  let esEnCurso = false;
+  let esFutura = false;
+  if (endStr && endStr < todayStr) {
+    esFinalizada = true;
+  } else if (startStr && startStr <= todayStr && todayStr <= endStr) {
+    esEnCurso = true;
+  } else {
+    esFutura = true;
+  }
+  return {
+    esFinalizada,
+    esEnCurso,
+    esFutura,
+    todayStr,
+    startDateStr: startStr,
+    endDateStr: endStr
+  };
+}
 function formatPrice(price, isFree) {
   if (isFree || !price || price === 0) {
     return "Gratis";
@@ -866,9 +900,14 @@ function renderRaceCards(container, races = [], isAdmin2 = false) {
     const disciplineBadgeClass = getDisciplineBadgeClass(race.discipline);
     const formattedPrice = formatPrice(race.price, race.isFree);
     const durationInfo = detectRaceDuration(race);
+    const timeStatus = getRaceTimeStatus(race);
     const multiDayBadgeHTML = durationInfo.esMultiDia ? `<span class="px-2.5 py-1 rounded-full text-xs font-black bg-purple-100 text-purple-900 border border-purple-300 flex items-center gap-1 shadow-sm"><span class="material-symbols-outlined text-xs">date_range</span> ${durationInfo.duracionDias} d\xEDas</span>` : "";
     let statusBadgeHTML = "";
-    if (race.status === "\xDAltimos Cupos") {
+    if (timeStatus.esFinalizada) {
+      statusBadgeHTML = `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-slate-200 text-slate-700 border border-slate-300">Finalizada</span>`;
+    } else if (timeStatus.esEnCurso) {
+      statusBadgeHTML = `<span class="px-2.5 py-1 rounded-full text-xs font-black bg-blue-600 text-white border border-blue-500 shadow-sm animate-pulse flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-white animate-ping"></span> En Curso</span>`;
+    } else if (race.status === "\xDAltimos Cupos") {
       statusBadgeHTML = `<span class="px-2.5 py-1 rounded-full text-xs font-extrabold bg-amber-100 text-amber-800 border border-amber-300 animate-pulse">\xDAltimos Cupos</span>`;
     } else if (race.status === "Inscripciones Abiertas") {
       statusBadgeHTML = `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">Inscripciones Abiertas</span>`;
@@ -878,8 +917,9 @@ function renderRaceCards(container, races = [], isAdmin2 = false) {
       statusBadgeHTML = `<span class="px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">${race.status || "Pr\xF3ximamente"}</span>`;
     }
     const freeBadgeHTML = race.isFree || race.price === 0 ? `<span class="px-2.5 py-1 rounded-full text-xs font-black bg-tertiary-fixed text-primary border border-lime-400">Gratuita</span>` : "";
+    const cardStateClasses = timeStatus.esFinalizada ? "opacity-65 grayscale-[30%] bg-slate-50/80 hover:opacity-100 hover:grayscale-0 transition-all" : "bg-white";
     return `
-      <article class="race-card bg-white rounded-3xl border border-outline-variant/40 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group">
+      <article class="race-card ${cardStateClasses} rounded-3xl border border-outline-variant/40 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group">
         
         <!-- Hero Image Header -->
         <div class="relative h-48 w-full overflow-hidden bg-surface-container">
@@ -1031,15 +1071,22 @@ function renderDetailView(container, race, isAdmin2 = false) {
   const bookmarked = isBookmarked(race.id);
   const disciplineBadgeClass = getDisciplineBadgeClass(race.discipline);
   const formattedPrice = formatPrice(race.price, race.isFree);
-  const categoriesHTML = Array.isArray(race.categories) && race.categories.length > 0 ? race.categories.map((cat) => `
-        <span class="px-3 py-1 rounded-lg bg-surface-container text-primary font-semibold text-xs border border-outline-variant/40">
-          ${cat}
-        </span>
-      `).join("") : '<span class="text-xs text-outline italic">Categor\xEDas por confirmar</span>';
+  const durationInfo = detectRaceDuration(race);
+  const timeStatus = getRaceTimeStatus(race);
+  const categoriesHTML = Array.isArray(race.categories) && race.categories.length > 0 ? race.categories.map((cat) => `<span class="px-3 py-1 rounded-xl text-xs font-semibold bg-surface-container text-primary border border-outline-variant/40">${cat}</span>`).join("") : '<span class="text-xs text-outline italic">No se especificaron categor\xEDas.</span>';
+  let detailTimeBadgeHTML = "";
+  let displayStatus = race.status || "Pr\xF3ximamente";
+  if (timeStatus.esFinalizada) {
+    detailTimeBadgeHTML = `<span class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-200 text-slate-800 border border-slate-300 shadow-md">Finalizada</span>`;
+    displayStatus = "Finalizada";
+  } else if (timeStatus.esEnCurso) {
+    detailTimeBadgeHTML = `<span class="px-3.5 py-1.5 rounded-xl text-xs font-black bg-blue-600 text-white border border-blue-500 shadow-md animate-pulse flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-white animate-ping"></span> En Curso</span>`;
+    displayStatus = "En Curso";
+  }
   container.innerHTML = `
     <div class="space-y-8 animate-fadeIn">
       
-      <!-- Back Button & Actions Bar -->
+      <!-- Top Action Bar (Volver, Favoritos & Admin Actions) -->
       <div class="flex items-center justify-between flex-wrap gap-4">
         <button 
           type="button" 
@@ -1088,6 +1135,7 @@ function renderDetailView(container, race, isAdmin2 = false) {
               <span class="material-symbols-outlined text-base">${getDisciplineIcon(race.discipline)}</span>
               ${race.discipline}
             </span>
+            ${detailTimeBadgeHTML}
             ${race.isFree ? `<span class="px-3.5 py-1.5 rounded-xl text-xs font-black bg-tertiary-fixed text-primary shadow-lg">Evento Gratuito</span>` : ""}
           </div>
 
@@ -1112,26 +1160,45 @@ function renderDetailView(container, race, isAdmin2 = false) {
         <div class="lg:col-span-8 space-y-8">
           
           <!-- Stats R\xE1pidos -->
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 p-6 bg-white rounded-3xl border border-outline-variant/40 shadow-sm text-center">
-            <div class="space-y-1">
-              <span class="material-symbols-outlined text-secondary text-2xl">calendar_month</span>
-              <p class="text-xs font-bold text-outline uppercase">Fecha</p>
-              <p class="font-display font-bold text-sm text-primary">${race.displayDate || race.date}</p>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div class="bg-white p-4 rounded-2xl border border-outline-variant/40 shadow-sm flex flex-col gap-1">
+              <span class="text-xs font-bold text-outline uppercase tracking-wider flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm text-secondary">calendar_today</span>
+                Fecha
+              </span>
+              <span class="font-display font-bold text-sm sm:text-base text-primary">
+                ${race.displayDate || race.date}
+              </span>
             </div>
-            <div class="space-y-1">
-              <span class="material-symbols-outlined text-secondary text-2xl">straighten</span>
-              <p class="text-xs font-bold text-outline uppercase">Distancia</p>
-              <p class="font-display font-bold text-sm text-primary">${race.distance}</p>
+
+            <div class="bg-white p-4 rounded-2xl border border-outline-variant/40 shadow-sm flex flex-col gap-1">
+              <span class="text-xs font-bold text-outline uppercase tracking-wider flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm text-secondary">straighten</span>
+                Distancia
+              </span>
+              <span class="font-display font-bold text-sm sm:text-base text-primary">
+                ${race.distance}
+              </span>
             </div>
-            <div class="space-y-1">
-              <span class="material-symbols-outlined text-secondary text-2xl">landscape</span>
-              <p class="text-xs font-bold text-outline uppercase">Desnivel</p>
-              <p class="font-display font-bold text-sm text-primary">${race.elevation}</p>
+
+            <div class="bg-white p-4 rounded-2xl border border-outline-variant/40 shadow-sm flex flex-col gap-1">
+              <span class="text-xs font-bold text-outline uppercase tracking-wider flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm text-secondary">landscape</span>
+                Desnivel
+              </span>
+              <span class="font-display font-bold text-sm sm:text-base text-primary">
+                ${race.elevation}
+              </span>
             </div>
-            <div class="space-y-1">
-              <span class="material-symbols-outlined text-secondary text-2xl">group</span>
-              <p class="text-xs font-bold text-outline uppercase">Inscriptos</p>
-              <p class="font-display font-bold text-sm text-primary">${race.participants || 0}+ ciclistas</p>
+
+            <div class="bg-white p-4 rounded-2xl border border-outline-variant/40 shadow-sm flex flex-col gap-1">
+              <span class="text-xs font-bold text-outline uppercase tracking-wider flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm text-secondary">payments</span>
+                Precio
+              </span>
+              <span class="font-display font-bold text-sm sm:text-base text-primary">
+                ${formattedPrice}
+              </span>
             </div>
           </div>
 
@@ -1139,7 +1206,7 @@ function renderDetailView(container, race, isAdmin2 = false) {
           <div class="bg-white p-6 sm:p-8 rounded-3xl border border-outline-variant/40 shadow-sm space-y-4">
             <h3 class="font-display font-bold text-xl text-primary flex items-center gap-2">
               <span class="material-symbols-outlined text-secondary">description</span>
-              Sobre la Competencia
+              Descripci\xF3n del Evento
             </h3>
             <p class="text-gray-700 text-base leading-relaxed whitespace-pre-line">
               ${race.description}
@@ -1174,7 +1241,7 @@ function renderDetailView(container, race, isAdmin2 = false) {
             <div class="space-y-3 pt-2">
               <div class="flex justify-between items-center text-sm py-2 border-b border-outline-variant/30">
                 <span class="text-outline font-medium">Estado:</span>
-                <span class="font-bold text-primary">${race.status}</span>
+                <span class="font-bold text-primary">${displayStatus}</span>
               </div>
               <div class="flex justify-between items-center text-sm py-2 border-b border-outline-variant/30">
                 <span class="text-outline font-medium">Organiza:</span>
@@ -1187,15 +1254,22 @@ function renderDetailView(container, race, isAdmin2 = false) {
             </div>
 
             <!-- CTA Button -->
-            <a 
-              href="${race.registrationUrl || "#"}" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              class="w-full bg-[#d8ef00] text-[#181919] font-display font-bold text-base hover:brightness-105 shadow-md rounded-2xl py-4 px-6 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
-            >
-              Ir a Formulario de Inscripci\xF3n
-              <span class="material-symbols-outlined text-xl">open_in_new</span>
-            </a>
+            ${timeStatus.esFinalizada ? `
+              <div class="w-full bg-slate-100 text-slate-600 border border-slate-300 font-display font-bold text-base rounded-2xl py-4 px-6 flex items-center justify-center gap-2 shadow-sm text-center">
+                <span class="material-symbols-outlined text-xl">event_busy</span>
+                Evento Finalizado
+              </div>
+            ` : `
+              <a 
+                href="${race.registrationUrl || "#"}" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                class="w-full bg-[#d8ef00] text-[#181919] font-display font-bold text-base hover:brightness-105 shadow-md rounded-2xl py-4 px-6 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+              >
+                Ir a Formulario de Inscripci\xF3n
+                <span class="material-symbols-outlined text-xl">open_in_new</span>
+              </a>
+            `}
 
             <!-- Dropdown A\xF1adir a mi calendario (Vista Detalle) -->
             <div class="relative inline-block w-full pt-1">
@@ -2333,6 +2407,10 @@ async function getFilteredRaces() {
   const races = await getAllRaces();
   const bookmarkedIds = getBookmarkedIds();
   const filteredList = races.filter((race) => {
+    const timeStatus = getRaceTimeStatus(race);
+    if (!showPastRaces && timeStatus.esFinalizada) {
+      return false;
+    }
     if (activeTab === "my-calendar" || activeTab === "agenda") {
       if (!bookmarkedIds.includes(race.id)) {
         return false;
@@ -2651,6 +2729,13 @@ function setupEventHandlers() {
   if (monthSelect) {
     monthSelect.addEventListener("change", (e) => {
       currentMonth = e.target.value;
+      updateCalendar();
+    });
+  }
+  const togglePastRacesBtn = document.getElementById("toggle-past-races");
+  if (togglePastRacesBtn) {
+    togglePastRacesBtn.addEventListener("change", (e) => {
+      showPastRaces = e.target.checked;
       updateCalendar();
     });
   }
@@ -3392,7 +3477,7 @@ async function initApp() {
     isAdmin = false;
   });
 }
-var currentDiscipline, currentRegion, currentMonth, searchQuery, activeTab, activeViewMode, currentRaceId, isAdmin;
+var currentDiscipline, currentRegion, currentMonth, searchQuery, showPastRaces, activeTab, activeViewMode, currentRaceId, isAdmin;
 var init_app = __esm({
   "js/app.js"() {
     init_router();
@@ -3406,6 +3491,7 @@ var init_app = __esm({
     currentRegion = "Todas las regiones";
     currentMonth = "Todos";
     searchQuery = "";
+    showPastRaces = false;
     activeTab = "all";
     activeViewMode = "cards";
     currentRaceId = null;

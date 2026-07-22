@@ -16,7 +16,8 @@ import {
   renderPendingRaces,
   renderMonthGrid,
   renderWeekGrid,
-  renderDayGrid
+  renderDayGrid,
+  getRaceTimeStatus
 } from './ui.js';
 import { validateRaceForm } from './validation.js';
 import { 
@@ -36,6 +37,7 @@ let currentDiscipline = "Todas";
 let currentRegion = "Todas las regiones";
 let currentMonth = "Todos";
 let searchQuery = "";
+let showPastRaces = false;
 let activeTab = "all"; // "all" o "my-calendar"
 let activeViewMode = "cards"; // "cards", "month", "week", "day"
 let currentRaceId = null;
@@ -158,6 +160,12 @@ export async function getFilteredRaces() {
   const bookmarkedIds = getBookmarkedIds();
 
   const filteredList = races.filter(race => {
+    // Filtrado por carreras pasadas (finalizadas)
+    const timeStatus = getRaceTimeStatus(race);
+    if (!showPastRaces && timeStatus.esFinalizada) {
+      return false;
+    }
+
     // Filtrado por pestaña activa (Mi Agenda / Mis Carreras)
     if (activeTab === 'my-calendar' || activeTab === 'agenda') {
       if (!bookmarkedIds.includes(race.id)) {
@@ -555,6 +563,15 @@ function setupEventHandlers() {
   if (monthSelect) {
     monthSelect.addEventListener('change', (e) => {
       currentMonth = e.target.value;
+      updateCalendar();
+    });
+  }
+
+  // Toggle de carreras pasadas (#toggle-past-races)
+  const togglePastRacesBtn = document.getElementById('toggle-past-races');
+  if (togglePastRacesBtn) {
+    togglePastRacesBtn.addEventListener('change', (e) => {
+      showPastRaces = e.target.checked;
       updateCalendar();
     });
   }

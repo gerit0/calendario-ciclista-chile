@@ -58,6 +58,20 @@ function renderDetailHtmlSSR(race) {
   const isFree = price === 0;
   const priceText = isFree ? 'Gratuita' : `$${price.toLocaleString('es-CL')}`;
 
+  const startStr = (race.fecha_inicio || race.fecha || race.startDate || race.date || '').split('T')[0];
+  const endStr = (race.fecha_fin || race.endDate || startStr).split('T')[0];
+  const now = new Date();
+  const todayChile = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Santiago', year: 'numeric', month: '2-digit', day: '2-digit' }).format(now);
+  const esFinalizada = endStr && endStr < todayChile;
+  const esEnCurso = startStr && startStr <= todayChile && todayChile <= endStr;
+
+  let statusBadgeSSR = '<span class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-tertiary-fixed text-primary shadow-md">Inscripciones Abiertas</span>';
+  if (esFinalizada) {
+    statusBadgeSSR = '<span class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-200 text-slate-800 shadow-md">Finalizada</span>';
+  } else if (esEnCurso) {
+    statusBadgeSSR = '<span class="px-3.5 py-1.5 rounded-xl text-xs font-black bg-blue-600 text-white shadow-md animate-pulse">En Curso</span>';
+  }
+
   return `
     <div class="space-y-8 animate-fadeIn">
       <div class="flex items-center justify-between flex-wrap gap-4">
@@ -78,9 +92,7 @@ function renderDetailHtmlSSR(race) {
             <span class="px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-white/20 backdrop-blur-md text-white border border-white/30">
               ${discipline}
             </span>
-            <span class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-tertiary-fixed text-primary shadow-md">
-              Inscripciones Abiertas
-            </span>
+            ${statusBadgeSSR}
             <span class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white/10 backdrop-blur-md text-white border border-white/20">
               ${priceText}
             </span>
