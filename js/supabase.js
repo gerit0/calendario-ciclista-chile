@@ -119,7 +119,8 @@ function mapSupabaseToFrontend(row) {
     heroImage: row.hero_image || '',
     description: row.descripcion || '',
     categories: categories,
-    participants: row.participantes != null ? row.participantes : 0
+    participants: row.participantes != null ? row.participantes : 0,
+    creadoPor: row.creado_por || null
   };
 }
 
@@ -192,7 +193,7 @@ export async function fetchRaceByIdSupabase(id) {
  * @param {Object} raceData Datos de la carrera en formato frontend o formulario.
  * @returns {Promise<{ success: boolean, data?: Object, error?: any }>}
  */
-export async function createPendingRaceSupabase(raceData) {
+export async function createRaceSupabase(raceData, userId) {
   const client = getSupabase();
   if (!client) {
     return {
@@ -201,8 +202,12 @@ export async function createPendingRaceSupabase(raceData) {
     };
   }
 
+  if (!userId) {
+    return { success: false, error: 'Se requiere una cuenta de organizador para publicar.' };
+  }
+
   try {
-    // 1. Limpieza de link_inscripcion (debe ser null o comenzar con http:// / https://)
+    // Limpieza de link_inscripcion (debe ser null o comenzar con http:// / https://)
     const rawUrl = raceData.link_inscripcion || raceData.registrationUrl || null;
     const cleanUrl = (rawUrl && typeof rawUrl === 'string' && rawUrl.trim() !== '#' && /^https?:\/\//i.test(rawUrl.trim()))
       ? rawUrl.trim()
@@ -218,13 +223,14 @@ export async function createPendingRaceSupabase(raceData) {
       desnivel: raceData.desnivel || raceData.elevation || null,
       organizador: raceData.organizador || raceData.organizer || null,
       link_inscripcion: cleanUrl,
-      categoria: Array.isArray(raceData.categories) 
-        ? raceData.categories.join(', ') 
+      categoria: Array.isArray(raceData.categories)
+        ? raceData.categories.join(', ')
         : (raceData.categoria || raceData.categories || null),
       precio: raceData.precio != null ? raceData.precio : (raceData.price != null ? raceData.price : 0),
       hero_image: raceData.hero_image || raceData.heroImage || null,
       descripcion: raceData.descripcion || raceData.description || null,
-      estado: 'pendiente'
+      estado: 'aprobada',
+      creado_por: userId
     };
 
     const insertPromise = client
@@ -237,9 +243,9 @@ export async function createPendingRaceSupabase(raceData) {
 
     let { data, error } = await Promise.race([insertPromise, timeoutPromise]);
 
-    // Fallback defensivo: si la tabla en Supabase no tiene aún las columnas distancia/desnivel en su caché de esquema
+    // Fallback defensivo: si la tabla no tiene aún las columnas distancia/desnivel en su caché de esquema
     if (error && (error.code === 'PGRST204' || String(error.message || error).includes('column'))) {
-      console.warn('Reintentando inserción sin columnas de distancia/desnivel no disponibles en el esquema Supabase...');
+      console.warn('Reintentando inserción sin columnas de distancia/desnivel...');
       const fallbackPayload = { ...payload };
       delete fallbackPayload.distancia;
       delete fallbackPayload.desnivel;
@@ -248,8 +254,8 @@ export async function createPendingRaceSupabase(raceData) {
       const elevInfo = payload.desnivel ? `Desnivel: ${payload.desnivel}` : '';
       const specHeader = [distInfo, elevInfo].filter(Boolean).join(' | ');
       if (specHeader) {
-        fallbackPayload.descripcion = fallbackPayload.descripcion 
-          ? `${specHeader}\n\n${fallbackPayload.descripcion}` 
+        fallbackPayload.descripcion = fallbackPayload.descripcion
+          ? `${specHeader}\n\n${fallbackPayload.descripcion}`
           : specHeader;
       }
 
@@ -259,26 +265,73 @@ export async function createPendingRaceSupabase(raceData) {
     }
 
     if (error) {
-      console.error('Error al insertar carrera pendiente en Supabase:', error);
+      console.error('Error al insertar carrera en Supabase:', error);
       return { success: false, error: error.message || error };
     }
-
-    // Disparar notificación por correo en segundo plano (no bloqueante)
-    fetch('/api/notify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    }).catch(err => console.warn('Notificación de correo omitida o no disponible:', err));
 
     return {
       success: true,
       data: (data && data.length > 0) ? data[0] : null
     };
   } catch (err) {
-    console.error('Excepción al crear carrera pendiente en Supabase:', err);
+    console.error('Excepción al crear carrera en Supabase:', err);
     return { success: false, error: err.message || err };
   }
 }
+
+/**
+ * Crea una cuenta de organizador o inicia sesión si ya existe.
+ * @param {string} email
+ * @param {string} password
+ * @returns {Promise<{ success: boolean, userId?: string, error?: any }>}
+ */
+export async function signUpOrLoginOrganizer(email, password) {
+  const client = getSupabase();
+  if (!client) return { success: false, error: 'Supabase no está configurado.' };
+
+  try {
+    // Intentar registro primero
+    const { data: signUpData, error: signUpError } = await client.auth.signUp({ email, password });
+
+    // Si el usuario ya existe, intentar iniciar sesión
+    if (signUpError && (signUpError.message?.includes('already') || signUpError.message?.includes('registered') || signUpError.status === 400)) {
+      const { data: loginData, error: loginError } = await client.auth.signInWithPassword({ email, password });
+      if (loginError) return { success: false, error: loginError.message || loginError };
+      return { success: true, userId: loginData.user?.id || null };
+    }
+
+    if (signUpError) return { success: false, error: signUpError.message || signUpError };
+
+    // Registro exitoso — en Supabase puede requerir confirmación de email
+    // Pero el user ya está disponible en la sesión
+    const userId = signUpData.user?.id || null;
+    return { success: true, userId };
+  } catch (err) {
+    console.error('Error en signUpOrLoginOrganizer:', err);
+    return { success: false, error: err.message || err };
+  }
+}
+
+/**
+ * Inicia sesión de un organizador existente.
+ * @param {string} email
+ * @param {string} password
+ * @returns {Promise<{ success: boolean, userId?: string, isAdmin?: boolean, error?: any }>}
+ */
+export async function loginOrganizer(email, password) {
+  const client = getSupabase();
+  if (!client) return { success: false, error: 'Supabase no está configurado.' };
+
+  try {
+    const { data, error } = await client.auth.signInWithPassword({ email, password });
+    if (error) return { success: false, error: error.message || error };
+    return { success: true, userId: data.user?.id || null };
+  } catch (err) {
+    console.error('Error en loginOrganizer:', err);
+    return { success: false, error: err.message || err };
+  }
+}
+
 
 /**
  * Inicia sesión de administrador con correo y contraseña.
@@ -450,7 +503,10 @@ export async function updateRaceSupabase(raceId, raceData) {
       ? rawUrl.trim()
       : null;
 
-    const payload = {
+    // Separamos los campos en dos grupos para evitar URI_TOO_LONG.
+    // Los campos de texto largo (descripcion, hero_image) se actualizan
+    // en una segunda llamada PATCH independiente para mantener cada URL corta.
+    const shortPayload = {
       nombre: raceData.name || raceData.nombre,
       fecha: raceData.date || raceData.fecha,
       disciplina: raceData.discipline || raceData.disciplina,
@@ -463,25 +519,39 @@ export async function updateRaceSupabase(raceId, raceData) {
       categoria: Array.isArray(raceData.categories) 
         ? raceData.categories.join(', ') 
         : (raceData.categoria || raceData.categories),
-      precio: raceData.price != null ? Number(raceData.price) : 0,
-      hero_image: raceData.heroImage || raceData.hero_image,
-      descripcion: raceData.description || raceData.descripcion
+      precio: raceData.price != null ? Number(raceData.price) : 0
     };
 
-    let { error } = await client
+    const longPayload = {
+      hero_image: raceData.heroImage || raceData.hero_image || null,
+      descripcion: raceData.description || raceData.descripcion || null
+    };
+
+    // --- Primera llamada: campos cortos ---
+    let { error: err1 } = await client
       .from('carreras')
-      .update(payload)
+      .update(shortPayload)
       .eq('id', raceId);
 
-    if (error && (error.code === 'PGRST204' || String(error.message || error).includes('column'))) {
-      const fallbackPayload = { ...payload };
+    // Fallback defensivo: si la tabla no tiene columnas distancia/desnivel en el caché de esquema
+    if (err1 && (err1.code === 'PGRST204' || String(err1.message || err1).includes('column'))) {
+      const fallbackPayload = { ...shortPayload };
       delete fallbackPayload.distancia;
       delete fallbackPayload.desnivel;
       const retryRes = await client.from('carreras').update(fallbackPayload).eq('id', raceId);
-      error = retryRes.error;
+      err1 = retryRes.error;
     }
 
-    if (error) throw error;
+    if (err1) throw err1;
+
+    // --- Segunda llamada: campos de texto largo ---
+    const { error: err2 } = await client
+      .from('carreras')
+      .update(longPayload)
+      .eq('id', raceId);
+
+    if (err2) throw err2;
+
     return { success: true };
   } catch (err) {
     console.error('Error al actualizar carrera en Supabase:', err);
