@@ -1,28 +1,1078 @@
-var Ht=Object.defineProperty;var V=(e,t,n)=>()=>{if(n)throw n[0];try{return e&&(t=e(e=0)),t}catch(a){throw n=[a],a}};var Vt=(e,t)=>{for(var n in t)Ht(e,n,{get:t[n],enumerable:!0})};function Oe(){let e=window.location.pathname||"/";if(e==="/"||e===""||e==="/index.html")return{viewName:"calendar",params:{},path:"/"};if(e==="/agenda"||e==="/agenda/")return{viewName:"agenda",params:{},path:"/agenda"};if(e==="/publicar"||e==="/publicar/")return{viewName:"register",params:{},path:"/publicar"};if(e==="/admin"||e==="/admin/")return{viewName:"admin-panel",params:{},path:"/admin"};let t=e.match(/^\/evento\/([^/]+)/);return t?{viewName:"detail",params:{id:t[1]},path:e}:{viewName:"calendar",params:{},path:"/"}}function U(e,t={}){window.location.pathname!==e&&window.history.pushState(t,"",e),typeof te=="function"&&te(Oe())}function st(e){te=e,window.addEventListener("popstate",()=>{typeof te=="function"&&te(Oe())}),document.addEventListener("click",t=>{let n=t.target.closest("a");if(!n)return;let a=n.getAttribute("href");a&&a.startsWith("/")&&!a.startsWith("//")&&!n.hasAttribute("target")&&!n.hasAttribute("download")&&(t.preventDefault(),U(a))}),typeof te=="function"&&te(Oe())}var te,ot=V(()=>{te=null});var K,Pe,Le=V(()=>{K=["Todas las regiones","Regi\xF3n de Arica y Parinacota","Regi\xF3n de Tarapac\xE1","Regi\xF3n de Antofagasta","Regi\xF3n de Atacama","Regi\xF3n de Coquimbo","Regi\xF3n de Valpara\xEDso","Regi\xF3n Metropolitana de Santiago","Regi\xF3n del Libertador General Bernardo O'Higgins","Regi\xF3n del Maule","Regi\xF3n de \xD1uble","Regi\xF3n del Biob\xEDo","Regi\xF3n de La Araucan\xEDa","Regi\xF3n de Los R\xEDos","Regi\xF3n de Los Lagos","Regi\xF3n de Ays\xE9n del General Carlos Ib\xE1\xF1ez del Campo","Regi\xF3n de Magallanes y de la Ant\xE1rtica Chilena"],Pe=[]});function Ue(e){return e?String(e).trim().split("T")[0].replace(/-/g,""):""}function lt(e,t){let n=(e||"").trim().split("T")[0],a=(t||n).trim().split("T")[0];if(!a)return"";let i=a.split("-").map(Number);if(i.length<3||isNaN(i[0])||isNaN(i[1])||isNaN(i[2]))return"";let o=new Date(i[0],i[1]-1,i[2]+1),s=o.getFullYear(),r=String(o.getMonth()+1).padStart(2,"0"),l=String(o.getDate()).padStart(2,"0");return`${s}${r}${l}`}function qt(e){if(!e)return"";let t=e.name||e.nombre||"Carrera de Ciclismo",n=Ue(e.startDate||e.fecha_inicio||e.date||e.fecha),a=lt(e.startDate||e.fecha_inicio||e.date||e.fecha,e.endDate||e.fecha_fin),i=e.city||e.ubicacion||"",o=e.region||"",s=[i,o].filter(Boolean).join(", ")||"Chile",r=e.discipline||e.disciplina||"Ciclismo",l=e.distance||e.distancia||"N/A",d=e.elevation||e.desnivel||"N/A",m=e.description||e.descripcion||"",g=`Disciplina: ${r}
-Distancia: ${l} | Desnivel: ${d}
-${m}
+var __defProp = Object.defineProperty;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __esm = (fn, res, err) => function __init() {
+  if (err) throw err[0];
+  try {
+    return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
+  } catch (e) {
+    throw err = [e], e;
+  }
+};
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
 
-M\xE1s informaci\xF3n en CalendarioCiclista Chile: https://calendariociclista.vercel.app/evento/${e.id}`,h=x=>String(x||"").replace(/\\/g,"\\\\").replace(/;/g,"\\;").replace(/,/g,"\\,").replace(/\n/g,"\\n");return["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//CalendarioCiclista Chile//NONSGML v1.0//ES","CALSCALE:GREGORIAN","METHOD:PUBLISH","BEGIN:VEVENT",`UID:carrera-${e.id}@calendariociclista.vercel.app`,`DTSTAMP:${Ue(new Date().toISOString())}T000000Z`,`DTSTART;VALUE=DATE:${n}`,`DTEND;VALUE=DATE:${a}`,`SUMMARY:${h(t)}`,`DESCRIPTION:${h(g)}`,`LOCATION:${h(s)}`,`URL:https://calendariociclista.vercel.app/evento/${e.id}`,"STATUS:CONFIRMED","END:VEVENT","END:VCALENDAR"].join(`\r
-`)}function dt(e){if(!e)return"#";let t=e.name||e.nombre||"Carrera de Ciclismo",n=Ue(e.startDate||e.fecha_inicio||e.date||e.fecha),a=lt(e.startDate||e.fecha_inicio||e.date||e.fecha,e.endDate||e.fecha_fin),i=e.city||e.ubicacion||"",o=e.region||"",s=[i,o].filter(Boolean).join(", ")||"Chile",r=e.discipline||e.disciplina||"Ciclismo",l=e.distance||e.distancia||"N/A",d=e.elevation||e.desnivel||"N/A",m=e.description||e.descripcion||"",g=`Disciplina: ${r}
-Distancia: ${l} | Desnivel: ${d}
-${m}
+// js/router.js
+function parseCurrentRoute() {
+  const path = window.location.pathname || "/";
+  if (path === "/" || path === "" || path === "/index.html") {
+    return { viewName: "calendar", params: {}, path: "/" };
+  }
+  if (path === "/agenda" || path === "/agenda/") {
+    return { viewName: "agenda", params: {}, path: "/agenda" };
+  }
+  if (path === "/publicar" || path === "/publicar/") {
+    return { viewName: "register", params: {}, path: "/publicar" };
+  }
+  if (path === "/admin" || path === "/admin/") {
+    return { viewName: "admin-panel", params: {}, path: "/admin" };
+  }
+  const eventMatch = path.match(/^\/evento\/([^/]+)/);
+  if (eventMatch) {
+    return { viewName: "detail", params: { id: eventMatch[1] }, path };
+  }
+  return { viewName: "calendar", params: {}, path: "/" };
+}
+function navigateTo(path, state = {}) {
+  if (window.location.pathname !== path) {
+    window.history.pushState(state, "", path);
+  }
+  if (typeof routeChangeCallback === "function") {
+    routeChangeCallback(parseCurrentRoute());
+  }
+}
+function initRouter(onRouteChanged) {
+  routeChangeCallback = onRouteChanged;
+  window.addEventListener("popstate", () => {
+    if (typeof routeChangeCallback === "function") {
+      routeChangeCallback(parseCurrentRoute());
+    }
+  });
+  document.addEventListener("click", (e) => {
+    const anchor = e.target.closest("a");
+    if (!anchor) return;
+    const href = anchor.getAttribute("href");
+    if (!href) return;
+    if (href.startsWith("/") && !href.startsWith("//") && !anchor.hasAttribute("target") && !anchor.hasAttribute("download")) {
+      e.preventDefault();
+      navigateTo(href);
+    }
+  });
+  if (typeof routeChangeCallback === "function") {
+    routeChangeCallback(parseCurrentRoute());
+  }
+}
+var routeChangeCallback;
+var init_router = __esm({
+  "js/router.js"() {
+    routeChangeCallback = null;
+  }
+});
 
-M\xE1s informaci\xF3n: https://calendariociclista.vercel.app/evento/${e.id}`,h="https://calendar.google.com/calendar/render",x=new URLSearchParams({action:"TEMPLATE",text:t,dates:`${n}/${a}`,details:g,location:s});return`${h}?${x.toString()}`}function ct(e){let t=qt(e);if(!t)return;let n=new Blob([t],{type:"text/calendar;charset=utf-8"}),a=URL.createObjectURL(n),i=document.createElement("a"),o=(e.name||e.nombre||"carrera").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)/g,"");i.href=a,i.download=`${o}.ics`,document.body.appendChild(i),i.click(),document.body.removeChild(i),URL.revokeObjectURL(a)}var ut=V(()=>{});import{createClient as Gt}from"@supabase/supabase-js";function mt(){let e=typeof window<"u"&&window.SUPABASE_URL?String(window.SUPABASE_URL).trim():Jt,t=typeof window<"u"&&window.SUPABASE_ANON_KEY?String(window.SUPABASE_ANON_KEY).trim():Yt;return{url:e,key:t}}function X(){let{url:e,key:t}=mt();if(!e||!t||e.includes("YOUR_SUPABASE_URL")||t.includes("YOUR_SUPABASE_ANON_KEY"))return!1;try{let n=new URL(e);return n.protocol==="http:"||n.protocol==="https:"}catch{return!1}}function N(){if(Se)return Se;if(!X())return null;let{url:e,key:t}=mt();try{return Se=Gt(e,t),Se}catch(n){return console.error("Error al inicializar el cliente de Supabase:",n),null}}function Fe(e){let t=e.precio!=null?Number(e.precio):0,n=e.fecha||"",a="";if(e.fecha)try{let r=new Date(e.fecha+"T00:00:00");if(!isNaN(r.getTime())){let l=r.toLocaleDateString("es-CL",{month:"long"});a=l.charAt(0).toUpperCase()+l.slice(1),n=r.toLocaleDateString("es-CL",{day:"numeric",month:"long",year:"numeric"})}}catch{n=e.fecha}let i=[];Array.isArray(e.categoria)?i=e.categoria:typeof e.categoria=="string"&&e.categoria.trim()!==""?i=e.categoria.split(",").map(r=>r.trim()):i=["General"];let o=e.fecha_inicio||e.fecha||"",s=e.fecha_fin||e.fecha_inicio||e.fecha||"";return{id:e.id,name:e.nombre||"",discipline:e.disciplina||"",date:o||e.fecha||"",startDate:o,endDate:s,month:a,displayDate:n,region:e.region||"",city:e.ubicacion||"",distance:e.distancia||"N/A",elevation:e.desnivel||"N/A",price:t,isFree:t===0,status:e.status||(e.estado==="aprobada"?"Inscripciones Abiertas":e.estado),organizer:e.organizador||"",registrationUrl:e.link_inscripcion||"",heroImage:e.hero_image||"",description:e.descripcion||"",categories:i,participants:e.participantes!=null?e.participantes:0,creadoPor:e.creado_por||null}}async function pt(){let e=N();if(!e)return console.warn("Supabase no est\xE1 configurado. Retornando array vac\xEDo."),[];try{let t=new Date,n=`${t.getFullYear()}-01-01`,a=`${t.getFullYear()+1}-12-31`,{data:i,error:o}=await e.from("carreras").select("*").eq("estado","aprobada").gte("fecha",n).lte("fecha",a).order("fecha",{ascending:!0}).limit(500);return o?(console.error("Error al consultar carreras aprobadas en Supabase:",o),[]):Array.isArray(i)?i.map(Fe):[]}catch(t){return console.error("Excepci\xF3n al consultar carreras en Supabase:",t),[]}}async function ft(e){let t=N();if(!t||!e)return null;try{let{data:n,error:a}=await t.from("carreras").select("*").eq("id",e).maybeSingle();return a||!n?null:Fe(n)}catch(n){return console.error("Error al obtener carrera por ID en Supabase:",n),null}}async function gt(e,t){let n=N();if(!n)return{success:!1,error:new Error("Supabase no est\xE1 configurado.")};if(!t)return{success:!1,error:"Se requiere una cuenta de organizador para publicar."};try{let a=e.link_inscripcion||e.registrationUrl||null,i=a&&typeof a=="string"&&a.trim()!=="#"&&/^https?:\/\//i.test(a.trim())?a.trim():null,o={nombre:e.nombre||e.name,fecha:e.fecha||e.date,disciplina:e.disciplina||e.discipline,region:e.region||null,ubicacion:e.ubicacion||e.city||null,distancia:e.distancia||e.distance||null,desnivel:e.desnivel||e.elevation||null,organizador:e.organizador||e.organizer||null,link_inscripcion:i,categoria:Array.isArray(e.categories)?e.categories.join(", "):e.categoria||e.categories||null,precio:e.precio!=null?e.precio:e.price!=null?e.price:0,hero_image:e.hero_image||e.heroImage||null,descripcion:e.descripcion||e.description||null,estado:"aprobada",creado_por:t},s=n.from("carreras").insert([o]),r=new Promise((m,g)=>setTimeout(()=>g(new Error("TIMEOUT_EXCEEDED")),6e3)),{data:l,error:d}=await Promise.race([s,r]);if(d&&(d.code==="PGRST204"||String(d.message||d).includes("column"))){console.warn("Reintentando inserci\xF3n sin columnas de distancia/desnivel...");let m={...o};delete m.distancia,delete m.desnivel;let g=o.distancia?`Distancia: ${o.distancia}`:"",h=o.desnivel?`Desnivel: ${o.desnivel}`:"",x=[g,h].filter(Boolean).join(" | ");x&&(m.descripcion=m.descripcion?`${x}
+// js/data.js
+var REGIONS_CHILE, INITIAL_RACES;
+var init_data = __esm({
+  "js/data.js"() {
+    REGIONS_CHILE = [
+      "Todas las regiones",
+      "Regi\xF3n de Arica y Parinacota",
+      "Regi\xF3n de Tarapac\xE1",
+      "Regi\xF3n de Antofagasta",
+      "Regi\xF3n de Atacama",
+      "Regi\xF3n de Coquimbo",
+      "Regi\xF3n de Valpara\xEDso",
+      "Regi\xF3n Metropolitana de Santiago",
+      "Regi\xF3n del Libertador General Bernardo O'Higgins",
+      "Regi\xF3n del Maule",
+      "Regi\xF3n de \xD1uble",
+      "Regi\xF3n del Biob\xEDo",
+      "Regi\xF3n de La Araucan\xEDa",
+      "Regi\xF3n de Los R\xEDos",
+      "Regi\xF3n de Los Lagos",
+      "Regi\xF3n de Ays\xE9n del General Carlos Ib\xE1\xF1ez del Campo",
+      "Regi\xF3n de Magallanes y de la Ant\xE1rtica Chilena"
+    ];
+    INITIAL_RACES = [
+      {
+        id: "race-001",
+        name: "Gran Fondo Valle del Elqui",
+        discipline: "Ruta",
+        date: "2026-10-15",
+        startDate: "2026-10-15",
+        endDate: "2026-10-15",
+        month: "Octubre",
+        displayDate: "15 de Octubre, 2026",
+        region: "Regi\xF3n de Coquimbo",
+        city: "Vicu\xF1a",
+        distance: "120 km",
+        elevation: "1850 m",
+        price: 35e3,
+        isFree: false,
+        status: "Inscripciones Abiertas",
+        organizer: "Club Ciclismo Coquimbo",
+        registrationUrl: "https://ejemplo.cl/registro/gf-elqui",
+        heroImage: "https://images.unsplash.com/photo-1541625602330-2277a4c46182?auto=format&fit=crop&w=1200&q=80",
+        description: "Una imperdible competencia de gran fondo recorriendo los imponentes paisajes astron\xF3micos y vi\xF1edos del Valle del Elqui con llegada en altitud.",
+        categories: ["Elite", "Master A", "Master B", "Master C", "Amateur", "Damas Elite", "Damas Master"],
+        participants: 340
+      },
+      {
+        id: "race-002",
+        name: "Desaf\xEDo Transandes MTB Chilo\xE9",
+        discipline: "MTB",
+        date: "2026-11-20",
+        startDate: "2026-11-20",
+        endDate: "2026-11-22",
+        month: "Noviembre",
+        displayDate: "20 - 22 de Noviembre, 2026",
+        region: "Regi\xF3n de Los Lagos",
+        city: "Castro",
+        distance: "85 km",
+        elevation: "2400 m",
+        price: 45e3,
+        isFree: false,
+        status: "Inscripciones Abiertas",
+        organizer: "Austral Bike Chile",
+        registrationUrl: "https://ejemplo.cl/registro/transandes-chiloe",
+        heroImage: "https://images.unsplash.com/photo-1517649763962-0c623266010b?auto=format&fit=crop&w=1200&q=80",
+        description: "Tres d\xEDas de puro XCM cruzando los bosques nativos, palafitos y senderos ancestrales de la m\xEDtica Isla Grande de Chilo\xE9.",
+        categories: ["Pro Elite", "Varones A", "Varones B", "Damas Pro", "Duplas Mixtas"],
+        participants: 210
+      },
+      {
+        id: "race-003",
+        name: "Gravel Pac\xEDfico Central",
+        discipline: "Gravel",
+        date: "2026-09-05",
+        startDate: "2026-09-05",
+        endDate: "2026-09-05",
+        month: "Septiembre",
+        displayDate: "5 de Septiembre, 2026",
+        region: "Regi\xF3n de Valpara\xEDso",
+        city: "Zapallar",
+        distance: "105 km",
+        elevation: "1400 m",
+        price: 28e3,
+        isFree: false,
+        status: "Pr\xF3ximamente",
+        organizer: "Gravel Chile Club",
+        registrationUrl: "https://ejemplo.cl/registro/gravel-pacifico",
+        heroImage: "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=1200&q=80",
+        description: "Aventura costera por caminos rurales de tierra, huertos de paltos y acantilados sobre el Oc\xE9ano Pac\xEDfico.",
+        categories: ["Gravel Open", "Gravel Master", "Gravel Damas", "E-Bike Gravel"],
+        participants: 180
+      },
+      {
+        id: "race-004",
+        name: "Copa Pista Vel\xF3dromo Pe\xF1alol\xE9n",
+        discipline: "Pista",
+        date: "2026-08-12",
+        startDate: "2026-08-12",
+        endDate: "2026-08-12",
+        month: "Agosto",
+        displayDate: "12 de Agosto, 2026",
+        region: "Regi\xF3n Metropolitana de Santiago",
+        city: "Pe\xF1alol\xE9n",
+        distance: "20 km",
+        elevation: "0 m",
+        price: 0,
+        isFree: true,
+        status: "Inscripciones Abiertas",
+        organizer: "Federaci\xF3n Nacional de Ciclismo",
+        registrationUrl: "https://ejemplo.cl/registro/copa-pista-penalolen",
+        heroImage: "https://images.unsplash.com/photo-1507035895480-2b3156c31fc8?auto=format&fit=crop&w=1200&q=80",
+        description: "Competencia de velocidad, persecuci\xF3n y prueba de eliminaci\xF3n en la madera bajo techo del Vel\xF3dromo de Pe\xF1alol\xE9n.",
+        categories: ["Junior", "Sub-23", "Elite Varones", "Elite Damas"],
+        participants: 95
+      },
+      {
+        id: "race-005",
+        name: "Nacional BMX Racing \xD1u\xF1oa",
+        discipline: "BMX",
+        date: "2026-10-28",
+        startDate: "2026-10-28",
+        endDate: "2026-10-28",
+        month: "Octubre",
+        displayDate: "28 de Octubre, 2026",
+        region: "Regi\xF3n Metropolitana de Santiago",
+        city: "\xD1u\xF1oa",
+        distance: "400 m",
+        elevation: "5 m",
+        price: 15e3,
+        isFree: false,
+        status: "Inscripciones Abiertas",
+        organizer: "BMX Chile Federation",
+        registrationUrl: "https://ejemplo.cl/registro/nacional-bmx",
+        heroImage: "https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1200&q=80",
+        description: "Fecha clasificatoria nacional de BMX Racing con arranques explosivos en el partido t\xE9cnico del Estadio Nacional.",
+        categories: ["Challenger 7-8", "Challenger 13-14", "Junior", "Elite Pro"],
+        participants: 150
+      },
+      {
+        id: "race-006",
+        name: "Chile Zwift Virtual League - Fecha 4",
+        discipline: "Virtual",
+        date: "2026-08-30",
+        startDate: "2026-08-30",
+        endDate: "2026-08-30",
+        month: "Agosto",
+        displayDate: "30 de Agosto, 2026",
+        region: "Todas las regiones",
+        city: "Online (Zwift)",
+        distance: "45 km",
+        elevation: "650 m",
+        price: 0,
+        isFree: true,
+        status: "Inscripciones Abiertas",
+        organizer: "E-Sports Cycling Chile",
+        registrationUrl: "https://ejemplo.cl/registro/zwift-chile-f4",
+        heroImage: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&w=1200&q=80",
+        description: "Competencia virtual oficial sincr\xF3nica por potencia e-cycling con transmisi\xF3n en vivo y r\xE1nkings acumulativos.",
+        categories: ["Cat A (+4.0 W/kg)", "Cat B (3.2-3.9 W/kg)", "Cat C (2.5-3.1 W/kg)", "Damas Open"],
+        participants: 420
+      },
+      {
+        id: "race-007",
+        name: "Ascenso Farellones Challenge",
+        discipline: "Ruta",
+        date: "2026-11-08",
+        month: "Noviembre",
+        displayDate: "8 de Noviembre, 2026",
+        region: "Regi\xF3n Metropolitana de Santiago",
+        city: "Lo Barnechea",
+        distance: "32 km",
+        elevation: "1980 m",
+        price: 32e3,
+        isFree: false,
+        status: "Cupos Agotados",
+        organizer: "Andes Cycling Promotions",
+        registrationUrl: "https://ejemplo.cl/registro/ascenso-farellones",
+        heroImage: "https://images.unsplash.com/photo-1517649763962-0c623266010b?auto=format&fit=crop&w=1200&q=80",
+        description: "El m\xEDtico desaf\xEDo de 40 curvas desde la curva 0 hasta Farellones. La escalada en ruta m\xE1s emblem\xE1tica de la capital.",
+        categories: ["Elite", "Master A", "Master B", "Master C", "Damas", "Cicloturismo"],
+        participants: 600
+      },
+      {
+        id: "race-008",
+        name: "Epic Araucan\xEDa MTB Marathon",
+        discipline: "MTB",
+        date: "2026-12-05",
+        month: "Diciembre",
+        displayDate: "5 de Diciembre, 2026",
+        region: "Regi\xF3n de La Araucan\xEDa",
+        city: "Puc\xF3n",
+        distance: "70 km",
+        elevation: "2100 m",
+        price: 38e3,
+        isFree: false,
+        status: "Pr\xF3ximamente",
+        organizer: "Volcano Bike Race",
+        registrationUrl: "https://ejemplo.cl/registro/epic-araucania",
+        heroImage: "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=1200&q=80",
+        description: "Ruta volc\xE1nica a los pies del Volc\xE1n Villarrica, sorteando arena volc\xE1nica, senderos de araucarias y lechos de r\xEDos.",
+        categories: ["XCM Elite", "XCM Master", "XCM Damas", "XCO Promocional"],
+        participants: 280
+      }
+    ];
+  }
+});
 
-${m.descripcion}`:x);let y=await n.from("carreras").insert([m]);l=y.data,d=y.error}return d?(console.error("Error al insertar carrera en Supabase:",d),{success:!1,error:d.message||d}):{success:!0,data:l&&l.length>0?l[0]:null}}catch(a){return console.error("Excepci\xF3n al crear carrera en Supabase:",a),{success:!1,error:a.message||a}}}async function bt(e,t){let n=N();if(!n)return{success:!1,error:"Supabase no est\xE1 configurado."};try{let{data:a,error:i}=await n.auth.signUp({email:e,password:t});if(i&&(i.message?.includes("already")||i.message?.includes("registered")||i.status===400)){let{data:s,error:r}=await n.auth.signInWithPassword({email:e,password:t});return r?{success:!1,error:r.message||r}:{success:!0,userId:s.user?.id||null}}return i?{success:!1,error:i.message||i}:{success:!0,userId:a.user?.id||null}}catch(a){return console.error("Error en signUpOrLoginOrganizer:",a),{success:!1,error:a.message||a}}}async function xt(e,t){let n=N();if(!n)return{success:!1,error:"Supabase no est\xE1 configurado."};try{let{data:a,error:i}=await n.auth.signInWithPassword({email:e,password:t});return i?{success:!1,error:i.message||i}:{success:!0,userId:a.user?.id||null}}catch(a){return console.error("Error en loginOrganizer:",a),{success:!1,error:a.message||a}}}async function yt(e,t){let n=N();if(!n)return{success:!1,error:"Supabase no est\xE1 configurado."};try{let{data:a,error:i}=await n.auth.signInWithPassword({email:e,password:t});if(i)throw i;return{success:!0,session:a.session,user:a.user}}catch(a){return console.error("Error al iniciar sesi\xF3n de admin:",a),{success:!1,error:a.message||a}}}async function fe(){let e=N();if(!e)return{success:!1,error:"Supabase no est\xE1 configurado."};try{let{error:t}=await e.auth.signOut();if(t)throw t;return{success:!0}}catch(t){return console.error("Error al cerrar sesi\xF3n:",t),{success:!1,error:t.message||t}}}async function vt(){let e=N();if(!e)return null;try{let{data:{user:t}}=await e.auth.getUser();return t}catch{return null}}async function ge(e){let t=N();if(!t||!e)return!1;try{let{data:n,error:a}=await t.from("usuarios_admin").select("user_id").eq("user_id",e).maybeSingle();if(a)throw a;return!!n}catch(n){return console.error("Error al verificar rol de admin:",n),!1}}async function ke(){let e=N();if(!e)return{success:!1,error:"Supabase no est\xE1 configurado."};try{let{data:t,error:n}=await e.from("carreras").select("*").eq("estado","pendiente").order("fecha",{ascending:!0});return n?(console.error("Error al consultar carreras pendientes:",n),{success:!1,error:n.message||String(n)}):Array.isArray(t)?{success:!0,data:t.map(Fe)}:{success:!0,data:[]}}catch(t){return console.error("Excepci\xF3n al consultar carreras pendientes:",t),{success:!1,error:t.message||String(t)}}}async function se(e,t){let n=N();if(!n)return{success:!1,error:"Supabase no est\xE1 configurado."};try{let{error:a}=await n.from("carreras").update({estado:t}).eq("id",e);if(a)throw a;return{success:!0}}catch(a){return console.error("Error al actualizar estado de carrera:",a),{success:!1,error:a.message||a}}}async function ht(e){let t=N();if(!t)return{success:!1,error:"Supabase no est\xE1 configurado."};try{let{error:n}=await t.from("carreras").delete().eq("id",e);if(n)throw n;return{success:!0}}catch(n){return console.error("Error al eliminar carrera de Supabase:",n),{success:!1,error:n.message||n}}}async function wt(e,t){let n=N();if(!n)return{success:!1,error:"Supabase no est\xE1 configurado."};try{let a=t.registrationUrl||t.link_inscripcion||null,i=a&&typeof a=="string"&&a.trim()!=="#"&&/^https?:\/\//i.test(a.trim())?a.trim():null,o={nombre:t.name||t.nombre,fecha:t.date||t.fecha,disciplina:t.discipline||t.disciplina,region:t.region,ubicacion:t.city||t.ubicacion,distancia:t.distance||t.distancia||null,desnivel:t.elevation||t.desnivel||null,organizador:t.organizer||t.organizador,link_inscripcion:i,categoria:Array.isArray(t.categories)?t.categories.join(", "):t.categoria||t.categories,precio:t.price!=null?Number(t.price):0},l={hero_image:t.heroImage||t.hero_image||null,descripcion:t.description||t.descripcion||null},{error:s}=await n.from("carreras").update(o).eq("id",e);if(s&&(s.code==="PGRST204"||String(s.message||s).includes("column"))){let r={...o};delete r.distancia,delete r.desnivel,s=(await n.from("carreras").update(r).eq("id",e)).error}if(s)throw s;let{error:c}=await n.from("carreras").update(l).eq("id",e);if(c)throw c;return{success:!0}}catch(a){return console.error("Error al actualizar carrera en Supabase:",a),{success:!1,error:a.message||a}}}}async function Et(e){let t=N();if(!t)return{success:!1,error:"Supabase no est\xE1 configurado."};try{let n=e.name.split(".").pop(),i=`hero-images/${`${Date.now()}-${Math.random().toString(36).substring(2,15)}.${n}`}`,{data:o,error:s}=await t.storage.from("race-images").upload(i,e,{cacheControl:"3600",upsert:!1});if(s)throw s;let{data:r}=t.storage.from("race-images").getPublicUrl(i);return{success:!0,url:r.publicUrl}}catch(n){return console.error("Error en uploadRaceImageSupabase:",n),{success:!1,error:n.message||n}}}var Jt,Yt,Se,Ce=V(()=>{Jt="",Yt="",Se=null});function oe(){try{let e=localStorage.getItem(It);if(!e)return[];let t=JSON.parse(e);return Array.isArray(t)?t:[]}catch(e){return console.error("Error leyendo bookmarks de localStorage:",e),[]}}function He(e){if(!e)return oe();let t=oe(),n=t.indexOf(e);n>=0?t.splice(n,1):t.push(e);try{localStorage.setItem(It,JSON.stringify(t))}catch(a){console.error("Error guardando bookmarks en localStorage:",a)}return t}function Ve(e){return e?oe().includes(e):!1}function be(){try{let e=localStorage.getItem($e);if(!e)return[];let t=JSON.parse(e);return Array.isArray(t)?t:[]}catch(e){return console.error("Error leyendo custom races de localStorage:",e),[]}}function Wt(e){if(!e)return be();let t=be();t.unshift(e);try{localStorage.setItem($e,JSON.stringify(t))}catch(n){console.error("Error guardando custom race en localStorage:",n)}return t}async function q(){let e=[];if(X())try{e=await pt()}catch(l){console.error("Error al obtener carreras desde Supabase:",l)}let t=be(),n="calendariociclista_deleted_initial_races",a=[];try{let l=localStorage.getItem(n);l&&(a=JSON.parse(l))}catch(l){console.error("Error leyendo deleted_initial_races:",l)}let i=Pe.filter(l=>!a.includes(l.id)),o=[...e,...t,...i],s=new Set,r=[];for(let l of o)l&&l.id&&!s.has(l.id)&&(s.add(l.id),r.push(l));return r}async function Dt(e,t){if(!e)return{success:!1,source:"none"};if(X())try{let a=await gt(e,t);if(a&&a.success)return{success:!0,source:"supabase",data:a.data};if(a&&a.error)return{success:!1,source:"supabase",error:a.error}}catch(a){return console.error("Error al enviar carrera a Supabase:",a),{success:!1,source:"supabase",error:a.message||a}}return{success:!0,source:"localStorage",data:Wt(e)}}async function Bt(e){if(!e)return{success:!1,error:"ID de carrera inv\xE1lido"};if(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(e)&&X())try{let s=await ht(e);return s.success?{success:!0,source:"supabase"}:{success:!1,error:s.error}}catch(s){return{success:!1,error:s.message||s}}let a=be(),i=a.filter(s=>s.id!==e);if(a.length!==i.length)try{return localStorage.setItem($e,JSON.stringify(i)),{success:!0,source:"localStorage"}}catch(s){return{success:!1,error:"Error al actualizar localStorage: "+s.message}}let o="calendariociclista_deleted_initial_races";try{let s=localStorage.getItem(o),r=s?JSON.parse(s):[];return r.includes(e)||(r.push(e),localStorage.setItem(o,JSON.stringify(r))),{success:!0,source:"localStorage_initial"}}catch(s){return{success:!1,error:"Error al eliminar carrera inicial localmente: "+s.message}}}async function Lt(e,t){if(!e)return{success:!1,error:"ID de carrera inv\xE1lido"};if(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(e)&&X())try{let r=await wt(e,t);return r.success?{success:!0,source:"supabase"}:{success:!1,error:r.error}}catch(r){return{success:!1,error:r.message||r}}let i=be(),o=i.findIndex(r=>r.id===e),s={...t,id:e};if(t.categories&&typeof t.categories=="string"&&(s.categories=t.categories.split(",").map(r=>r.trim()).filter(Boolean)),o>=0)i[o]={...i[o],...s};else{let r=Pe.find(l=>l.id===e)||{};i.unshift({...r,...s})}try{return localStorage.setItem($e,JSON.stringify(i)),{success:!0,source:"localStorage"}}catch(r){return{success:!1,error:"Error al actualizar localStorage: "+r.message}}}var It,$e,Ae=V(()=>{Le();Ce();It="calendariociclista_bookmarks",$e="calendariociclista_custom_races"});function le(e){if(!e||typeof e!="string")return null;let t=e.trim().split("T")[0].split("-");if(t.length!==3)return null;let n=parseInt(t[0],10),a=parseInt(t[1],10)-1,i=parseInt(t[2],10);return isNaN(n)||isNaN(a)||isNaN(i)?null:new Date(n,a,i)}function G(e){if(!e)return{esMultiDia:!1,duracionDias:1,startDateStr:"",endDateStr:"",startDateObj:null,endDateObj:null};let t=(e.startDate||e.fecha_inicio||e.date||"").split("T")[0].trim(),n=(e.endDate||e.fecha_fin||t).split("T")[0].trim(),a=le(t),i=le(n||t);if(!a||!i||isNaN(a.getTime())||isNaN(i.getTime()))return{esMultiDia:!1,duracionDias:1,startDateStr:t,endDateStr:n||t,startDateObj:a,endDateObj:i};let o=i.getTime()-a.getTime(),s=Math.round(o/(1e3*60*60*24)),r=Math.max(1,s+1);return{esMultiDia:r>1,duracionDias:r,startDateStr:t,endDateStr:n,startDateObj:a,endDateObj:i}}function St(e,t){let n=G(e);if(!n.esMultiDia)return null;let a=typeof t=="string"?le(t):t;if(!a||!n.startDateObj||!n.endDateObj||a<n.startDateObj||a>n.endDateObj)return null;let i=a.getTime()-n.startDateObj.getTime();return`D\xEDa ${Math.round(i/(1e3*60*60*24))+1} de ${n.duracionDias}`}function Kt(){let e=new Date;return new Intl.DateTimeFormat("en-CA",{timeZone:"America/Santiago",year:"numeric",month:"2-digit",day:"2-digit"}).format(e)}function Me(e,t){let n=G(e),a=t||Kt(),i=n.startDateStr||"",o=n.endDateStr||i,s=!1,r=!1,l=!1;return o&&o<a?s=!0:i&&i<=a&&a<=o?r=!0:l=!0,{esFinalizada:s,esEnCurso:r,esFutura:l,todayStr:a,startDateStr:i,endDateStr:o}}function qe(e,t){return t||!e||e===0?"Gratis":"$"+Number(e).toLocaleString("es-CL")}function de(e){switch(e){case"Ruta":return"bg-[#181919] text-white";case"MTB":return"bg-[#a73918] text-white";case"Gravel":return"bg-[#1b4332] text-white";case"Pista":return"bg-[#334155] text-white";case"BMX":return"bg-[#d97706] text-white";case"Virtual":return"bg-[#2563eb] text-white";default:return"bg-gray-800 text-white"}}function Ge(e){switch(e){case"Ruta":return"directions_bike";case"MTB":return"terrain";case"Gravel":return"explore";case"Pista":return"sports_score";case"BMX":return"two_wheeler";case"Virtual":return"devices";default:return"directions_bike"}}function Re(e,t="Todas"){e&&(e.innerHTML=Xt.map(n=>`
+// js/supabase.js
+import { createClient } from "@supabase/supabase-js";
+function getCredentials() {
+  const url = typeof window !== "undefined" && window.SUPABASE_URL ? String(window.SUPABASE_URL).trim() : DEFAULT_URL;
+  const key = typeof window !== "undefined" && window.SUPABASE_ANON_KEY ? String(window.SUPABASE_ANON_KEY).trim() : DEFAULT_ANON_KEY;
+  return { url, key };
+}
+function isSupabaseConfigured() {
+  const { url, key } = getCredentials();
+  if (!url || !key) return false;
+  if (url.includes("YOUR_SUPABASE_URL") || key.includes("YOUR_SUPABASE_ANON_KEY")) return false;
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
+  } catch (e) {
+    return false;
+  }
+}
+function getSupabase() {
+  if (supabaseInstance) return supabaseInstance;
+  if (!isSupabaseConfigured()) return null;
+  const { url, key } = getCredentials();
+  try {
+    supabaseInstance = createClient(url, key);
+    return supabaseInstance;
+  } catch (error) {
+    console.error("Error al inicializar el cliente de Supabase:", error);
+    return null;
+  }
+}
+function mapSupabaseToFrontend(row) {
+  const priceNum = row.precio != null ? Number(row.precio) : 0;
+  let displayDate = row.fecha || "";
+  let month = "";
+  if (row.fecha) {
+    try {
+      const d = /* @__PURE__ */ new Date(row.fecha + "T00:00:00");
+      if (!isNaN(d.getTime())) {
+        const monthName = d.toLocaleDateString("es-CL", { month: "long" });
+        month = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+        displayDate = d.toLocaleDateString("es-CL", { day: "numeric", month: "long", year: "numeric" });
+      }
+    } catch (e) {
+      displayDate = row.fecha;
+    }
+  }
+  let categories = [];
+  if (Array.isArray(row.categoria)) {
+    categories = row.categoria;
+  } else if (typeof row.categoria === "string" && row.categoria.trim() !== "") {
+    categories = row.categoria.split(",").map((c) => c.trim());
+  } else {
+    categories = ["General"];
+  }
+  const startDate = row.fecha_inicio || row.fecha || "";
+  const endDate = row.fecha_fin || row.fecha_inicio || row.fecha || "";
+  return {
+    id: row.id,
+    name: row.nombre || "",
+    discipline: row.disciplina || "",
+    date: startDate || row.fecha || "",
+    startDate,
+    endDate,
+    month,
+    displayDate,
+    region: row.region || "",
+    city: row.ubicacion || "",
+    distance: row.distancia || "N/A",
+    elevation: row.desnivel || "N/A",
+    price: priceNum,
+    isFree: priceNum === 0,
+    status: row.status || (row.estado === "aprobada" ? "Inscripciones Abiertas" : row.estado),
+    organizer: row.organizador || "",
+    registrationUrl: row.link_inscripcion || "",
+    heroImage: row.hero_image || "",
+    description: row.descripcion || "",
+    categories,
+    participants: row.participantes != null ? row.participantes : 0
+  };
+}
+async function fetchApprovedRacesSupabase() {
+  const client = getSupabase();
+  if (!client) {
+    console.warn("Supabase no est\xE1 configurado. Retornando array vac\xEDo.");
+    return [];
+  }
+  try {
+    const hoy = /* @__PURE__ */ new Date();
+    const fechaDesde = `${hoy.getFullYear()}-01-01`;
+    const fechaHasta = `${hoy.getFullYear() + 1}-12-31`;
+    const { data, error } = await client.from("carreras").select("*").eq("estado", "aprobada").gte("fecha", fechaDesde).lte("fecha", fechaHasta).order("fecha", { ascending: true }).limit(500);
+    if (error) {
+      console.error("Error al consultar carreras aprobadas en Supabase:", error);
+      return [];
+    }
+    if (!Array.isArray(data)) return [];
+    return data.map(mapSupabaseToFrontend);
+  } catch (err) {
+    console.error("Excepci\xF3n al consultar carreras en Supabase:", err);
+    return [];
+  }
+}
+async function fetchRaceByIdSupabase(id) {
+  const client = getSupabase();
+  if (!client || !id) return null;
+  try {
+    const { data, error } = await client.from("carreras").select("*").eq("id", id).maybeSingle();
+    if (error || !data) return null;
+    return mapSupabaseToFrontend(data);
+  } catch (err) {
+    console.error("Error al obtener carrera por ID en Supabase:", err);
+    return null;
+  }
+}
+async function createPendingRaceSupabase(raceData) {
+  const client = getSupabase();
+  if (!client) {
+    return {
+      success: false,
+      error: new Error("Supabase no est\xE1 configurado.")
+    };
+  }
+  try {
+    const payload = {
+      nombre: raceData.nombre || raceData.name,
+      fecha: raceData.fecha || raceData.date,
+      disciplina: raceData.disciplina || raceData.discipline,
+      region: raceData.region || null,
+      ubicacion: raceData.ubicacion || raceData.city || null,
+      distancia: raceData.distancia || raceData.distance || null,
+      desnivel: raceData.desnivel || raceData.elevation || null,
+      organizador: raceData.organizador || raceData.organizer || null,
+      link_inscripcion: raceData.link_inscripcion || raceData.registrationUrl || null,
+      categoria: Array.isArray(raceData.categories) ? raceData.categories.join(", ") : raceData.categoria || raceData.categories || null,
+      precio: raceData.precio != null ? raceData.precio : raceData.price != null ? raceData.price : 0,
+      hero_image: raceData.hero_image || raceData.heroImage || null,
+      descripcion: raceData.descripcion || raceData.description || null,
+      estado: "pendiente"
+    };
+    const insertPromise = client.from("carreras").insert([payload]);
+    const timeoutPromise = new Promise(
+      (_, reject) => setTimeout(() => reject(new Error("TIMEOUT_EXCEEDED")), 6e3)
+    );
+    const { data, error } = await Promise.race([insertPromise, timeoutPromise]);
+    if (error) {
+      console.error("Error al insertar carrera pendiente en Supabase:", error);
+      return { success: false, error: error.message || error };
+    }
+    return {
+      success: true,
+      data: data && data.length > 0 ? data[0] : null
+    };
+  } catch (err) {
+    console.error("Excepci\xF3n al crear carrera pendiente en Supabase:", err);
+    throw err;
+  }
+}
+async function loginAdmin(email, password) {
+  const client = getSupabase();
+  if (!client) return { success: false, error: "Supabase no est\xE1 configurado." };
+  try {
+    const { data, error } = await client.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    return { success: true, session: data.session, user: data.user };
+  } catch (err) {
+    console.error("Error al iniciar sesi\xF3n de admin:", err);
+    return { success: false, error: err.message || err };
+  }
+}
+async function logoutAdmin() {
+  const client = getSupabase();
+  if (!client) return { success: false, error: "Supabase no est\xE1 configurado." };
+  try {
+    const { error } = await client.auth.signOut();
+    if (error) throw error;
+    return { success: true };
+  } catch (err) {
+    console.error("Error al cerrar sesi\xF3n:", err);
+    return { success: false, error: err.message || err };
+  }
+}
+async function getCurrentUser() {
+  const client = getSupabase();
+  if (!client) return null;
+  try {
+    const { data: { user } } = await client.auth.getUser();
+    return user;
+  } catch {
+    return null;
+  }
+}
+async function checkIsAdmin(userId) {
+  const client = getSupabase();
+  if (!client || !userId) return false;
+  try {
+    const { data, error } = await client.from("usuarios_admin").select("user_id").eq("user_id", userId).maybeSingle();
+    if (error) throw error;
+    return !!data;
+  } catch (err) {
+    console.error("Error al verificar rol de admin:", err);
+    return false;
+  }
+}
+async function fetchPendingRacesSupabase() {
+  const client = getSupabase();
+  if (!client) return { success: false, error: "Supabase no est\xE1 configurado." };
+  try {
+    const { data, error } = await client.from("carreras").select("*").eq("estado", "pendiente").order("fecha", { ascending: true });
+    if (error) {
+      console.error("Error al consultar carreras pendientes:", error);
+      return { success: false, error: error.message || String(error) };
+    }
+    if (!Array.isArray(data)) return { success: true, data: [] };
+    return { success: true, data: data.map(mapSupabaseToFrontend) };
+  } catch (err) {
+    console.error("Excepci\xF3n al consultar carreras pendientes:", err);
+    return { success: false, error: err.message || String(err) };
+  }
+}
+async function updateRaceStatusSupabase(raceId, status) {
+  const client = getSupabase();
+  if (!client) return { success: false, error: "Supabase no est\xE1 configurado." };
+  try {
+    const { error } = await client.from("carreras").update({ estado: status }).eq("id", raceId);
+    if (error) throw error;
+    return { success: true };
+  } catch (err) {
+    console.error("Error al actualizar estado de carrera:", err);
+    return { success: false, error: err.message || err };
+  }
+}
+async function uploadRaceImageSupabase(file) {
+  const client = getSupabase();
+  if (!client) return { success: false, error: "Supabase no est\xE1 configurado." };
+  try {
+    const fileExt = file.name.split(".").pop();
+    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
+    const filePath = `hero-images/${fileName}`;
+    const { data, error } = await client.storage.from("race-images").upload(filePath, file, {
+      cacheControl: "3600",
+      upsert: false
+    });
+    if (error) throw error;
+    const { data: publicUrlData } = client.storage.from("race-images").getPublicUrl(filePath);
+    return {
+      success: true,
+      url: publicUrlData.publicUrl
+    };
+  } catch (err) {
+    console.error("Error en uploadRaceImageSupabase:", err);
+    return { success: false, error: err.message || err };
+  }
+}
+async function updateRaceSupabase(raceId, raceData) {
+  const client = getSupabase();
+  if (!client) return { success: false, error: "Supabase no está configurado." };
+  try {
+    const rawUrl = raceData.registrationUrl || raceData.link_inscripcion || null;
+    const cleanUrl = (rawUrl && typeof rawUrl === "string" && rawUrl.trim() !== "#" && /^https?:\/\//i.test(rawUrl.trim()))
+      ? rawUrl.trim()
+      : null;
+
+    // Separamos en dos grupos para evitar URI_TOO_LONG:
+    // campos cortos primero, campos de texto largo en segunda llamada.
+    const shortPayload = {
+      nombre: raceData.name || raceData.nombre,
+      fecha: raceData.date || raceData.fecha,
+      disciplina: raceData.discipline || raceData.disciplina,
+      region: raceData.region,
+      ubicacion: raceData.city || raceData.ubicacion,
+      distancia: raceData.distance || raceData.distancia || null,
+      desnivel: raceData.elevation || raceData.desnivel || null,
+      organizador: raceData.organizer || raceData.organizador,
+      link_inscripcion: cleanUrl,
+      categoria: Array.isArray(raceData.categories)
+        ? raceData.categories.join(", ")
+        : (raceData.categoria || raceData.categories),
+      precio: raceData.price != null ? Number(raceData.price) : 0
+    };
+
+    const longPayload = {
+      hero_image: raceData.heroImage || raceData.hero_image || null,
+      descripcion: raceData.description || raceData.descripcion || null
+    };
+
+    let { error: err1 } = await client.from("carreras").update(shortPayload).eq("id", raceId);
+
+    if (err1 && (err1.code === "PGRST204" || String(err1.message || err1).includes("column"))) {
+      const fallbackPayload = { ...shortPayload };
+      delete fallbackPayload.distancia;
+      delete fallbackPayload.desnivel;
+      err1 = (await client.from("carreras").update(fallbackPayload).eq("id", raceId)).error;
+    }
+    if (err1) throw err1;
+
+    const { error: err2 } = await client.from("carreras").update(longPayload).eq("id", raceId);
+    if (err2) throw err2;
+
+    return { success: true };
+  } catch (err) {
+    console.error("Error al actualizar carrera en Supabase:", err);
+    return { success: false, error: err.message || err };
+  }
+}
+var DEFAULT_URL, DEFAULT_ANON_KEY, supabaseInstance;
+var init_supabase = __esm({
+  "js/supabase.js"() {
+    DEFAULT_URL = "";
+    DEFAULT_ANON_KEY = "";
+    supabaseInstance = null;
+  }
+});
+
+// js/storage.js
+function getBookmarkedIds() {
+  try {
+    const data = localStorage.getItem(BOOKMARKS_KEY);
+    if (!data) return [];
+    const parsed = JSON.parse(data);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    console.error("Error leyendo bookmarks de localStorage:", error);
+    return [];
+  }
+}
+function toggleBookmark(raceId) {
+  if (!raceId) return getBookmarkedIds();
+  const bookmarks = getBookmarkedIds();
+  const index = bookmarks.indexOf(raceId);
+  if (index >= 0) {
+    bookmarks.splice(index, 1);
+  } else {
+    bookmarks.push(raceId);
+  }
+  try {
+    localStorage.setItem(BOOKMARKS_KEY, JSON.stringify(bookmarks));
+  } catch (error) {
+    console.error("Error guardando bookmarks en localStorage:", error);
+  }
+  return bookmarks;
+}
+function isBookmarked(raceId) {
+  if (!raceId) return false;
+  const bookmarks = getBookmarkedIds();
+  return bookmarks.includes(raceId);
+}
+function getCustomRaces() {
+  try {
+    const data = localStorage.getItem(CUSTOM_RACES_KEY);
+    if (!data) return [];
+    const parsed = JSON.parse(data);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    console.error("Error leyendo custom races de localStorage:", error);
+    return [];
+  }
+}
+function saveCustomRace(newRace) {
+  if (!newRace) return getCustomRaces();
+  const customRaces = getCustomRaces();
+  customRaces.unshift(newRace);
+  try {
+    localStorage.setItem(CUSTOM_RACES_KEY, JSON.stringify(customRaces));
+  } catch (error) {
+    console.error("Error guardando custom race en localStorage:", error);
+  }
+  return customRaces;
+}
+async function getAllRaces() {
+  let supabaseRaces = [];
+  if (isSupabaseConfigured()) {
+    try {
+      supabaseRaces = await fetchApprovedRacesSupabase();
+    } catch (error) {
+      console.error("Error al obtener carreras desde Supabase:", error);
+    }
+  }
+  const customRaces = getCustomRaces();
+  const DELETED_INITIAL_KEY = "calendariociclista_deleted_initial_races";
+  let deletedInitialIds = [];
+  try {
+    const deletedStr = localStorage.getItem(DELETED_INITIAL_KEY);
+    if (deletedStr) deletedInitialIds = JSON.parse(deletedStr);
+  } catch (err) {
+    console.error("Error leyendo deleted_initial_races:", err);
+  }
+  const filteredInitial = INITIAL_RACES.filter((r) => !deletedInitialIds.includes(r.id));
+  const combined = [...supabaseRaces, ...customRaces, ...filteredInitial];
+  const seenIds = /* @__PURE__ */ new Set();
+  const uniqueRaces = [];
+  for (const race of combined) {
+    if (race && race.id && !seenIds.has(race.id)) {
+      seenIds.add(race.id);
+      uniqueRaces.push(race);
+    }
+  }
+  return uniqueRaces;
+}
+async function saveRace(newRace) {
+  if (!newRace) return { success: false, source: "none" };
+  if (isSupabaseConfigured()) {
+    try {
+      const res = await createPendingRaceSupabase(newRace);
+      if (res && res.success) {
+        return { success: true, source: "supabase", data: res.data };
+      }
+    } catch (error) {
+      console.error("Error al enviar carrera a Supabase. Realizando fallback a localStorage:", error);
+    }
+  }
+  const savedLocal = saveCustomRace(newRace);
+  return { success: true, source: "localStorage", data: savedLocal };
+}
+async function deleteRace(raceId) {
+  if (!raceId) return { success: false, error: "ID de carrera inv\xE1lido" };
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  const isUUID = uuidRegex.test(raceId);
+  if (isUUID && isSupabaseConfigured()) {
+    try {
+      const res = await deleteRaceSupabase(raceId);
+      if (res.success) return { success: true, source: "supabase" };
+      return { success: false, error: res.error };
+    } catch (err) {
+      return { success: false, error: err.message || err };
+    }
+  }
+  const customRaces = getCustomRaces();
+  const updatedCustom = customRaces.filter((r) => r.id !== raceId);
+  if (customRaces.length !== updatedCustom.length) {
+    try {
+      localStorage.setItem(CUSTOM_RACES_KEY, JSON.stringify(updatedCustom));
+      return { success: true, source: "localStorage" };
+    } catch (err) {
+      return { success: false, error: "Error al actualizar localStorage: " + err.message };
+    }
+  }
+  const DELETED_INITIAL_KEY = "calendariociclista_deleted_initial_races";
+  try {
+    const deletedStr = localStorage.getItem(DELETED_INITIAL_KEY);
+    const deletedIds = deletedStr ? JSON.parse(deletedStr) : [];
+    if (!deletedIds.includes(raceId)) {
+      deletedIds.push(raceId);
+      localStorage.setItem(DELETED_INITIAL_KEY, JSON.stringify(deletedIds));
+    }
+    return { success: true, source: "localStorage_initial" };
+  } catch (err) {
+    return { success: false, error: "Error al eliminar carrera inicial localmente: " + err.message };
+  }
+}
+async function updateRace(raceId, raceData) {
+  if (!raceId) return { success: false, error: "ID de carrera inv\xE1lido" };
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  const isUUID = uuidRegex.test(raceId);
+  if (isUUID && isSupabaseConfigured()) {
+    try {
+      const res = await updateRaceSupabase(raceId, raceData);
+      if (res.success) return { success: true, source: "supabase" };
+      return { success: false, error: res.error };
+    } catch (err) {
+      return { success: false, error: err.message || err };
+    }
+  }
+  const customRaces = getCustomRaces();
+  const existingIndex = customRaces.findIndex((r) => r.id === raceId);
+  let updatedRace = { ...raceData, id: raceId };
+  if (raceData.categories && typeof raceData.categories === "string") {
+    updatedRace.categories = raceData.categories.split(",").map((c) => c.trim()).filter(Boolean);
+  }
+  if (existingIndex >= 0) {
+    customRaces[existingIndex] = { ...customRaces[existingIndex], ...updatedRace };
+  } else {
+    const original = INITIAL_RACES.find((r) => r.id === raceId) || {};
+    customRaces.unshift({ ...original, ...updatedRace });
+  }
+  try {
+    localStorage.setItem(CUSTOM_RACES_KEY, JSON.stringify(customRaces));
+    return { success: true, source: "localStorage" };
+  } catch (err) {
+    return { success: false, error: "Error al actualizar localStorage: " + err.message };
+  }
+}
+var BOOKMARKS_KEY, CUSTOM_RACES_KEY;
+var init_storage = __esm({
+  "js/storage.js"() {
+    init_data();
+    init_supabase();
+    BOOKMARKS_KEY = "calendariociclista_bookmarks";
+    CUSTOM_RACES_KEY = "calendariociclista_custom_races";
+  }
+});
+
+// js/calendar-export.js
+function toICSDate(dateStr) {
+  if (!dateStr) return "";
+  return dateStr.replace(/-/g, "").split("T")[0];
+}
+function escapeICS(str) {
+  if (!str) return "";
+  return String(str).replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\n/g, "\\n").replace(/\r/g, "");
+}
+function generateICSContent(race) {
+  const startStr = (race.startDate || race.fecha_inicio || race.date || "").split("T")[0].trim();
+  const endStr = (race.endDate || race.fecha_fin || startStr).split("T")[0].trim();
+  const dtstart = toICSDate(startStr);
+  let dtend = dtstart;
+  if (endStr && endStr !== startStr) {
+    dtend = toICSDate(endStr);
+  } else {
+    const d = /* @__PURE__ */ new Date(startStr + "T00:00:00");
+    d.setDate(d.getDate() + 1);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    dtend = `${y}${m}${day}`;
+  }
+  const name = escapeICS(race.name || "Carrera de Ciclismo");
+  const location = escapeICS([race.city, race.region].filter(Boolean).join(", "));
+  const description = escapeICS(
+    [
+      race.description || "",
+      race.registrationUrl ? `Inscripci\xF3n: ${race.registrationUrl}` : "",
+      `Disciplina: ${race.discipline || ""}`,
+      race.distance ? `Distancia: ${race.distance}` : "",
+      race.elevation ? `Desnivel: ${race.elevation}` : ""
+    ].filter(Boolean).join("\n")
+  );
+  const uid = `race-${race.id}@calendariociclista.vercel.app`;
+  const now = (/* @__PURE__ */ new Date()).toISOString().replace(/[-:.]/g, "").slice(0, 15) + "Z";
+  return [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//CalendarioCiclista Chile//ES",
+    "CALSCALE:GREGORIAN",
+    "METHOD:PUBLISH",
+    "BEGIN:VEVENT",
+    `UID:${uid}`,
+    `DTSTAMP:${now}`,
+    `DTSTART;VALUE=DATE:${dtstart}`,
+    `DTEND;VALUE=DATE:${dtend}`,
+    `SUMMARY:${name}`,
+    `LOCATION:${location}`,
+    `DESCRIPTION:${description}`,
+    `URL:https://calendariociclista.vercel.app/evento/${race.id}`,
+    "END:VEVENT",
+    "END:VCALENDAR"
+  ].join("\r\n");
+}
+function buildGoogleCalendarUrl(race) {
+  const startStr = (race.startDate || race.fecha_inicio || race.date || "").split("T")[0].trim();
+  const endStr = (race.endDate || race.fecha_fin || startStr).split("T")[0].trim();
+  const dtstart = toICSDate(startStr);
+  let dtend = dtstart;
+  if (endStr && endStr !== startStr) {
+    dtend = toICSDate(endStr);
+  } else {
+    const d = /* @__PURE__ */ new Date(startStr + "T00:00:00");
+    d.setDate(d.getDate() + 1);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    dtend = `${y}${m}${day}`;
+  }
+  const params = new URLSearchParams({
+    action: "TEMPLATE",
+    text: race.name || "Carrera de Ciclismo",
+    dates: `${dtstart}/${dtend}`,
+    location: [race.city, race.region].filter(Boolean).join(", "),
+    details: [
+      race.description || "",
+      race.registrationUrl ? `
+Inscripci\xF3n: ${race.registrationUrl}` : ""
+    ].filter(Boolean).join("")
+  });
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
+function downloadICS(icsContent, filename = "evento") {
+  const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${filename}.ics`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1e3);
+}
+function renderCalendarButtonHTML(raceId, context = "card") {
+  const isDetail = context === "detail";
+  const btnClass = isDetail ? "px-4 py-2.5 rounded-xl bg-surface-container border border-outline-variant/50 text-primary font-display font-bold text-sm flex items-center gap-2 hover:bg-surface-container-high transition-all shadow-sm" : "w-full py-2.5 rounded-xl bg-surface-container border border-outline-variant/40 text-primary font-display font-bold text-xs flex items-center justify-center gap-1.5 hover:bg-surface-container-high transition-all";
+  return `
+    <div class="relative cal-export-wrapper" data-race-id="${raceId}">
+      <button
+        type="button"
+        class="btn-cal-export ${btnClass}"
+        aria-haspopup="true"
+        aria-expanded="false"
+        aria-label="A\xF1adir al calendario"
+      >
+        <span class="material-symbols-outlined ${isDetail ? "text-base" : "text-sm"}">event</span>
+        <span>${isDetail ? "A\xF1adir al calendario" : "Al calendario"}</span>
+        <span class="material-symbols-outlined ${isDetail ? "text-sm" : "text-xs"} transition-transform duration-200 cal-chevron">expand_more</span>
+      </button>
+
+      <!-- Dropdown menu -->
+      <div
+        class="cal-export-dropdown hidden absolute ${isDetail ? "right-0" : "left-0 right-0"} bottom-full mb-2 bg-white rounded-2xl border border-outline-variant/40 shadow-xl z-50 overflow-hidden min-w-[220px]"
+        role="menu"
+      >
+        <div class="p-1.5 space-y-0.5">
+          <button type="button" class="cal-option cal-google w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-container text-left transition-colors" role="menuitem" data-race-id="${raceId}">
+            <span class="w-7 h-7 rounded-lg bg-[#4285F4]/10 flex items-center justify-center flex-shrink-0">
+              <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+              </svg>
+            </span>
+            <div>
+              <p class="font-display font-bold text-sm text-primary">Google Calendar</p>
+              <p class="text-xs text-outline">Abre en nueva pesta\xF1a</p>
+            </div>
+          </button>
+
+          <button type="button" class="cal-option cal-apple w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-container text-left transition-colors" role="menuitem" data-race-id="${raceId}">
+            <span class="w-7 h-7 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+              <span class="material-symbols-outlined text-base text-gray-700">calendar_month</span>
+            </span>
+            <div>
+              <p class="font-display font-bold text-sm text-primary">Apple Calendar</p>
+              <p class="text-xs text-outline">Descarga archivo .ics</p>
+            </div>
+          </button>
+
+          <button type="button" class="cal-option cal-outlook w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-container text-left transition-colors" role="menuitem" data-race-id="${raceId}">
+            <span class="w-7 h-7 rounded-lg bg-[#0078D4]/10 flex items-center justify-center flex-shrink-0">
+              <svg viewBox="0 0 24 24" class="w-4 h-4" fill="#0078D4">
+                <path d="M7.88 12.04q0 .45-.11.87-.1.41-.33.74-.22.33-.58.52-.37.2-.87.2t-.85-.2q-.35-.21-.57-.55-.22-.33-.33-.75-.1-.42-.1-.86t.1-.87q.1-.43.34-.76.22-.34.59-.54.36-.2.87-.2t.86.2q.35.21.57.55.22.34.31.77.1.43.1.88zM24 12v9.38q0 .46-.33.8-.33.32-.8.32H7.13q-.46 0-.8-.33-.32-.33-.32-.8V18H1q-.41 0-.7-.3-.3-.29-.3-.7V7q0-.41.3-.7Q.58 6 1 6h6.5V2.55q0-.44.3-.75.3-.3.75-.3h12.9q.44 0 .75.3.3.3.3.75V10.85l1.24.72q.06.04.06.1zm-2 1.3l-3.44-2V9.45l-8.42 4.9v7.08h11.86zm-7.3-5.19l3.44-2.01-3.44-2.01-3.44 2.01zm-8.56 1.7l.5.3V15.45q.37.16.71.43.33.27.55.62.23.35.35.75.12.4.12.84 0 .55-.19.99-.19.45-.53.77-.34.32-.8.5-.45.16-.97.16-.55 0-1-.17-.44-.18-.76-.5-.32-.3-.49-.72-.18-.42-.18-.93 0-.42.11-.83.11-.4.33-.74.23-.33.57-.56.34-.22.75-.3l.01-7.41-4.3-2.55v9.17H2.28V8.26z"/>
+              </svg>
+            </span>
+            <div>
+              <p class="font-display font-bold text-sm text-primary">Outlook</p>
+              <p class="text-xs text-outline">Descarga archivo .ics</p>
+            </div>
+          </button>
+
+          <div class="border-t border-outline-variant/30 my-1"></div>
+
+          <button type="button" class="cal-option cal-copy w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-container text-left transition-colors" role="menuitem" data-race-id="${raceId}">
+            <span class="w-7 h-7 rounded-lg bg-tertiary-fixed/30 flex items-center justify-center flex-shrink-0">
+              <span class="material-symbols-outlined text-base text-primary">content_copy</span>
+            </span>
+            <div>
+              <p class="font-display font-bold text-sm text-primary">Copiar fecha</p>
+              <p class="text-xs text-outline">Copia al portapapeles</p>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+var init_calendar_export = __esm({
+  "js/calendar-export.js"() {
+  }
+});
+
+// js/ui.js
+function parseLocalDate(dateStr) {
+  if (!dateStr || typeof dateStr !== "string") return null;
+  const parts = dateStr.trim().split("T")[0].split("-");
+  if (parts.length !== 3) return null;
+  const year = parseInt(parts[0], 10);
+  const month = parseInt(parts[1], 10) - 1;
+  const day = parseInt(parts[2], 10);
+  if (isNaN(year) || isNaN(month) || isNaN(day)) return null;
+  return new Date(year, month, day);
+}
+function detectRaceDuration(race) {
+  if (!race) {
+    return { esMultiDia: false, duracionDias: 1, startDateStr: "", endDateStr: "", startDateObj: null, endDateObj: null };
+  }
+  const startStr = (race.startDate || race.fecha_inicio || race.date || "").split("T")[0].trim();
+  const endStr = (race.endDate || race.fecha_fin || startStr).split("T")[0].trim();
+  const startObj = parseLocalDate(startStr);
+  const endObj = parseLocalDate(endStr || startStr);
+  if (!startObj || !endObj || isNaN(startObj.getTime()) || isNaN(endObj.getTime())) {
+    return {
+      esMultiDia: false,
+      duracionDias: 1,
+      startDateStr: startStr,
+      endDateStr: endStr || startStr,
+      startDateObj: startObj,
+      endDateObj: endObj
+    };
+  }
+  const diffTime = endObj.getTime() - startObj.getTime();
+  const diffDays = Math.round(diffTime / (1e3 * 60 * 60 * 24));
+  const duracionDias = Math.max(1, diffDays + 1);
+  const esMultiDia = duracionDias > 1;
+  return {
+    esMultiDia,
+    duracionDias,
+    startDateStr: startStr,
+    endDateStr: endStr,
+    startDateObj: startObj,
+    endDateObj: endObj
+  };
+}
+function getRaceDayProgress(race, currentDate) {
+  const durationInfo = detectRaceDuration(race);
+  if (!durationInfo.esMultiDia) return null;
+  const currentObj = typeof currentDate === "string" ? parseLocalDate(currentDate) : currentDate;
+  if (!currentObj || !durationInfo.startDateObj || !durationInfo.endDateObj) return null;
+  if (currentObj < durationInfo.startDateObj || currentObj > durationInfo.endDateObj) {
+    return null;
+  }
+  const diffTime = currentObj.getTime() - durationInfo.startDateObj.getTime();
+  const currentDay = Math.round(diffTime / (1e3 * 60 * 60 * 24)) + 1;
+  return `D\xEDa ${currentDay} de ${durationInfo.duracionDias}`;
+}
+function formatPrice(price, isFree) {
+  if (isFree || !price || price === 0) {
+    return "Gratis";
+  }
+  return "$" + Number(price).toLocaleString("es-CL");
+}
+function getDisciplineBadgeClass(discipline) {
+  switch (discipline) {
+    case "Ruta":
+      return "bg-[#181919] text-white";
+    case "MTB":
+      return "bg-[#a73918] text-white";
+    case "Gravel":
+      return "bg-[#1b4332] text-white";
+    case "Pista":
+      return "bg-[#334155] text-white";
+    case "BMX":
+      return "bg-[#d97706] text-white";
+    case "Virtual":
+      return "bg-[#2563eb] text-white";
+    default:
+      return "bg-gray-800 text-white";
+  }
+}
+function getDisciplineIcon(discipline) {
+  switch (discipline) {
+    case "Ruta":
+      return "directions_bike";
+    case "MTB":
+      return "terrain";
+    case "Gravel":
+      return "explore";
+    case "Pista":
+      return "sports_score";
+    case "BMX":
+      return "two_wheeler";
+    case "Virtual":
+      return "devices";
+    default:
+      return "directions_bike";
+  }
+}
+function renderDisciplineChips(container, activeDiscipline = "Todas") {
+  if (!container) return;
+  container.innerHTML = DISCIPLINES.map((discipline) => {
+    const isActive = discipline === activeDiscipline;
+    const activeClasses = "bg-primary text-tertiary-fixed font-bold shadow-sm ring-2 ring-primary";
+    const inactiveClasses = "bg-white text-primary hover:bg-surface-container border border-outline-variant/40 font-medium";
+    return `
       <button 
         type="button" 
-        data-discipline="${n}" 
-        class="chip-discipline px-4 py-2 rounded-xl text-xs sm:text-sm transition-all duration-150 flex items-center gap-1.5 cursor-pointer ${n===t?"bg-primary text-tertiary-fixed font-bold shadow-sm ring-2 ring-primary":"bg-white text-primary hover:bg-surface-container border border-outline-variant/40 font-medium"}"
+        data-discipline="${discipline}" 
+        class="chip-discipline px-4 py-2 rounded-xl text-xs sm:text-sm transition-all duration-150 flex items-center gap-1.5 cursor-pointer ${isActive ? activeClasses : inactiveClasses}"
       >
-        <span class="material-symbols-outlined text-base">${n==="Todas"?"apps":Ge(n)}</span>
-        ${n}
+        <span class="material-symbols-outlined text-base">${discipline === "Todas" ? "apps" : getDisciplineIcon(discipline)}</span>
+        ${discipline}
       </button>
-    `).join(""))}function xe(e,t=[],n="Todas las regiones"){if(!e)return;let a=e.tagName==="SELECT"?e:e.querySelector("select");a&&(a.innerHTML=t.map(i=>`
-    <option value="${i}" ${i===n?"selected":""}>
-      ${i}
+    `;
+  }).join("");
+}
+function renderRegionSelect(container, regions = [], activeRegion = "Todas las regiones") {
+  if (!container) return;
+  const selectElem = container.tagName === "SELECT" ? container : container.querySelector("select");
+  if (!selectElem) return;
+  selectElem.innerHTML = regions.map((region) => `
+    <option value="${region}" ${region === activeRegion ? "selected" : ""}>
+      ${region}
     </option>
-  `).join(""))}function kt(e,t=[],n=!1,a=null){if(e){if(t.length===0){e.innerHTML=`
+  `).join("");
+}
+function renderRaceCards(container, races = [], isAdmin2 = false) {
+  if (!container) return;
+  if (races.length === 0) {
+    container.innerHTML = `
       <div class="col-span-full py-16 text-center bg-white rounded-3xl border border-dashed border-outline-variant/60 p-8 space-y-4">
         <div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mx-auto text-outline">
           <span class="material-symbols-outlined text-4xl">search_off</span>
@@ -32,14 +1082,34 @@ ${m.descripcion}`:x);let y=await n.from("carreras").insert([m]);l=y.data,d=y.err
           Intenta cambiar los filtros de disciplina, regi\xF3n, mes o t\xE9rmino de b\xFAsqueda.
         </p>
       </div>
-    `;return}e.innerHTML=t.map(i=>{let o=Ve(i.id),s=de(i.discipline),r=qe(i.price,i.isFree),l=G(i),d=Me(i),m=l.esMultiDia?`<span class="px-2.5 py-1 rounded-full text-xs font-black bg-purple-100 text-purple-900 border border-purple-300 flex items-center gap-1 shadow-sm"><span class="material-symbols-outlined text-xs">date_range</span> ${l.duracionDias} d\xEDas</span>`:"",g="";d.esFinalizada?g='<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-slate-200 text-slate-700 border border-slate-300">Finalizada</span>':d.esEnCurso?g='<span class="px-2.5 py-1 rounded-full text-xs font-black bg-blue-600 text-white border border-blue-500 shadow-sm animate-pulse flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-white animate-ping"></span> En Curso</span>':i.status==="\xDAltimos Cupos"?g='<span class="px-2.5 py-1 rounded-full text-xs font-extrabold bg-amber-100 text-amber-800 border border-amber-300 animate-pulse">\xDAltimos Cupos</span>':i.status==="Inscripciones Abiertas"?g='<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">Inscripciones Abiertas</span>':i.status==="Cupos Agotados"?g='<span class="px-2.5 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-700">Cupos Agotados</span>':g=`<span class="px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">${i.status||"Pr\xF3ximamente"}</span>`;let h=i.isFree||i.price===0?'<span class="px-2.5 py-1 rounded-full text-xs font-black bg-tertiary-fixed text-primary border border-lime-400">Gratuita</span>':"";return`
-      <article class="race-card ${d.esFinalizada?"opacity-65 grayscale-[30%] bg-slate-50/80 hover:opacity-100 hover:grayscale-0 transition-all":"bg-white"} rounded-3xl border border-outline-variant/40 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group">
+    `;
+    return;
+  }
+  container.innerHTML = races.map((race) => {
+    const bookmarked = isBookmarked(race.id);
+    const disciplineBadgeClass = getDisciplineBadgeClass(race.discipline);
+    const formattedPrice = formatPrice(race.price, race.isFree);
+    const durationInfo = detectRaceDuration(race);
+    const multiDayBadgeHTML = durationInfo.esMultiDia ? `<span class="px-2.5 py-1 rounded-full text-xs font-black bg-purple-100 text-purple-900 border border-purple-300 flex items-center gap-1 shadow-sm"><span class="material-symbols-outlined text-xs">date_range</span> ${durationInfo.duracionDias} d\xEDas</span>` : "";
+    let statusBadgeHTML = "";
+    if (race.status === "\xDAltimos Cupos") {
+      statusBadgeHTML = `<span class="px-2.5 py-1 rounded-full text-xs font-extrabold bg-amber-100 text-amber-800 border border-amber-300 animate-pulse">\xDAltimos Cupos</span>`;
+    } else if (race.status === "Inscripciones Abiertas") {
+      statusBadgeHTML = `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">Inscripciones Abiertas</span>`;
+    } else if (race.status === "Cupos Agotados") {
+      statusBadgeHTML = `<span class="px-2.5 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-700">Cupos Agotados</span>`;
+    } else {
+      statusBadgeHTML = `<span class="px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">${race.status || "Pr\xF3ximamente"}</span>`;
+    }
+    const freeBadgeHTML = race.isFree || race.price === 0 ? `<span class="px-2.5 py-1 rounded-full text-xs font-black bg-tertiary-fixed text-primary border border-lime-400">Gratuita</span>` : "";
+    return `
+      <article class="race-card bg-white rounded-3xl border border-outline-variant/40 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group">
         
         <!-- Hero Image Header -->
         <div class="relative h-48 w-full overflow-hidden bg-surface-container">
           <img 
-            src="${i.heroImage||"https://images.unsplash.com/photo-1541625602330-2277a4c46182?auto=format&fit=crop&w=800&q=80"}" 
-            alt="${i.name}" 
+            src="${race.heroImage || "https://images.unsplash.com/photo-1541625602330-2277a4c46182?auto=format&fit=crop&w=800&q=80"}" 
+            alt="${race.name}" 
             loading="lazy"
             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           >
@@ -47,23 +1117,23 @@ ${m.descripcion}`:x);let y=await n.from("carreras").insert([m]);l=y.data,d=y.err
           
           <!-- Badges superiores (Disciplina, Multi-D\xEDa y Gratuita) -->
           <div class="absolute top-3 left-3 flex flex-wrap gap-1.5 z-10">
-            <span class="px-3 py-1 rounded-lg text-xs font-bold shadow-md flex items-center gap-1 ${s}">
-              <span class="material-symbols-outlined text-sm">${Ge(i.discipline)}</span>
-              ${i.discipline}
+            <span class="px-3 py-1 rounded-lg text-xs font-bold shadow-md flex items-center gap-1 ${disciplineBadgeClass}">
+              <span class="material-symbols-outlined text-sm">${getDisciplineIcon(race.discipline)}</span>
+              ${race.discipline}
             </span>
-            ${m}
-            ${h}
+            ${multiDayBadgeHTML}
+            ${freeBadgeHTML}
           </div>
 
           <!-- Bot\xF3n Bookmark / Favorito -->
           <button 
             type="button" 
-            data-bookmark-id="${i.id}" 
+            data-bookmark-id="${race.id}" 
             aria-label="Guardar en favoritos" 
             class="btn-bookmark absolute top-3 right-3 w-10 h-10 rounded-full bg-white/90 backdrop-blur-md text-primary hover:bg-white flex items-center justify-center shadow-md transition-all active:scale-90 z-10"
           >
-            <span class="material-symbols-outlined ${o?"filled text-secondary":"text-outline"}">
-              ${o?"bookmark":"bookmark_border"}
+            <span class="material-symbols-outlined ${bookmarked ? "filled text-secondary" : "text-outline"}">
+              ${bookmarked ? "bookmark" : "bookmark_border"}
             </span>
           </button>
 
@@ -71,10 +1141,10 @@ ${m.descripcion}`:x);let y=await n.from("carreras").insert([m]);l=y.data,d=y.err
           <div class="absolute bottom-3 left-3 right-3 text-white z-10 flex items-center justify-between text-xs">
             <span class="font-bold flex items-center gap-1 bg-black/40 backdrop-blur-sm px-2.5 py-1 rounded-md">
               <span class="material-symbols-outlined text-sm text-tertiary-fixed">calendar_today</span>
-              ${i.displayDate||i.date}
+              ${race.displayDate || race.date}
             </span>
             <span class="font-medium bg-black/40 backdrop-blur-sm px-2.5 py-1 rounded-md truncate max-w-[50%]">
-              ${i.city}
+              ${race.city}
             </span>
           </div>
 
@@ -86,36 +1156,36 @@ ${m.descripcion}`:x);let y=await n.from("carreras").insert([m]);l=y.data,d=y.err
           <div class="space-y-2">
             <!-- Estado & Precio -->
             <div class="flex items-center justify-between gap-2">
-              <div>${g}</div>
+              <div>${statusBadgeHTML}</div>
               <span class="font-display font-black text-lg text-primary">
-                ${r}
+                ${formattedPrice}
               </span>
             </div>
 
             <!-- T\xEDtulo de la Carrera -->
             <h3 class="font-display font-bold text-xl text-primary group-hover:text-secondary transition-colors line-clamp-2 leading-snug">
-              ${i.name}
+              ${race.name}
             </h3>
 
             <!-- Especificaciones t\xE9cnicas (Distancia & Desnivel) -->
             <div class="flex items-center gap-4 text-xs font-semibold text-outline pt-1">
               <span class="flex items-center gap-1">
                 <span class="material-symbols-outlined text-base">straighten</span>
-                ${i.distance}
+                ${race.distance}
               </span>
               <span class="flex items-center gap-1">
                 <span class="material-symbols-outlined text-base">landscape</span>
-                ${i.elevation}
+                ${race.elevation}
               </span>
               <span class="flex items-center gap-1 truncate">
                 <span class="material-symbols-outlined text-base">map</span>
-                ${i.region.replace("Regi\xF3n de ","").replace("Regi\xF3n del Libertador General ","").replace("Regi\xF3n del ","")}
+                ${race.region.replace("Regi\xF3n de ", "").replace("Regi\xF3n del Libertador General ", "").replace("Regi\xF3n del ", "")}
               </span>
             </div>
 
             <!-- Descripci\xF3n corta -->
             <p class="text-xs text-gray-600 line-clamp-2 leading-relaxed pt-1">
-              ${i.description}
+              ${race.description}
             </p>
           </div>
 
@@ -123,64 +1193,45 @@ ${m.descripcion}`:x);let y=await n.from("carreras").insert([m]);l=y.data,d=y.err
           <div class="pt-4 border-t border-outline-variant/30 flex flex-col gap-2">
             <button 
               type="button" 
-              data-race-id="${i.id}" 
+              data-race-id="${race.id}" 
               class="btn-view-detail w-full bg-[#d8ef00] text-[#181919] font-display font-bold text-sm hover:brightness-105 shadow-sm rounded-xl py-3 px-4 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
             >
               Ver Detalle
               <span class="material-symbols-outlined text-base">arrow_forward</span>
             </button>
-
-            <!-- Dropdown A\xF1adir a mi calendario -->
-            <div class="relative inline-block w-full">
-              <button 
-                type="button" 
-                data-calendar-trigger="${i.id}" 
-                class="w-full bg-surface-container hover:bg-surface-container-high text-primary font-display font-bold text-xs py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 transition-colors border border-outline-variant/50"
-                aria-expanded="false"
-              >
-                <span class="material-symbols-outlined text-sm">calendar_add_on</span>
-                A\xF1adir a mi calendario
-                <span class="material-symbols-outlined text-xs">expand_more</span>
-              </button>
-
-              <div 
-                id="calendar-dropdown-${i.id}" 
-                class="calendar-dropdown-menu hidden absolute left-0 right-0 bottom-full mb-2 bg-white rounded-2xl shadow-xl border border-outline-variant/40 p-1.5 z-50 animate-fadeIn"
-              >
-                <button type="button" data-calendar-action="google" data-race-id="${i.id}" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-primary hover:bg-surface-container flex items-center gap-2 transition-colors">
-                  <span class="text-base">\u{1F4C5}</span> Google Calendar
-                </button>
-                <button type="button" data-calendar-action="apple" data-race-id="${i.id}" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-primary hover:bg-surface-container flex items-center gap-2 transition-colors">
-                  <span class="text-base">\u{1F34E}</span> Apple Calendar (.ics)
-                </button>
-                <button type="button" data-calendar-action="outlook" data-race-id="${i.id}" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-primary hover:bg-surface-container flex items-center gap-2 transition-colors">
-                  <span class="text-base">\u{1F4C6}</span> Outlook (.ics)
-                </button>
-                <button type="button" data-calendar-action="copy" data-race-id="${i.id}" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-primary hover:bg-surface-container flex items-center gap-2 transition-colors border-t border-outline-variant/30 mt-1 pt-2">
-                  <span class="material-symbols-outlined text-sm text-outline">content_copy</span> Copiar Fecha
-                </button>
-              </div>
-            </div>
-
-            ${n||a&&i.creadoPor===a?`
+            ${renderCalendarButtonHTML(race.id, "card")}
+            ${isAdmin2 ? `
             <div class="flex gap-2 w-full pt-1">
-              <button type="button" data-edit-id="${i.id}" class="flex-grow py-2.5 rounded-xl bg-surface-container border border-outline-variant/60 text-primary font-bold text-xs hover:bg-surface-container-high transition-colors flex items-center justify-center gap-1">
+              <button type="button" data-edit-id="${race.id}" class="flex-grow py-2.5 rounded-xl bg-surface-container border border-outline-variant/60 text-primary font-bold text-xs hover:bg-surface-container-high transition-colors flex items-center justify-center gap-1">
                 <span class="material-symbols-outlined text-sm">edit</span> Editar
               </button>
-              <button type="button" data-delete-id="${i.id}" class="py-2.5 px-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-600 font-bold text-xs hover:bg-red-500/20 transition-colors flex items-center justify-center gap-1" title="Eliminar Carrera">
+              <button type="button" data-delete-id="${race.id}" class="py-2.5 px-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-600 font-bold text-xs hover:bg-red-500/20 transition-colors flex items-center justify-center gap-1" title="Eliminar Carrera">
                 <span class="material-symbols-outlined text-sm">delete</span>
               </button>
             </div>
-            `:""}
+            ` : ""}
           </div>
 
         </div>
 
       </article>
-    `}).join("")}}function Te(e,t,n=!1,a=null){if(!e||!t)return;let i=Ve(t.id),o=de(t.discipline),s=qe(t.price,t.isFree),r=G(t),l=Me(t),d=Array.isArray(t.categories)&&t.categories.length>0?t.categories.map(x=>`<span class="px-3 py-1 rounded-xl text-xs font-semibold bg-surface-container text-primary border border-outline-variant/40">${x}</span>`).join(""):'<span class="text-xs text-outline italic">No se especificaron categor\xEDas.</span>',m="",g=t.status||"Pr\xF3ximamente";l.esFinalizada?(m='<span class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-200 text-slate-800 border border-slate-300 shadow-md">Finalizada</span>',g="Finalizada"):l.esEnCurso&&(m='<span class="px-3.5 py-1.5 rounded-xl text-xs font-black bg-blue-600 text-white border border-blue-500 shadow-md animate-pulse flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-white animate-ping"></span> En Curso</span>',g="En Curso");let h=n||a&&t.creadoPor===a;e.innerHTML=`
+    `;
+  }).join("");
+}
+function renderDetailView(container, race, isAdmin2 = false) {
+  if (!container || !race) return;
+  const bookmarked = isBookmarked(race.id);
+  const disciplineBadgeClass = getDisciplineBadgeClass(race.discipline);
+  const formattedPrice = formatPrice(race.price, race.isFree);
+  const categoriesHTML = Array.isArray(race.categories) && race.categories.length > 0 ? race.categories.map((cat) => `
+        <span class="px-3 py-1 rounded-lg bg-surface-container text-primary font-semibold text-xs border border-outline-variant/40">
+          ${cat}
+        </span>
+      `).join("") : '<span class="text-xs text-outline italic">Categor\xEDas por confirmar</span>';
+  container.innerHTML = `
     <div class="space-y-8 animate-fadeIn">
       
-      <!-- Top Action Bar (Volver, Favoritos & Admin Actions) -->
+      <!-- Back Button & Actions Bar -->
       <div class="flex items-center justify-between flex-wrap gap-4">
         <button 
           type="button" 
@@ -192,24 +1243,25 @@ ${m.descripcion}`:x);let y=await n.from("carreras").insert([m]);l=y.data,d=y.err
         </button>
 
         <div class="flex items-center gap-2">
-          ${h?`
-            <button type="button" data-edit-id="${t.id}" class="px-4 py-2.5 rounded-xl bg-surface-container border border-outline-variant/55 text-primary font-display font-bold text-sm flex items-center gap-2 hover:bg-surface-container-high transition-all shadow-sm">
+          ${isAdmin2 ? `
+            <button type="button" data-edit-id="${race.id}" class="px-4 py-2.5 rounded-xl bg-surface-container border border-outline-variant/55 text-primary font-display font-bold text-sm flex items-center gap-2 hover:bg-surface-container-high transition-all shadow-sm">
               <span class="material-symbols-outlined text-base">edit</span> Editar
             </button>
-            <button type="button" data-delete-id="${t.id}" class="px-4 py-2.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-600 font-display font-bold text-sm flex items-center gap-2 hover:bg-red-500/20 transition-all shadow-sm">
+            <button type="button" data-delete-id="${race.id}" class="px-4 py-2.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-600 font-display font-bold text-sm flex items-center gap-2 hover:bg-red-500/20 transition-all shadow-sm">
               <span class="material-symbols-outlined text-base">delete</span> Eliminar
             </button>
-          `:""}
+          ` : ""}
           <button 
             type="button" 
-            data-bookmark-id="${t.id}" 
+            data-bookmark-id="${race.id}" 
             class="btn-bookmark px-4 py-2.5 rounded-xl bg-white border border-outline-variant/50 text-primary font-display font-bold text-sm flex items-center gap-2 hover:bg-surface-container transition-all shadow-sm"
           >
-            <span class="material-symbols-outlined ${i?"filled text-secondary":"text-outline"}">
-              ${i?"bookmark":"bookmark_border"}
+            <span class="material-symbols-outlined ${bookmarked ? "filled text-secondary" : "text-outline"}">
+              ${bookmarked ? "bookmark" : "bookmark_border"}
             </span>
-            ${i?"Guardada en Agenda":"Guardar en Agenda"}
+            ${bookmarked ? "Guardada en Agenda" : "Guardar en Agenda"}
           </button>
+          ${renderCalendarButtonHTML(race.id, "detail")}
         </div>
       </div>
 
@@ -217,30 +1269,29 @@ ${m.descripcion}`:x);let y=await n.from("carreras").insert([m]);l=y.data,d=y.err
       <div class="relative rounded-3xl bg-primary text-white overflow-hidden shadow-2xl">
         <div class="relative h-72 sm:h-96 w-full">
           <img 
-            src="${t.heroImage||"https://images.unsplash.com/photo-1541625602330-2277a4c46182?auto=format&fit=crop&w=1600&q=80"}" 
-            alt="${t.name}" 
+            src="${race.heroImage || "https://images.unsplash.com/photo-1541625602330-2277a4c46182?auto=format&fit=crop&w=1600&q=80"}" 
+            alt="${race.name}" 
             class="w-full h-full object-cover"
           >
           <div class="absolute inset-0 bg-gradient-to-t from-primary via-primary/60 to-transparent"></div>
           
           <!-- Badges superiores -->
           <div class="absolute top-6 left-6 flex flex-wrap gap-2 z-10">
-            <span class="px-3.5 py-1.5 rounded-xl text-xs font-extrabold shadow-lg flex items-center gap-1.5 ${o}">
-              <span class="material-symbols-outlined text-base">${Ge(t.discipline)}</span>
-              ${t.discipline}
+            <span class="px-3.5 py-1.5 rounded-xl text-xs font-extrabold shadow-lg flex items-center gap-1.5 ${disciplineBadgeClass}">
+              <span class="material-symbols-outlined text-base">${getDisciplineIcon(race.discipline)}</span>
+              ${race.discipline}
             </span>
-            ${m}
-            ${t.isFree?'<span class="px-3.5 py-1.5 rounded-xl text-xs font-black bg-tertiary-fixed text-primary shadow-lg">Evento Gratuito</span>':""}
+            ${race.isFree ? `<span class="px-3.5 py-1.5 rounded-xl text-xs font-black bg-tertiary-fixed text-primary shadow-lg">Evento Gratuito</span>` : ""}
           </div>
 
           <!-- Informaci\xF3n Overlay sobre banner -->
           <div class="absolute bottom-6 left-6 right-6 z-10 space-y-3">
             <div class="flex items-center gap-2 text-tertiary-fixed font-display font-bold text-xs uppercase tracking-widest">
               <span class="material-symbols-outlined text-sm">location_on</span>
-              ${t.city}, ${t.region}
+              ${race.city}, ${race.region}
             </div>
             <h1 class="text-2xl sm:text-4xl md:text-5xl font-display font-black tracking-tight text-white leading-tight">
-              ${t.name}
+              ${race.name}
             </h1>
           </div>
 
@@ -254,45 +1305,26 @@ ${m.descripcion}`:x);let y=await n.from("carreras").insert([m]);l=y.data,d=y.err
         <div class="lg:col-span-8 space-y-8">
           
           <!-- Stats R\xE1pidos -->
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div class="bg-white p-4 rounded-2xl border border-outline-variant/40 shadow-sm flex flex-col gap-1">
-              <span class="text-xs font-bold text-outline uppercase tracking-wider flex items-center gap-1">
-                <span class="material-symbols-outlined text-sm text-secondary">calendar_today</span>
-                Fecha
-              </span>
-              <span class="font-display font-bold text-sm sm:text-base text-primary">
-                ${t.displayDate||t.date}
-              </span>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 p-6 bg-white rounded-3xl border border-outline-variant/40 shadow-sm text-center">
+            <div class="space-y-1">
+              <span class="material-symbols-outlined text-secondary text-2xl">calendar_month</span>
+              <p class="text-xs font-bold text-outline uppercase">Fecha</p>
+              <p class="font-display font-bold text-sm text-primary">${race.displayDate || race.date}</p>
             </div>
-
-            <div class="bg-white p-4 rounded-2xl border border-outline-variant/40 shadow-sm flex flex-col gap-1">
-              <span class="text-xs font-bold text-outline uppercase tracking-wider flex items-center gap-1">
-                <span class="material-symbols-outlined text-sm text-secondary">straighten</span>
-                Distancia
-              </span>
-              <span class="font-display font-bold text-sm sm:text-base text-primary">
-                ${t.distance}
-              </span>
+            <div class="space-y-1">
+              <span class="material-symbols-outlined text-secondary text-2xl">straighten</span>
+              <p class="text-xs font-bold text-outline uppercase">Distancia</p>
+              <p class="font-display font-bold text-sm text-primary">${race.distance}</p>
             </div>
-
-            <div class="bg-white p-4 rounded-2xl border border-outline-variant/40 shadow-sm flex flex-col gap-1">
-              <span class="text-xs font-bold text-outline uppercase tracking-wider flex items-center gap-1">
-                <span class="material-symbols-outlined text-sm text-secondary">landscape</span>
-                Desnivel
-              </span>
-              <span class="font-display font-bold text-sm sm:text-base text-primary">
-                ${t.elevation}
-              </span>
+            <div class="space-y-1">
+              <span class="material-symbols-outlined text-secondary text-2xl">landscape</span>
+              <p class="text-xs font-bold text-outline uppercase">Desnivel</p>
+              <p class="font-display font-bold text-sm text-primary">${race.elevation}</p>
             </div>
-
-            <div class="bg-white p-4 rounded-2xl border border-outline-variant/40 shadow-sm flex flex-col gap-1">
-              <span class="text-xs font-bold text-outline uppercase tracking-wider flex items-center gap-1">
-                <span class="material-symbols-outlined text-sm text-secondary">payments</span>
-                Precio
-              </span>
-              <span class="font-display font-bold text-sm sm:text-base text-primary">
-                ${s}
-              </span>
+            <div class="space-y-1">
+              <span class="material-symbols-outlined text-secondary text-2xl">group</span>
+              <p class="text-xs font-bold text-outline uppercase">Inscriptos</p>
+              <p class="font-display font-bold text-sm text-primary">${race.participants || 0}+ ciclistas</p>
             </div>
           </div>
 
@@ -300,10 +1332,10 @@ ${m.descripcion}`:x);let y=await n.from("carreras").insert([m]);l=y.data,d=y.err
           <div class="bg-white p-6 sm:p-8 rounded-3xl border border-outline-variant/40 shadow-sm space-y-4">
             <h3 class="font-display font-bold text-xl text-primary flex items-center gap-2">
               <span class="material-symbols-outlined text-secondary">description</span>
-              Descripci\xF3n del Evento
+              Sobre la Competencia
             </h3>
             <p class="text-gray-700 text-base leading-relaxed whitespace-pre-line">
-              ${t.description}
+              ${race.description}
             </p>
           </div>
 
@@ -314,7 +1346,7 @@ ${m.descripcion}`:x);let y=await n.from("carreras").insert([m]);l=y.data,d=y.err
               Categor\xEDas Habilitadas
             </h3>
             <div class="flex flex-wrap gap-2">
-              ${d}
+              ${categoriesHTML}
             </div>
           </div>
 
@@ -328,74 +1360,35 @@ ${m.descripcion}`:x);let y=await n.from("carreras").insert([m]);l=y.data,d=y.err
             <div class="space-y-1">
               <span class="text-xs font-bold text-outline uppercase tracking-wider">Precio de Inscripci\xF3n</span>
               <div class="font-display font-black text-3xl text-primary">
-                ${s}
+                ${formattedPrice}
               </div>
             </div>
 
             <div class="space-y-3 pt-2">
               <div class="flex justify-between items-center text-sm py-2 border-b border-outline-variant/30">
                 <span class="text-outline font-medium">Estado:</span>
-                <span class="font-bold text-primary">${g}</span>
+                <span class="font-bold text-primary">${race.status}</span>
               </div>
               <div class="flex justify-between items-center text-sm py-2 border-b border-outline-variant/30">
                 <span class="text-outline font-medium">Organiza:</span>
-                <span class="font-bold text-primary truncate max-w-[60%]">${t.organizer}</span>
+                <span class="font-bold text-primary truncate max-w-[60%]">${race.organizer}</span>
               </div>
               <div class="flex justify-between items-center text-sm py-2">
                 <span class="text-outline font-medium">Ubicaci\xF3n:</span>
-                <span class="font-bold text-primary">${t.city}</span>
+                <span class="font-bold text-primary">${race.city}</span>
               </div>
             </div>
 
             <!-- CTA Button -->
-            ${l.esFinalizada?`
-              <div class="w-full bg-slate-100 text-slate-600 border border-slate-300 font-display font-bold text-base rounded-2xl py-4 px-6 flex items-center justify-center gap-2 shadow-sm text-center">
-                <span class="material-symbols-outlined text-xl">event_busy</span>
-                Evento Finalizado
-              </div>
-            `:`
-              <a 
-                href="${t.registrationUrl||"#"}" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                class="w-full bg-[#d8ef00] text-[#181919] font-display font-bold text-base hover:brightness-105 shadow-md rounded-2xl py-4 px-6 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
-              >
-                Ir a Formulario de Inscripci\xF3n
-                <span class="material-symbols-outlined text-xl">open_in_new</span>
-              </a>
-            `}
-
-            <!-- Dropdown A\xF1adir a mi calendario (Vista Detalle) -->
-            <div class="relative inline-block w-full pt-1">
-              <button 
-                type="button" 
-                data-calendar-trigger="${t.id}" 
-                class="w-full bg-surface-container hover:bg-surface-container-high text-primary font-display font-bold text-sm py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors border border-outline-variant/50 shadow-sm"
-                aria-expanded="false"
-              >
-                <span class="material-symbols-outlined text-base">calendar_add_on</span>
-                A\xF1adir a mi calendario
-                <span class="material-symbols-outlined text-sm">expand_more</span>
-              </button>
-
-              <div 
-                id="calendar-dropdown-${t.id}" 
-                class="calendar-dropdown-menu hidden absolute left-0 right-0 bottom-full mb-2 bg-white rounded-2xl shadow-xl border border-outline-variant/40 p-2 z-50 animate-fadeIn"
-              >
-                <button type="button" data-calendar-action="google" data-race-id="${t.id}" class="w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold text-primary hover:bg-surface-container flex items-center gap-2 transition-colors">
-                  <span class="text-base">\u{1F4C5}</span> Google Calendar
-                </button>
-                <button type="button" data-calendar-action="apple" data-race-id="${t.id}" class="w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold text-primary hover:bg-surface-container flex items-center gap-2 transition-colors">
-                  <span class="text-base">\u{1F34E}</span> Apple Calendar (.ics)
-                </button>
-                <button type="button" data-calendar-action="outlook" data-race-id="${t.id}" class="w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold text-primary hover:bg-surface-container flex items-center gap-2 transition-colors">
-                  <span class="text-base">\u{1F4C6}</span> Outlook (.ics)
-                </button>
-                <button type="button" data-calendar-action="copy" data-race-id="${t.id}" class="w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold text-primary hover:bg-surface-container flex items-center gap-2 transition-colors border-t border-outline-variant/30 mt-1 pt-2">
-                  <span class="material-symbols-outlined text-sm text-outline">content_copy</span> Copiar Fecha
-                </button>
-              </div>
-            </div>
+            <a 
+              href="${race.registrationUrl || "#"}" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              class="w-full bg-[#d8ef00] text-[#181919] font-display font-bold text-base hover:brightness-105 shadow-md rounded-2xl py-4 px-6 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+            >
+              Ir a Formulario de Inscripci\xF3n
+              <span class="material-symbols-outlined text-xl">open_in_new</span>
+            </a>
 
             <p class="text-[11px] text-center text-outline leading-tight">
               Ser\xE1s redirigido al sitio web oficial del organizador para completar tu registro.
@@ -408,7 +1401,41 @@ ${m.descripcion}`:x);let y=await n.from("carreras").insert([m]);l=y.data,d=y.err
       </div>
 
     </div>
-  `}function H(e){let t=document.getElementById("view-calendar"),n=document.getElementById("view-detail"),a=document.getElementById("view-register"),i=document.getElementById("view-admin-panel"),o=document.getElementById("nav-explore"),s=document.getElementById("nav-agenda"),r=document.getElementById("nav-register"),l=document.getElementById("nav-admin-panel");t&&t.classList.add("hidden"),n&&n.classList.add("hidden"),a&&a.classList.add("hidden"),i&&i.classList.add("hidden");let d="text-outline hover:text-primary hover:bg-surface-container-low",m="text-primary bg-surface-container-low font-bold";o&&(o.className=`nav-btn px-4 py-2 rounded-lg font-display font-bold text-sm transition-colors flex items-center gap-2 ${e==="calendar"?m:d}`),s&&(s.className=`nav-btn px-4 py-2 rounded-lg font-display font-bold text-sm transition-colors flex items-center gap-2 ${e==="agenda"?m:d}`),l&&(l.className=`nav-btn px-4 py-2 rounded-lg font-display font-bold text-sm transition-colors flex items-center gap-2 ${e==="admin-panel"?m:d}`),e==="calendar"||e==="agenda"?t&&t.classList.remove("hidden"):e==="detail"?n&&n.classList.remove("hidden"):e==="register"?a&&a.classList.remove("hidden"):e==="admin-panel"&&i&&i.classList.remove("hidden"),window.scrollTo({top:0,behavior:"smooth"})}function Ne(e,t=[]){if(e){if(t.length===0){e.innerHTML=`
+  `;
+}
+function switchView(viewName) {
+  const viewCalendar = document.getElementById("view-calendar");
+  const viewDetail = document.getElementById("view-detail");
+  const viewRegister = document.getElementById("view-register");
+  const viewAdminPanel = document.getElementById("view-admin-panel");
+  const navExplore = document.getElementById("nav-explore");
+  const navAgenda = document.getElementById("nav-agenda");
+  const navRegister = document.getElementById("nav-register");
+  const navAdminPanel = document.getElementById("nav-admin-panel");
+  if (viewCalendar) viewCalendar.classList.add("hidden");
+  if (viewDetail) viewDetail.classList.add("hidden");
+  if (viewRegister) viewRegister.classList.add("hidden");
+  if (viewAdminPanel) viewAdminPanel.classList.add("hidden");
+  const inactiveNavClasses = "text-outline hover:text-primary hover:bg-surface-container-low";
+  const activeNavClasses = "text-primary bg-surface-container-low font-bold";
+  if (navExplore) navExplore.className = `nav-btn px-4 py-2 rounded-lg font-display font-bold text-sm transition-colors flex items-center gap-2 ${viewName === "calendar" ? activeNavClasses : inactiveNavClasses}`;
+  if (navAgenda) navAgenda.className = `nav-btn px-4 py-2 rounded-lg font-display font-bold text-sm transition-colors flex items-center gap-2 ${viewName === "agenda" ? activeNavClasses : inactiveNavClasses}`;
+  if (navAdminPanel) navAdminPanel.className = `nav-btn px-4 py-2 rounded-lg font-display font-bold text-sm transition-colors flex items-center gap-2 ${viewName === "admin-panel" ? activeNavClasses : inactiveNavClasses}`;
+  if (viewName === "calendar" || viewName === "agenda") {
+    if (viewCalendar) viewCalendar.classList.remove("hidden");
+  } else if (viewName === "detail") {
+    if (viewDetail) viewDetail.classList.remove("hidden");
+  } else if (viewName === "register") {
+    if (viewRegister) viewRegister.classList.remove("hidden");
+  } else if (viewName === "admin-panel") {
+    if (viewAdminPanel) viewAdminPanel.classList.remove("hidden");
+  }
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+function renderPendingRaces(container, races = []) {
+  if (!container) return;
+  if (races.length === 0) {
+    container.innerHTML = `
       <div class="col-span-full py-16 text-center bg-white rounded-3xl border border-dashed border-outline-variant/60 p-8 space-y-4">
         <div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mx-auto text-outline">
           <span class="material-symbols-outlined text-4xl">task_alt</span>
@@ -416,37 +1443,91 @@ ${m.descripcion}`:x);let y=await n.from("carreras").insert([m]);l=y.data,d=y.err
         <h3 class="font-display font-bold text-xl text-primary">No hay propuestas pendientes</h3>
         <p class="text-outline text-sm max-w-md mx-auto">Buen trabajo, el calendario est\xE1 al d\xEDa y moderado.</p>
       </div>
-    `;return}e.innerHTML=t.map(n=>`
+    `;
+    return;
+  }
+  container.innerHTML = races.map((race) => {
+    const disciplineBadgeClass = getDisciplineBadgeClass(race.discipline);
+    return `
       <article class="bg-white rounded-3xl border border-outline-variant/40 overflow-hidden shadow-sm flex flex-col group p-6 space-y-4">
         <div class="flex items-center justify-between">
-          <span class="px-2.5 py-1 rounded-lg text-xs font-bold ${de(n.discipline)}">
-            ${n.discipline}
+          <span class="px-2.5 py-1 rounded-lg text-xs font-bold ${disciplineBadgeClass}">
+            ${race.discipline}
           </span>
           <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
             Pendiente
           </span>
         </div>
         <div>
-          <h3 class="font-display font-bold text-lg text-primary line-clamp-2">${n.name}</h3>
-          <p class="text-xs text-outline font-semibold">${n.displayDate||n.date} \u2014 ${n.city}, ${n.region}</p>
+          <h3 class="font-display font-bold text-lg text-primary line-clamp-2">${race.name}</h3>
+          <p class="text-xs text-outline font-semibold">${race.displayDate || race.date} \u2014 ${race.city}, ${race.region}</p>
         </div>
-        <p class="text-xs text-gray-600 line-clamp-3">${n.description}</p>
+        <p class="text-xs text-gray-600 line-clamp-3">${race.description}</p>
         <div class="pt-4 border-t border-outline-variant/30 grid grid-cols-2 gap-2">
-          <button type="button" data-id="${n.id}" data-approve-id="${n.id}" class="btn-approve-race py-2.5 rounded-xl bg-emerald-600 text-white font-display font-bold text-xs hover:bg-emerald-700 transition-colors flex items-center justify-center gap-1 shadow-sm">
+          <button type="button" data-id="${race.id}" data-approve-id="${race.id}" class="btn-approve-race py-2.5 rounded-xl bg-emerald-600 text-white font-display font-bold text-xs hover:bg-emerald-700 transition-colors flex items-center justify-center gap-1 shadow-sm">
             <span class="material-symbols-outlined text-sm">check_circle</span> Aprobar
           </button>
-          <button type="button" data-id="${n.id}" data-reject-id="${n.id}" class="btn-reject-race py-2.5 rounded-xl bg-red-600 text-white font-display font-bold text-xs hover:bg-red-700 transition-colors flex items-center justify-center gap-1 shadow-sm">
+          <button type="button" data-id="${race.id}" data-reject-id="${race.id}" class="btn-reject-race py-2.5 rounded-xl bg-red-600 text-white font-display font-bold text-xs hover:bg-red-700 transition-colors flex items-center justify-center gap-1 shadow-sm">
             <span class="material-symbols-outlined text-sm">cancel</span> Rechazar
           </button>
         </div>
       </article>
-    `).join("")}}function Ct(e,t=[],n="Todos"){if(!e)return;let a=2026,i=9;if(n&&n!=="Todos"){let I=n.split(" "),D={Enero:0,Febrero:1,Marzo:2,Abril:3,Mayo:4,Junio:5,Julio:6,Agosto:7,Septiembre:8,Octubre:9,Noviembre:10,Diciembre:11};D[I[0]]!==void 0&&(i=D[I[0]]),I[1]&&!isNaN(parseInt(I[1],10))&&(a=parseInt(I[1],10))}else if(t.length>0){let I=t.find(D=>D.startDate||D.date);if(I){let D=le(I.startDate||I.date);D&&(a=D.getFullYear(),i=D.getMonth())}}let s=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"][i],r=new Date(a,i,1),l=new Date(a,i+1,0),d=r.getDay(),m=d===0?6:d-1,g=new Date(r);g.setDate(g.getDate()-m);let h=m+l.getDate(),x=Math.ceil(h/7),y=`
+    `;
+  }).join("");
+}
+function renderMonthGrid(container, races = [], activeMonthYear = "Todos") {
+  if (!container) return;
+  let year = 2026;
+  let monthIndex = 9;
+  if (activeMonthYear && activeMonthYear !== "Todos") {
+    const parts = activeMonthYear.split(" ");
+    const monthsNameMap = {
+      "Enero": 0,
+      "Febrero": 1,
+      "Marzo": 2,
+      "Abril": 3,
+      "Mayo": 4,
+      "Junio": 5,
+      "Julio": 6,
+      "Agosto": 7,
+      "Septiembre": 8,
+      "Octubre": 9,
+      "Noviembre": 10,
+      "Diciembre": 11
+    };
+    if (monthsNameMap[parts[0]] !== void 0) {
+      monthIndex = monthsNameMap[parts[0]];
+    }
+    if (parts[1] && !isNaN(parseInt(parts[1], 10))) {
+      year = parseInt(parts[1], 10);
+    }
+  } else if (races.length > 0) {
+    const firstWithDate = races.find((r) => r.startDate || r.date);
+    if (firstWithDate) {
+      const d = parseLocalDate(firstWithDate.startDate || firstWithDate.date);
+      if (d) {
+        year = d.getFullYear();
+        monthIndex = d.getMonth();
+      }
+    }
+  }
+  const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+  const monthName = monthNames[monthIndex];
+  const firstOfMonth = new Date(year, monthIndex, 1);
+  const lastOfMonth = new Date(year, monthIndex + 1, 0);
+  const firstDayDayOfWeek = firstOfMonth.getDay();
+  const startOffset = firstDayDayOfWeek === 0 ? 6 : firstDayDayOfWeek - 1;
+  const startDateGrid = new Date(firstOfMonth);
+  startDateGrid.setDate(startDateGrid.getDate() - startOffset);
+  const totalDaysNeeded = startOffset + lastOfMonth.getDate();
+  const totalWeeks = Math.ceil(totalDaysNeeded / 7);
+  let html = `
     <div class="space-y-4 animate-fadeIn">
       <!-- Header del Mes -->
       <div class="flex items-center justify-between pb-2 border-b border-outline-variant/30">
         <h3 class="font-display font-black text-xl text-primary flex items-center gap-2">
           <span class="material-symbols-outlined text-secondary text-2xl">calendar_month</span>
-          ${s} ${a}
+          ${monthName} ${year}
         </h3>
         <span class="text-xs font-bold px-3 py-1 rounded-full bg-surface-container text-outline uppercase tracking-wider">
           Vista Mensual
@@ -466,60 +1547,138 @@ ${m.descripcion}`:x);let y=await n.from("carreras").insert([m]);l=y.data,d=y.err
 
       <!-- Filas de Semanas -->
       <div class="space-y-3">
-  `,E=new Date(g);for(let I=0;I<x;I++){let D=new Date(E),L=new Date(E);L.setDate(L.getDate()+6);let Y=[];for(let R=0;R<7;R++)Y.push(new Date(E)),E.setDate(E.getDate()+1);let C=[];t.forEach(R=>{let S=G(R);if(!(!S.startDateObj||!S.endDateObj)&&S.startDateObj<=L&&S.endDateObj>=D){let F=1,O=7;if(S.startDateObj>D){let W=S.startDateObj.getTime()-D.getTime();F=Math.round(W/(1e3*60*60*24))+1}if(S.endDateObj<L){let W=S.endDateObj.getTime()-D.getTime();O=Math.round(W/(1e3*60*60*24))+1}C.push({race:R,dur:S,colStart:Math.max(1,Math.min(7,F)),colEnd:Math.max(1,Math.min(7,O)),span:Math.max(1,O-F+1)})}}),C.sort((R,S)=>R.dur.esMultiDia!==S.dur.esMultiDia?R.dur.esMultiDia?-1:1:R.colStart!==S.colStart?R.colStart-S.colStart:S.span-R.span),y+=`
+  `;
+  let currentIterDate = new Date(startDateGrid);
+  for (let w = 0; w < totalWeeks; w++) {
+    const weekStartDate = new Date(currentIterDate);
+    const weekEndDate = new Date(currentIterDate);
+    weekEndDate.setDate(weekEndDate.getDate() + 6);
+    const weekDays = [];
+    for (let d = 0; d < 7; d++) {
+      weekDays.push(new Date(currentIterDate));
+      currentIterDate.setDate(currentIterDate.getDate() + 1);
+    }
+    const racesInWeek = [];
+    races.forEach((race) => {
+      const dur = detectRaceDuration(race);
+      if (!dur.startDateObj || !dur.endDateObj) return;
+      if (dur.startDateObj <= weekEndDate && dur.endDateObj >= weekStartDate) {
+        let colStart = 1;
+        let colEnd = 7;
+        if (dur.startDateObj > weekStartDate) {
+          const diffMs = dur.startDateObj.getTime() - weekStartDate.getTime();
+          colStart = Math.round(diffMs / (1e3 * 60 * 60 * 24)) + 1;
+        }
+        if (dur.endDateObj < weekEndDate) {
+          const diffMs = dur.endDateObj.getTime() - weekStartDate.getTime();
+          colEnd = Math.round(diffMs / (1e3 * 60 * 60 * 24)) + 1;
+        }
+        racesInWeek.push({
+          race,
+          dur,
+          colStart: Math.max(1, Math.min(7, colStart)),
+          colEnd: Math.max(1, Math.min(7, colEnd)),
+          span: Math.max(1, colEnd - colStart + 1)
+        });
+      }
+    });
+    racesInWeek.sort((a, b) => {
+      if (a.dur.esMultiDia !== b.dur.esMultiDia) {
+        return a.dur.esMultiDia ? -1 : 1;
+      }
+      if (a.colStart !== b.colStart) {
+        return a.colStart - b.colStart;
+      }
+      return b.span - a.span;
+    });
+    html += `
       <div class="relative bg-surface-container-low/50 rounded-2xl p-2.5 border border-outline-variant/30 min-h-[110px] sm:min-h-[130px] flex flex-col justify-between space-y-2">
         
         <!-- N\xFAmeros de los D\xEDas -->
         <div class="grid grid-cols-7 gap-1 sm:gap-2 text-right">
-          ${Y.map(R=>{let S=R.getMonth()===i,F=new Date().toDateString()===R.toDateString(),O=R.getDate();return`
-              <div class="pr-1 font-display font-bold text-xs ${S?"text-primary":"text-outline-variant/50"}">
-                <span class="${F?"bg-secondary text-white px-1.5 py-0.5 rounded-full":""}">
-                  ${O}
+          ${weekDays.map((dayObj) => {
+      const isCurrentMonth = dayObj.getMonth() === monthIndex;
+      const isToday = (/* @__PURE__ */ new Date()).toDateString() === dayObj.toDateString();
+      const dayNum = dayObj.getDate();
+      return `
+              <div class="pr-1 font-display font-bold text-xs ${isCurrentMonth ? "text-primary" : "text-outline-variant/50"}">
+                <span class="${isToday ? "bg-secondary text-white px-1.5 py-0.5 rounded-full" : ""}">
+                  ${dayNum}
                 </span>
               </div>
-            `}).join("")}
+            `;
+    }).join("")}
         </div>
 
         <!-- Renderizado de Barras de Eventos -->
         <div class="grid grid-cols-7 gap-1 sm:gap-2 gap-y-1.5 z-10">
-          ${C.map(R=>{let{race:S,dur:F,colStart:O,span:W}=R,me=de(S.discipline);return F.esMultiDia?`
+          ${racesInWeek.map((item) => {
+      const { race, dur, colStart, span } = item;
+      const badgeClass = getDisciplineBadgeClass(race.discipline);
+      if (dur.esMultiDia) {
+        return `
                 <div 
-                  data-race-id="${S.id}"
-                  style="grid-column: ${O} / span ${W};"
+                  data-race-id="${race.id}"
+                  style="grid-column: ${colStart} / span ${span};"
                   class="cursor-pointer group relative bg-gradient-to-r from-primary via-primary/95 to-primary/80 text-white rounded-xl px-2.5 py-1.5 text-xs font-bold shadow-sm hover:brightness-110 transition-all flex items-center justify-between overflow-hidden border-l-4 border-tertiary-fixed"
-                  title="${S.name} (${F.duracionDias} d\xEDas)"
+                  title="${race.name} (${dur.duracionDias} d\xEDas)"
                 >
                   <div class="flex items-center gap-1.5 truncate">
-                    <span class="px-1.5 py-0.5 rounded text-[10px] font-black uppercase ${me}">${S.discipline}</span>
-                    <span class="truncate font-display font-extrabold text-white">${S.name}</span>
+                    <span class="px-1.5 py-0.5 rounded text-[10px] font-black uppercase ${badgeClass}">${race.discipline}</span>
+                    <span class="truncate font-display font-extrabold text-white">${race.name}</span>
                   </div>
                   <span class="shrink-0 text-[10px] font-bold bg-white/20 px-1.5 py-0.5 rounded-full text-tertiary-fixed ml-1">
-                    ${F.duracionDias}d
+                    ${dur.duracionDias}d
                   </span>
                 </div>
-              `:`
+              `;
+      } else {
+        return `
                 <div 
-                  data-race-id="${S.id}"
-                  style="grid-column: ${O} / span 1;"
+                  data-race-id="${race.id}"
+                  style="grid-column: ${colStart} / span 1;"
                   class="cursor-pointer group relative bg-white border border-outline-variant/60 hover:border-primary text-primary rounded-xl px-2 py-1 text-[11px] font-bold shadow-2xs hover:shadow-md transition-all flex items-center gap-1 truncate"
-                  title="${S.name}"
+                  title="${race.name}"
                 >
-                  <span class="w-2 h-2 rounded-full ${me} shrink-0"></span>
-                  <span class="truncate font-medium">${S.name}</span>
+                  <span class="w-2 h-2 rounded-full ${badgeClass} shrink-0"></span>
+                  <span class="truncate font-medium">${race.name}</span>
                 </div>
-              `}).join("")}
+              `;
+      }
+    }).join("")}
         </div>
 
       </div>
-    `}y+=`
+    `;
+  }
+  html += `
       </div>
     </div>
-  `,e.innerHTML=y}function $t(e,t=[],n=new Date){if(!e)return;let a=typeof n=="string"?le(n)||new Date:n,i=a.getDay(),o=i===0?6:i-1,s=new Date(a);s.setDate(s.getDate()-o);let r=[];for(let x=0;x<7;x++){let y=new Date(s);y.setDate(y.getDate()+x),r.push(y)}let l=r[6],d=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"],g=`
+  `;
+  container.innerHTML = html;
+}
+function renderWeekGrid(container, races = [], referenceDate = /* @__PURE__ */ new Date()) {
+  if (!container) return;
+  const refObj = typeof referenceDate === "string" ? parseLocalDate(referenceDate) || /* @__PURE__ */ new Date() : referenceDate;
+  const dayOfWeek = refObj.getDay();
+  const offsetToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+  const mondayObj = new Date(refObj);
+  mondayObj.setDate(mondayObj.getDate() - offsetToMonday);
+  const weekDays = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(mondayObj);
+    d.setDate(d.getDate() + i);
+    weekDays.push(d);
+  }
+  const sundayObj = weekDays[6];
+  const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+  const headerText = `Semana del ${mondayObj.getDate()} de ${monthNames[mondayObj.getMonth()]} al ${sundayObj.getDate()} de ${monthNames[sundayObj.getMonth()]}, ${sundayObj.getFullYear()}`;
+  let html = `
     <div class="space-y-6 animate-fadeIn">
       <div class="flex items-center justify-between pb-2 border-b border-outline-variant/30">
         <h3 class="font-display font-black text-xl text-primary flex items-center gap-2">
           <span class="material-symbols-outlined text-secondary text-2xl">view_week</span>
-          ${`Semana del ${s.getDate()} de ${d[s.getMonth()]} al ${l.getDate()} de ${d[l.getMonth()]}, ${l.getFullYear()}`}
+          ${headerText}
         </h3>
         <span class="text-xs font-bold px-3 py-1 rounded-full bg-surface-container text-outline uppercase tracking-wider">
           Vista Semanal
@@ -527,94 +1686,263 @@ ${m.descripcion}`:x);let y=await n.from("carreras").insert([m]);l=y.data,d=y.err
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-7 gap-4">
-  `,h=["Lunes","Martes","Mi\xE9rcoles","Jueves","Viernes","S\xE1bado","Domingo"];r.forEach((x,y)=>{let E=new Date().toDateString()===x.toDateString(),I=t.filter(D=>{let L=G(D);return L.startDateObj&&L.endDateObj&&x>=L.startDateObj&&x<=L.endDateObj});g+=`
+  `;
+  const dayNames = ["Lunes", "Martes", "Mi\xE9rcoles", "Jueves", "Viernes", "S\xE1bado", "Domingo"];
+  weekDays.forEach((dayObj, index) => {
+    const isToday = (/* @__PURE__ */ new Date()).toDateString() === dayObj.toDateString();
+    const activeRaces = races.filter((race) => {
+      const dur = detectRaceDuration(race);
+      return dur.startDateObj && dur.endDateObj && dayObj >= dur.startDateObj && dayObj <= dur.endDateObj;
+    });
+    html += `
       <div class="bg-surface-container-low/50 rounded-2xl p-3 border border-outline-variant/30 flex flex-col space-y-3 min-h-[160px]">
         <div class="flex items-center justify-between border-b border-outline-variant/20 pb-2">
-          <span class="font-display font-bold text-xs text-primary">${h[y]}</span>
-          <span class="text-xs font-extrabold ${E?"bg-secondary text-white px-2 py-0.5 rounded-full":"text-outline"}">
-            ${x.getDate()}
+          <span class="font-display font-bold text-xs text-primary">${dayNames[index]}</span>
+          <span class="text-xs font-extrabold ${isToday ? "bg-secondary text-white px-2 py-0.5 rounded-full" : "text-outline"}">
+            ${dayObj.getDate()}
           </span>
         </div>
 
         <div class="space-y-2 flex-grow">
-          ${I.length===0?`
+          ${activeRaces.length === 0 ? `
             <p class="text-[11px] text-outline italic py-2 text-center">Sin eventos</p>
-          `:I.map(D=>{let L=G(D),Y=de(D.discipline),C=St(D,x);return`
+          ` : activeRaces.map((race) => {
+      const dur = detectRaceDuration(race);
+      const badgeClass = getDisciplineBadgeClass(race.discipline);
+      const dayProgress = getRaceDayProgress(race, dayObj);
+      return `
               <div 
-                data-race-id="${D.id}" 
+                data-race-id="${race.id}" 
                 class="cursor-pointer bg-white border border-outline-variant/40 hover:border-primary p-2.5 rounded-xl shadow-2xs hover:shadow-md transition-all space-y-1.5"
               >
                 <div class="flex items-center justify-between gap-1">
-                  <span class="px-1.5 py-0.5 rounded text-[10px] font-black uppercase ${Y}">${D.discipline}</span>
-                  ${L.esMultiDia&&C?`
+                  <span class="px-1.5 py-0.5 rounded text-[10px] font-black uppercase ${badgeClass}">${race.discipline}</span>
+                  ${dur.esMultiDia && dayProgress ? `
                     <span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-purple-100 text-purple-900 border border-purple-300">
-                      ${C}
+                      ${dayProgress}
                     </span>
-                  `:""}
+                  ` : ""}
                 </div>
-                <h5 class="font-display font-bold text-xs text-primary line-clamp-2">${D.name}</h5>
-                <p class="text-[10px] text-outline font-medium truncate">${D.city}</p>
+                <h5 class="font-display font-bold text-xs text-primary line-clamp-2">${race.name}</h5>
+                <p class="text-[10px] text-outline font-medium truncate">${race.city}</p>
               </div>
-            `}).join("")}
+            `;
+    }).join("")}
         </div>
       </div>
-    `}),g+=`
+    `;
+  });
+  html += `
       </div>
     </div>
-  `,e.innerHTML=g}function At(e,t=[],n=new Date){if(!e)return;let a=typeof n=="string"?le(n)||new Date:n,i=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"],s=`${["Domingo","Lunes","Martes","Mi\xE9rcoles","Jueves","Viernes","S\xE1bado"][a.getDay()]} ${a.getDate()} de ${i[a.getMonth()]}, ${a.getFullYear()}`,r=t.filter(d=>{let m=G(d);return m.startDateObj&&m.endDateObj&&a>=m.startDateObj&&a<=m.endDateObj}),l=`
+  `;
+  container.innerHTML = html;
+}
+function renderDayGrid(container, races = [], referenceDate = /* @__PURE__ */ new Date()) {
+  if (!container) return;
+  const dayObj = typeof referenceDate === "string" ? parseLocalDate(referenceDate) || /* @__PURE__ */ new Date() : referenceDate;
+  const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+  const dayNames = ["Domingo", "Lunes", "Martes", "Mi\xE9rcoles", "Jueves", "Viernes", "S\xE1bado"];
+  const headerText = `${dayNames[dayObj.getDay()]} ${dayObj.getDate()} de ${monthNames[dayObj.getMonth()]}, ${dayObj.getFullYear()}`;
+  const activeRaces = races.filter((race) => {
+    const dur = detectRaceDuration(race);
+    return dur.startDateObj && dur.endDateObj && dayObj >= dur.startDateObj && dayObj <= dur.endDateObj;
+  });
+  let html = `
     <div class="space-y-6 animate-fadeIn">
       <div class="flex items-center justify-between pb-2 border-b border-outline-variant/30">
         <h3 class="font-display font-black text-xl text-primary flex items-center gap-2">
           <span class="material-symbols-outlined text-secondary text-2xl">today</span>
-          ${s}
+          ${headerText}
         </h3>
         <span class="text-xs font-bold px-3 py-1 rounded-full bg-surface-container text-outline uppercase tracking-wider">
-          Vista Diaria (${r.length} evento${r.length===1?"":"s"})
+          Vista Diaria (${activeRaces.length} evento${activeRaces.length === 1 ? "" : "s"})
         </span>
       </div>
 
       <div class="space-y-4">
-        ${r.length===0?`
+        ${activeRaces.length === 0 ? `
           <div class="py-16 text-center bg-white rounded-3xl border border-dashed border-outline-variant/60 p-8 space-y-3">
             <span class="material-symbols-outlined text-4xl text-outline">event_busy</span>
             <h4 class="font-display font-bold text-lg text-primary">No hay eventos para este d\xEDa</h4>
             <p class="text-xs text-outline">Prueba seleccionando otra fecha o cambiando las disciplinas.</p>
           </div>
-        `:r.map(d=>{let m=G(d),g=de(d.discipline),h=St(d,a);return`
+        ` : activeRaces.map((race) => {
+    const dur = detectRaceDuration(race);
+    const badgeClass = getDisciplineBadgeClass(race.discipline);
+    const dayProgress = getRaceDayProgress(race, dayObj);
+    return `
             <article 
-              data-race-id="${d.id}" 
+              data-race-id="${race.id}" 
               class="cursor-pointer bg-white p-6 rounded-3xl border border-outline-variant/40 hover:border-primary shadow-sm hover:shadow-lg transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 group"
             >
               <div class="space-y-2 max-w-xl">
                 <div class="flex items-center gap-2 flex-wrap">
-                  <span class="px-2.5 py-1 rounded-lg text-xs font-bold ${g}">${d.discipline}</span>
-                  ${m.esMultiDia&&h?`
+                  <span class="px-2.5 py-1 rounded-lg text-xs font-bold ${badgeClass}">${race.discipline}</span>
+                  ${dur.esMultiDia && dayProgress ? `
                     <span class="px-3 py-1 rounded-full text-xs font-black bg-purple-100 text-purple-900 border border-purple-300 shadow-2xs flex items-center gap-1">
-                      <span class="material-symbols-outlined text-xs">flag</span> ${h}
+                      <span class="material-symbols-outlined text-xs">flag</span> ${dayProgress}
                     </span>
-                  `:`
+                  ` : `
                     <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-surface-container text-outline">Un solo d\xEDa</span>
                   `}
                 </div>
-                <h4 class="font-display font-black text-xl text-primary group-hover:text-secondary transition-colors">${d.name}</h4>
-                <p class="text-xs text-gray-600 line-clamp-2">${d.description}</p>
+                <h4 class="font-display font-black text-xl text-primary group-hover:text-secondary transition-colors">${race.name}</h4>
+                <p class="text-xs text-gray-600 line-clamp-2">${race.description}</p>
                 <div class="flex items-center gap-4 text-xs text-outline font-semibold">
-                  <span>\u{1F4CD} ${d.city}, ${d.region}</span>
-                  <span>\u{1F4CF} ${d.distance}</span>
+                  <span>\u{1F4CD} ${race.city}, ${race.region}</span>
+                  <span>\u{1F4CF} ${race.distance}</span>
                 </div>
               </div>
 
               <div class="sm:text-right shrink-0 space-y-2">
-                <span class="font-display font-black text-xl text-primary block">${qe(d.price,d.isFree)}</span>
+                <span class="font-display font-black text-xl text-primary block">${formatPrice(race.price, race.isFree)}</span>
                 <button type="button" class="px-4 py-2 rounded-xl bg-tertiary-fixed text-primary font-bold text-xs hover:brightness-105 shadow-sm inline-flex items-center gap-1">
                   Ver Detalles <span class="material-symbols-outlined text-sm">arrow_forward</span>
                 </button>
               </div>
             </article>
-          `}).join("")}
+          `;
+  }).join("")}
       </div>
     </div>
-  `;e.innerHTML=l}var Xt,Je=V(()=>{Ae();Xt=["Todas","Ruta","MTB","Gravel","Pista","BMX","Virtual"]});function J(e){if(typeof e!="string")return"";let t={"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"};return e.trim().replace(/[&<>"']/g,n=>t[n])}function Qt(e){if(!e||typeof e!="string")return!0;let t=e.trim();if(t==="")return!0;/^https?:\/\//i.test(t)||(t="https://"+t);try{let n=new URL(t);return n.protocol==="http:"||n.protocol==="https:"}catch{return!1}}function Ye(e){let t=e||{},n={},a={},i=J(t.name);a.name=i,(!i||i.length<3||i.length>100)&&(n.name="El nombre de la carrera debe tener entre 3 y 100 caracteres.");let o=typeof t.discipline=="string"?t.discipline.trim():"";a.discipline=o,Zt.includes(o)||(n.discipline="Debe seleccionar una disciplina v\xE1lida (Ruta, MTB, Gravel, Pista, BMX, Virtual).");let s=t.isMultiDay===!0||t.isMultiDay==="on"||t.isMultiDay==="true",r=typeof t.date=="string"?t.date.trim():"",l=s&&typeof t.startDate=="string"&&t.startDate.trim()!==""?t.startDate.trim():r,d=s&&typeof t.endDate=="string"&&t.endDate.trim()!==""?t.endDate.trim():l,m=/^\d{4}-\d{2}-\d{2}$/;a.date=l||r,a.startDate=l||r,a.endDate=d||l||r,!a.startDate||!m.test(a.startDate)||isNaN(Date.parse(a.startDate))?n.date="La fecha de inicio debe tener un formato v\xE1lido (AAAA-MM-DD).":s&&(!a.endDate||!m.test(a.endDate)||isNaN(Date.parse(a.endDate)))?n.endDate="La fecha de t\xE9rmino debe tener un formato v\xE1lido (AAAA-MM-DD).":s&&a.endDate<a.startDate&&(n.endDate="La fecha de t\xE9rmino no puede ser anterior a la fecha de inicio.");let g=J(t.region);a.region=g,g||(n.region="La regi\xF3n es obligatoria.");let h=J(t.organizador);a.organizador=h,(!h||h.length<2||h.length>100)&&(n.organizador="El organizador debe tener entre 2 y 100 caracteres.");let x=typeof t.registrationUrl=="string"?t.registrationUrl.trim():"";x&&!/^https?:\/\//i.test(x)&&(x="https://"+x),a.registrationUrl=x,Qt(x)||(n.registrationUrl="La URL de inscripci\xF3n debe ser una URL v\xE1lida (ej: https://ejemplo.cl).");let y=J(t.city);a.city=y,(!y||y.length<1||y.length>100)&&(n.city="La ciudad / comuna es obligatoria (m\xE1ximo 100 caracteres).");let E=J(t.distance);a.distance=E,(!E||E.length<1||E.length>30)&&(n.distance="La distancia es obligatoria (ej: 120 km) y no puede superar 30 caracteres.");let I=J(t.description);return a.description=I,(!I||I.length<10||I.length>2e3)&&(n.description="La descripci\xF3n es obligatoria (entre 10 y 2000 caracteres)."),a.elevation=J(t.elevation),a.price=J(t.price),a.heroImage=J(t.heroImage),{isValid:Object.keys(n).length===0,errors:n,sanitizedData:a}}var Zt,We=V(()=>{Zt=["Ruta","MTB","Gravel","Pista","BMX","Virtual"]});var ve={};Vt(ve,{ensureAdminElementsMounted:()=>ze,loadPendingRacesList:()=>Ke,openEditModal:()=>aa,openLoginModal:()=>ta,setAuthChangeCallback:()=>ea});function ea(e){ye=e}function ze(){if(!Mt){if(!document.getElementById("view-admin-panel")){let e=document.querySelector("main");if(e){let t=document.createElement("section");t.id="view-admin-panel",t.className="hidden space-y-8",t.innerHTML=`
+  `;
+  container.innerHTML = html;
+}
+var DISCIPLINES;
+var init_ui = __esm({
+  "js/ui.js"() {
+    init_storage();
+    init_calendar_export();
+    DISCIPLINES = ["Todas", "Ruta", "MTB", "Gravel", "Pista", "BMX", "Virtual"];
+  }
+});
+
+// js/validation.js
+function sanitizeHTML(str) {
+  if (typeof str !== "string") return "";
+  const map = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  };
+  return str.trim().replace(/[&<>"']/g, (match) => map[match]);
+}
+function isValidURL(urlStr) {
+  if (!urlStr || typeof urlStr !== "string") return true;
+  let trimmed = urlStr.trim();
+  if (trimmed === "") return true;
+  if (!/^https?:\/\//i.test(trimmed)) {
+    trimmed = "https://" + trimmed;
+  }
+  try {
+    const parsed = new URL(trimmed);
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+function validateRaceForm(data) {
+  const raw = data || {};
+  const errors = {};
+  const sanitizedData = {};
+  const name = sanitizeHTML(raw.name);
+  sanitizedData.name = name;
+  if (!name || name.length < 3 || name.length > 100) {
+    errors.name = "El nombre de la carrera debe tener entre 3 y 100 caracteres.";
+  }
+  const discipline = typeof raw.discipline === "string" ? raw.discipline.trim() : "";
+  sanitizedData.discipline = discipline;
+  if (!VALID_DISCIPLINES.includes(discipline)) {
+    errors.discipline = "Debe seleccionar una disciplina v\xE1lida (Ruta, MTB, Gravel, Pista, BMX, Virtual).";
+  }
+  const isMultiDay = raw.isMultiDay === true || raw.isMultiDay === "on" || raw.isMultiDay === "true";
+  const dateStr = typeof raw.date === "string" ? raw.date.trim() : "";
+  const startDateStr = isMultiDay && typeof raw.startDate === "string" && raw.startDate.trim() !== "" ? raw.startDate.trim() : dateStr;
+  const endDateStr = isMultiDay && typeof raw.endDate === "string" && raw.endDate.trim() !== "" ? raw.endDate.trim() : startDateStr;
+  const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+  sanitizedData.date = startDateStr || dateStr;
+  sanitizedData.startDate = startDateStr || dateStr;
+  sanitizedData.endDate = endDateStr || startDateStr || dateStr;
+  if (!sanitizedData.startDate || !dateRegex.test(sanitizedData.startDate) || isNaN(Date.parse(sanitizedData.startDate))) {
+    errors.date = "La fecha de inicio debe tener un formato v\xE1lido (AAAA-MM-DD).";
+  } else if (isMultiDay && (!sanitizedData.endDate || !dateRegex.test(sanitizedData.endDate) || isNaN(Date.parse(sanitizedData.endDate)))) {
+    errors.endDate = "La fecha de t\xE9rmino debe tener un formato v\xE1lido (AAAA-MM-DD).";
+  } else if (isMultiDay && sanitizedData.endDate < sanitizedData.startDate) {
+    errors.endDate = "La fecha de t\xE9rmino no puede ser anterior a la fecha de inicio.";
+  }
+  const region = sanitizeHTML(raw.region);
+  sanitizedData.region = region;
+  if (!region) {
+    errors.region = "La regi\xF3n es obligatoria.";
+  }
+  const organizador = sanitizeHTML(raw.organizador);
+  sanitizedData.organizador = organizador;
+  if (!organizador || organizador.length < 2 || organizador.length > 100) {
+    errors.organizador = "El organizador debe tener entre 2 y 100 caracteres.";
+  }
+  let registrationUrl = typeof raw.registrationUrl === "string" ? raw.registrationUrl.trim() : "";
+  if (registrationUrl && !/^https?:\/\//i.test(registrationUrl)) {
+    registrationUrl = "https://" + registrationUrl;
+  }
+  sanitizedData.registrationUrl = registrationUrl;
+  if (!isValidURL(registrationUrl)) {
+    errors.registrationUrl = "La URL de inscripci\xF3n debe ser una URL v\xE1lida (ej: https://ejemplo.cl).";
+  }
+  const city = sanitizeHTML(raw.city);
+  sanitizedData.city = city;
+  if (!city || city.length < 1 || city.length > 100) {
+    errors.city = "La ciudad / comuna es obligatoria (m\xE1ximo 100 caracteres).";
+  }
+  const distance = sanitizeHTML(raw.distance);
+  sanitizedData.distance = distance;
+  if (!distance || distance.length < 1 || distance.length > 30) {
+    errors.distance = "La distancia es obligatoria (ej: 120 km) y no puede superar 30 caracteres.";
+  }
+  const description = sanitizeHTML(raw.description);
+  sanitizedData.description = description;
+  if (!description || description.length < 10 || description.length > 2e3) {
+    errors.description = "La descripci\xF3n es obligatoria (entre 10 y 2000 caracteres).";
+  }
+  sanitizedData.elevation = sanitizeHTML(raw.elevation);
+  sanitizedData.price = sanitizeHTML(raw.price);
+  sanitizedData.heroImage = sanitizeHTML(raw.heroImage);
+  return {
+    isValid: Object.keys(errors).length === 0,
+    errors,
+    sanitizedData
+  };
+}
+var VALID_DISCIPLINES;
+var init_validation = __esm({
+  "js/validation.js"() {
+    VALID_DISCIPLINES = ["Ruta", "MTB", "Gravel", "Pista", "BMX", "Virtual"];
+  }
+});
+
+// js/admin.js
+var admin_exports = {};
+__export(admin_exports, {
+  ensureAdminElementsMounted: () => ensureAdminElementsMounted,
+  loadPendingRacesList: () => loadPendingRacesList,
+  openEditModal: () => openEditModal,
+  openLoginModal: () => openLoginModal,
+  setAuthChangeCallback: () => setAuthChangeCallback
+});
+function setAuthChangeCallback(cb) {
+  onAuthChangeCallback = cb;
+}
+function ensureAdminElementsMounted() {
+  if (isMounted) return;
+  if (!document.getElementById("view-admin-panel")) {
+    const main = document.querySelector("main");
+    if (main) {
+      const adminSection = document.createElement("section");
+      adminSection.id = "view-admin-panel";
+      adminSection.className = "hidden space-y-8";
+      adminSection.innerHTML = `
         <div class="flex items-center justify-between border-b border-outline-variant/30 pb-4">
           <div>
             <h1 class="text-2xl sm:text-3xl font-display font-black text-primary flex items-center gap-2">
@@ -636,7 +1964,15 @@ ${m.descripcion}`:x);let y=await n.from("carreras").insert([m]);l=y.data,d=y.err
             <!-- Pending race items populated dynamically -->
           </div>
         </div>
-      `,e.appendChild(t)}}if(!document.getElementById("login-modal")){let e=document.createElement("div");e.id="login-modal",e.className="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn",e.innerHTML=`
+      `;
+      main.appendChild(adminSection);
+    }
+  }
+  if (!document.getElementById("login-modal")) {
+    const loginDiv = document.createElement("div");
+    loginDiv.id = "login-modal";
+    loginDiv.className = "hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn";
+    loginDiv.innerHTML = `
       <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full border border-outline-variant/40 shadow-2xl relative space-y-6">
         <button id="btn-close-login" class="absolute top-4 right-4 text-outline hover:text-primary transition-colors p-1 rounded-lg hover:bg-surface-container">
           <span class="material-symbols-outlined text-2xl">close</span>
@@ -669,7 +2005,14 @@ ${m.descripcion}`:x);let y=await n.from("carreras").insert([m]);l=y.data,d=y.err
           </button>
         </form>
       </div>
-    `,document.body.appendChild(e)}if(!document.getElementById("edit-modal")){let e=document.createElement("div");e.id="edit-modal",e.className="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto",e.innerHTML=`
+    `;
+    document.body.appendChild(loginDiv);
+  }
+  if (!document.getElementById("edit-modal")) {
+    const editDiv = document.createElement("div");
+    editDiv.id = "edit-modal";
+    editDiv.className = "hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto";
+    editDiv.innerHTML = `
       <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-3xl w-full border border-outline-variant/40 shadow-2xl my-8 relative space-y-6 max-h-[90vh] overflow-y-auto">
         <button id="btn-close-edit" class="absolute top-4 right-4 text-outline hover:text-primary transition-colors p-1 rounded-lg hover:bg-surface-container">
           <span class="material-symbols-outlined text-2xl">close</span>
@@ -876,18 +2219,334 @@ ${m.descripcion}`:x);let y=await n.from("carreras").insert([m]);l=y.data,d=y.err
           </div>
         </form>
       </div>
-    `,document.body.appendChild(e);let t=document.getElementById("edit-form-region");t&&K&&(t.innerHTML=K.filter(n=>n!=="Todas las regiones").map(n=>`<option value="${n}">${n}</option>`).join(""))}Mt=!0,ra()}}function ta(){ze();let e=document.getElementById("login-modal"),t=document.getElementById("login-error-container");t&&t.classList.add("hidden"),document.getElementById("login-form")?.reset(),e&&e.classList.remove("hidden")}function aa(e){if(!e)return;ze();let t=document.getElementById("edit-modal");document.getElementById("edit-race-id").value=e.id||"",document.getElementById("edit-form-name").value=e.name||"",document.getElementById("edit-form-discipline").value=e.discipline||"Ruta";let n=!!e.endDate&&e.endDate!==e.date,a=document.getElementById("edit-form-is-multiday");a&&(a.checked=n,na(n)),n?(document.getElementById("edit-form-start-date").value=e.date||e.startDate||"",document.getElementById("edit-form-end-date").value=e.endDate||""):document.getElementById("edit-form-date").value=e.date||"",document.getElementById("edit-form-region").value=e.region||K[0],document.getElementById("edit-form-city").value=e.city||"",document.getElementById("edit-form-distance").value=e.distance||"",document.getElementById("edit-form-elevation").value=e.elevation||"",document.getElementById("edit-form-price").value=e.price||0,document.getElementById("edit-form-is-free").checked=!!e.isFree,document.getElementById("edit-form-status").value=e.status||"Inscripciones Abiertas",document.getElementById("edit-form-organizer").value=e.organizer||e.organizador||"",document.getElementById("edit-form-url").value=e.registrationUrl||"",document.getElementById("edit-form-image").value=e.heroImage||"",document.getElementById("edit-form-categories").value=Array.isArray(e.categories)?e.categories.join(", "):e.categories||"",document.getElementById("edit-form-description").value=e.description||"",t&&t.classList.remove("hidden")}function na(e){let t=document.getElementById("edit-form-single-date-container"),n=document.getElementById("edit-form-start-date-container"),a=document.getElementById("edit-form-end-date-container");e?(t&&t.classList.add("hidden"),n&&n.classList.remove("hidden"),a&&a.classList.remove("hidden")):(t&&t.classList.remove("hidden"),n&&n.classList.add("hidden"),a&&a.classList.add("hidden"))}async function Ke(){ze();let e=document.getElementById("pending-races-list"),t=document.getElementById("pending-count");if(!e)return;let n=await ke();if(n&&n.success){let a=Array.isArray(n.data)?n.data:[];t&&(t.textContent=a.length),Ne(e,a),ia()}else{t&&(t.textContent="0");let a=n&&n.error?n.error.message||String(n.error):"Error al conectar con la base de datos.";e.innerHTML=`<p class="col-span-full text-center text-red-500 font-bold">Error al cargar propuestas: ${a}</p>`}}function ia(){let e=document.getElementById("pending-races-list");e&&(e.querySelectorAll(".btn-approve-race, [data-approve-id]").forEach(t=>{t.addEventListener("click",async n=>{let a=t.getAttribute("data-id")||t.getAttribute("data-approve-id")||t.dataset.id;if(!a)return;t.disabled=!0,t.textContent="Aprobando...";let i=await se(a,"aprobada");if(i.success)B("\u2705 Carrera aprobada con \xE9xito. Ahora es visible en el calendario p\xFAblico."),await Ke();else{let o=i.error?.message||(typeof i.error=="string"?i.error:JSON.stringify(i.error));alert("Error al aprobar la carrera: "+o),t.disabled=!1,t.textContent="Aprobar"}})}),e.querySelectorAll(".btn-reject-race, [data-reject-id]").forEach(t=>{t.addEventListener("click",async n=>{let a=t.getAttribute("data-id")||t.getAttribute("data-reject-id")||t.dataset.id;if(!a||!confirm("\xBFEst\xE1s seguro de que deseas rechazar esta propuesta?"))return;t.disabled=!0,t.textContent="Rechazando...";let i=await se(a,"rechazada");if(i.success)B("\u{1F6AB} Carrera rechazada."),await Ke();else{let o=i.error?.message||(typeof i.error=="string"?i.error:JSON.stringify(i.error));alert("Error al rechazar la carrera: "+o),t.disabled=!1,t.textContent="Rechazar"}})}))}function ra(){let e=document.getElementById("btn-close-login");e&&e.addEventListener("click",()=>{document.getElementById("login-modal")?.classList.add("hidden")});let t=document.getElementById("login-form");t&&t.addEventListener("submit",async a=>{a.preventDefault();let i=document.getElementById("login-email")?.value||"",o=document.getElementById("login-password")?.value||"",s=document.getElementById("btn-submit-login"),r=document.getElementById("login-error-container"),l=document.getElementById("login-error-msg");s&&(s.disabled=!0,s.classList.add("opacity-50"));let d=await yt(i,o);d.success&&d.user?await ge(d.user.id)?(Rt=!0,typeof ye=="function"&&ye(!0),document.getElementById("login-modal")?.classList.add("hidden"),B("\u{1F513} \xA1Sesi\xF3n iniciada con \xE9xito! Has ingresado como Administrador del sistema.")):(await fe(),Rt=!1,typeof ye=="function"&&ye(!1),r&&l&&(l.textContent="Acceso denegado: El usuario no es administrador.",r.classList.remove("hidden"))):r&&l&&(l.textContent=d.error||"Credenciales incorrectas o problema de conexi\xF3n.",r.classList.remove("hidden")),s&&(s.disabled=!1,s.classList.remove("opacity-50"))});let n=document.getElementById("btn-close-edit");n&&n.addEventListener("click",()=>{document.getElementById("edit-modal")?.classList.add("hidden")})}var Mt,Rt,ye,he=V(()=>{Ce();Le();Ae();Je();Tt();We();Mt=!1,Rt=!1,ye=null});function ue(e){e&&(e.querySelectorAll(".field-error-msg").forEach(t=>t.remove()),e.querySelectorAll("input, select, textarea").forEach(t=>{t.classList.remove("border-secondary","ring-1","ring-secondary")}))}function Nt(e,t){if(ue(e),!e||!t)return;let n=e.querySelector('[name="isMultiDay"]')?.checked||!1,a={name:"name",discipline:"discipline",date:n?"startDate":"date",startDate:"startDate",endDate:"endDate",region:"region",organizador:"organizer",organizer:"organizer",registrationUrl:"registrationUrl",city:"city",distance:"distance",description:"description"};for(let[i,o]of Object.entries(t)){let s=a[i]||i,r=e.querySelector(`[name="${s}"]`)||e.querySelector(`#form-${s}`)||e.querySelector(`#edit-form-${s}`);if(n&&(i==="date"||i==="startDate")&&(r=e.querySelector('[name="startDate"]')||e.querySelector("#form-start-date")||e.querySelector("#edit-form-start-date")||r),r){r.classList.add("border-secondary","ring-1","ring-secondary");let l=document.createElement("p");l.className="field-error-msg text-secondary text-xs font-semibold mt-1 flex items-center gap-1",l.innerHTML=`<span class="material-symbols-outlined text-sm">error</span> ${o}`;let d=r.closest(".space-y-2")||r.parentNode;d&&d.appendChild(l)}}}function B(e){let t=document.getElementById("toast-notification");t&&t.remove();let n=document.createElement("div");n.id="toast-notification",n.className="fixed bottom-6 right-6 z-50 max-w-lg bg-primary text-white p-5 rounded-2xl shadow-2xl border border-tertiary-fixed/50 flex items-start gap-4 transition-all duration-300 transform translate-y-0",n.innerHTML=`
+    `;
+    document.body.appendChild(editDiv);
+    const editRegionSelect = document.getElementById("edit-form-region");
+    if (editRegionSelect && REGIONS_CHILE) {
+      editRegionSelect.innerHTML = REGIONS_CHILE.filter((r) => r !== "Todas las regiones").map((r) => `<option value="${r}">${r}</option>`).join("");
+    }
+  }
+  isMounted = true;
+  bindAdminEvents();
+}
+function openLoginModal() {
+  ensureAdminElementsMounted();
+  const loginModal = document.getElementById("login-modal");
+  const errorContainer = document.getElementById("login-error-container");
+  if (errorContainer) errorContainer.classList.add("hidden");
+  document.getElementById("login-form")?.reset();
+  if (loginModal) loginModal.classList.remove("hidden");
+}
+function openEditModal(race) {
+  if (!race) return;
+  ensureAdminElementsMounted();
+  const editModal = document.getElementById("edit-modal");
+  document.getElementById("edit-race-id").value = race.id || "";
+  document.getElementById("edit-form-name").value = race.name || "";
+  document.getElementById("edit-form-discipline").value = race.discipline || "Ruta";
+  const isMultiDay = !!race.endDate && race.endDate !== race.date;
+  const isMultiCheckbox = document.getElementById("edit-form-is-multiday");
+  if (isMultiCheckbox) {
+    isMultiCheckbox.checked = isMultiDay;
+    toggleEditMultiDay(isMultiDay);
+  }
+  if (isMultiDay) {
+    document.getElementById("edit-form-start-date").value = race.date || race.startDate || "";
+    document.getElementById("edit-form-end-date").value = race.endDate || "";
+  } else {
+    document.getElementById("edit-form-date").value = race.date || "";
+  }
+  document.getElementById("edit-form-region").value = race.region || REGIONS_CHILE[0];
+  document.getElementById("edit-form-city").value = race.city || "";
+  document.getElementById("edit-form-distance").value = race.distance || "";
+  document.getElementById("edit-form-elevation").value = race.elevation || "";
+  document.getElementById("edit-form-price").value = race.price || 0;
+  document.getElementById("edit-form-is-free").checked = !!race.isFree;
+  document.getElementById("edit-form-status").value = race.status || "Inscripciones Abiertas";
+  document.getElementById("edit-form-organizer").value = race.organizer || race.organizador || "";
+  document.getElementById("edit-form-url").value = race.registrationUrl || "";
+  document.getElementById("edit-form-image").value = race.heroImage || "";
+  document.getElementById("edit-form-categories").value = Array.isArray(race.categories) ? race.categories.join(", ") : race.categories || "";
+  document.getElementById("edit-form-description").value = race.description || "";
+  if (editModal) editModal.classList.remove("hidden");
+}
+function toggleEditMultiDay(show) {
+  const singleContainer = document.getElementById("edit-form-single-date-container");
+  const startContainer = document.getElementById("edit-form-start-date-container");
+  const endContainer = document.getElementById("edit-form-end-date-container");
+  if (show) {
+    if (singleContainer) singleContainer.classList.add("hidden");
+    if (startContainer) startContainer.classList.remove("hidden");
+    if (endContainer) endContainer.classList.remove("hidden");
+  } else {
+    if (singleContainer) singleContainer.classList.remove("hidden");
+    if (startContainer) startContainer.classList.add("hidden");
+    if (endContainer) endContainer.classList.add("hidden");
+  }
+}
+async function loadPendingRacesList() {
+  ensureAdminElementsMounted();
+  const container = document.getElementById("pending-races-list");
+  const countEl = document.getElementById("pending-count");
+  if (!container) return;
+  const res = await fetchPendingRacesSupabase();
+  if (res && res.success) {
+    const pendingList = Array.isArray(res.data) ? res.data : [];
+    if (countEl) countEl.textContent = pendingList.length;
+    renderPendingRaces(container, pendingList);
+    bindPendingRaceActionEvents();
+  } else {
+    if (countEl) countEl.textContent = "0";
+    const errorMsg = res && res.error ? res.error.message || String(res.error) : "Error al conectar con la base de datos.";
+    container.innerHTML = `<p class="col-span-full text-center text-red-500 font-bold">Error al cargar propuestas: ${errorMsg}</p>`;
+  }
+}
+function bindPendingRaceActionEvents() {
+  const container = document.getElementById("pending-races-list");
+  if (!container) return;
+  container.querySelectorAll(".btn-approve-race, [data-approve-id]").forEach((btn) => {
+    btn.addEventListener("click", async (e) => {
+      const raceId = btn.getAttribute("data-id") || btn.getAttribute("data-approve-id") || btn.dataset.id;
+      if (!raceId) return;
+      btn.disabled = true;
+      btn.textContent = "Aprobando...";
+      const res = await updateRaceStatusSupabase(raceId, "aprobada");
+      if (res.success) {
+        showNotificationToast("\u2705 Carrera aprobada con \xE9xito. Ahora es visible en el calendario p\xFAblico.");
+        await loadPendingRacesList();
+      } else {
+        const errorMsg = res.error?.message || (typeof res.error === "string" ? res.error : JSON.stringify(res.error));
+        alert("Error al aprobar la carrera: " + errorMsg);
+        btn.disabled = false;
+        btn.textContent = "Aprobar";
+      }
+    });
+  });
+  container.querySelectorAll(".btn-reject-race, [data-reject-id]").forEach((btn) => {
+    btn.addEventListener("click", async (e) => {
+      const raceId = btn.getAttribute("data-id") || btn.getAttribute("data-reject-id") || btn.dataset.id;
+      if (!raceId) return;
+      if (!confirm("\xBFEst\xE1s seguro de que deseas rechazar esta propuesta?")) return;
+      btn.disabled = true;
+      btn.textContent = "Rechazando...";
+      const res = await updateRaceStatusSupabase(raceId, "rechazada");
+      if (res.success) {
+        showNotificationToast("\u{1F6AB} Carrera rechazada.");
+        await loadPendingRacesList();
+      } else {
+        const errorMsg = res.error?.message || (typeof res.error === "string" ? res.error : JSON.stringify(res.error));
+        alert("Error al rechazar la carrera: " + errorMsg);
+        btn.disabled = false;
+        btn.textContent = "Rechazar";
+      }
+    });
+  });
+}
+function bindAdminEvents() {
+  const closeLoginBtn = document.getElementById("btn-close-login");
+  if (closeLoginBtn) {
+    closeLoginBtn.addEventListener("click", () => {
+      document.getElementById("login-modal")?.classList.add("hidden");
+    });
+  }
+  const loginForm = document.getElementById("login-form");
+  if (loginForm) {
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("login-email")?.value || "";
+      const password = document.getElementById("login-password")?.value || "";
+      const submitBtn = document.getElementById("btn-submit-login");
+      const errorContainer = document.getElementById("login-error-container");
+      const errorMsgEl = document.getElementById("login-error-msg");
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.classList.add("opacity-50");
+      }
+      const res = await loginAdmin(email, password);
+      if (res.success && res.user) {
+        const checkAdmin = await checkIsAdmin(res.user.id);
+        if (checkAdmin) {
+          isAdminState = true;
+          if (typeof onAuthChangeCallback === "function") onAuthChangeCallback(true);
+          document.getElementById("login-modal")?.classList.add("hidden");
+          showNotificationToast("\u{1F513} \xA1Sesi\xF3n iniciada con \xE9xito! Has ingresado como Administrador del sistema.");
+        } else {
+          await logoutAdmin();
+          isAdminState = false;
+          if (typeof onAuthChangeCallback === "function") onAuthChangeCallback(false);
+          if (errorContainer && errorMsgEl) {
+            errorMsgEl.textContent = "Acceso denegado: El usuario no es administrador.";
+            errorContainer.classList.remove("hidden");
+          }
+        }
+      } else {
+        if (errorContainer && errorMsgEl) {
+          errorMsgEl.textContent = res.error || "Credenciales incorrectas o problema de conexi\xF3n.";
+          errorContainer.classList.remove("hidden");
+        }
+      }
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove("opacity-50");
+      }
+    });
+  }
+  const closeEditBtn = document.getElementById("btn-close-edit");
+  if (closeEditBtn) {
+    closeEditBtn.addEventListener("click", () => {
+      document.getElementById("edit-modal")?.classList.add("hidden");
+    });
+  }
+}
+var isMounted, isAdminState, onAuthChangeCallback;
+var init_admin = __esm({
+  "js/admin.js"() {
+    init_supabase();
+    init_data();
+    init_storage();
+    init_ui();
+    init_app();
+    init_validation();
+    isMounted = false;
+    isAdminState = false;
+    onAuthChangeCallback = null;
+  }
+});
+
+// js/app.js
+function clearFormErrors(form) {
+  if (!form) return;
+  form.querySelectorAll(".field-error-msg").forEach((el) => el.remove());
+  form.querySelectorAll("input, select, textarea").forEach((input) => {
+    input.classList.remove("border-secondary", "ring-1", "ring-secondary");
+  });
+}
+function renderFormErrors(form, errors) {
+  clearFormErrors(form);
+  if (!form || !errors) return;
+  const isMultiDay = form.querySelector('[name="isMultiDay"]')?.checked || false;
+  const fieldMap = {
+    name: "name",
+    discipline: "discipline",
+    date: isMultiDay ? "startDate" : "date",
+    startDate: "startDate",
+    endDate: "endDate",
+    region: "region",
+    organizador: "organizer",
+    organizer: "organizer",
+    registrationUrl: "registrationUrl",
+    city: "city",
+    distance: "distance",
+    description: "description"
+  };
+  for (const [key, errorMsg] of Object.entries(errors)) {
+    let fieldName = fieldMap[key] || key;
+    let inputElem = form.querySelector(`[name="${fieldName}"]`) || form.querySelector(`#form-${fieldName}`) || form.querySelector(`#edit-form-${fieldName}`);
+    if (isMultiDay && (key === "date" || key === "startDate")) {
+      inputElem = form.querySelector('[name="startDate"]') || form.querySelector("#form-start-date") || form.querySelector("#edit-form-start-date") || inputElem;
+    }
+    if (inputElem) {
+      inputElem.classList.add("border-secondary", "ring-1", "ring-secondary");
+      const errEl = document.createElement("p");
+      errEl.className = "field-error-msg text-secondary text-xs font-semibold mt-1 flex items-center gap-1";
+      errEl.innerHTML = `<span class="material-symbols-outlined text-sm">error</span> ${errorMsg}`;
+      const parent = inputElem.closest(".space-y-2") || inputElem.parentNode;
+      if (parent) {
+        parent.appendChild(errEl);
+      }
+    }
+  }
+}
+function showNotificationToast(message) {
+  const existing = document.getElementById("toast-notification");
+  if (existing) existing.remove();
+  const toast = document.createElement("div");
+  toast.id = "toast-notification";
+  toast.className = "fixed bottom-6 right-6 z-50 max-w-lg bg-primary text-white p-5 rounded-2xl shadow-2xl border border-tertiary-fixed/50 flex items-start gap-4 transition-all duration-300 transform translate-y-0";
+  toast.innerHTML = `
     <div class="w-10 h-10 rounded-xl bg-tertiary-fixed text-primary flex items-center justify-center flex-shrink-0 font-bold shadow-md">
       <span class="material-symbols-outlined text-2xl">published_with_changes</span>
     </div>
     <div class="flex-grow text-sm space-y-1">
       <h4 class="font-display font-bold text-tertiary-fixed text-base">Notificaci\xF3n del Sistema</h4>
-      <p class="text-gray-200 leading-relaxed font-medium">${e}</p>
+      <p class="text-gray-200 leading-relaxed font-medium">${message}</p>
     </div>
     <button type="button" id="close-toast-btn" aria-label="Cerrar notificaci\xF3n" class="text-gray-400 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/10">
       <span class="material-symbols-outlined text-xl">close</span>
     </button>
-  `,document.body.appendChild(n);let a=n.querySelector("#close-toast-btn");a&&a.addEventListener("click",()=>{n.remove()}),setTimeout(()=>{document.body.contains(n)&&(n.classList.add("opacity-0","translate-y-2"),setTimeout(()=>{document.body.contains(n)&&n.remove()},300))},9e3)}async function sa(){let e=await q(),t=oe(),n=e.filter(a=>{let i=Me(a);if(!Ot&&i.esFinalizada||(ne==="my-calendar"||ne==="agenda")&&!t.includes(a.id)||Z&&Z!=="Todas"&&a.discipline!==Z||we&&we!=="Todas las regiones"&&a.region!==we)return!1;if(ae&&ae!=="Todos"){let o=a.monthYear||"";if(!o&&a.date){let l=new Date(a.date+"T00:00:00");o=`${["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"][l.getMonth()]} ${l.getFullYear()}`}let s=o===ae,r=ae.split(" ").length===1&&o.startsWith(ae);if(!s&&!r)return!1}if(Xe.trim()!==""){let o=Xe.toLowerCase().trim(),s=a.name?a.name.toLowerCase().includes(o):!1,r=a.city?a.city.toLowerCase().includes(o):!1,l=a.organizer||a.organizador?(a.organizer||a.organizador).toLowerCase().includes(o):!1,d=a.description?a.description.toLowerCase().includes(o):!1;if(!s&&!r&&!l&&!d)return!1}return!0});return n.sort((a,i)=>a.date?i.date?new Date(a.date)-new Date(i.date):-1:1),n}function oa(e,t=3){if(!e)return;let n="";for(let a=0;a<t;a++)n+=`
+  `;
+  document.body.appendChild(toast);
+  const closeBtn = toast.querySelector("#close-toast-btn");
+  if (closeBtn) {
+    closeBtn.addEventListener("click", () => {
+      toast.remove();
+    });
+  }
+  setTimeout(() => {
+    if (document.body.contains(toast)) {
+      toast.classList.add("opacity-0", "translate-y-2");
+      setTimeout(() => {
+        if (document.body.contains(toast)) toast.remove();
+      }, 300);
+    }
+  }, 9e3);
+}
+async function getFilteredRaces() {
+  const races = await getAllRaces();
+  const bookmarkedIds = getBookmarkedIds();
+  const filteredList = races.filter((race) => {
+    if (activeTab === "my-calendar" || activeTab === "agenda") {
+      if (!bookmarkedIds.includes(race.id)) {
+        return false;
+      }
+    }
+    if (currentDiscipline && currentDiscipline !== "Todas") {
+      if (race.discipline !== currentDiscipline) {
+        return false;
+      }
+    }
+    if (currentRegion && currentRegion !== "Todas las regiones") {
+      if (race.region !== currentRegion) {
+        return false;
+      }
+    }
+    if (currentMonth && currentMonth !== "Todos") {
+      let raceMonthYear = race.monthYear || "";
+      if (!raceMonthYear && race.date) {
+        const dateObj = /* @__PURE__ */ new Date(race.date + "T00:00:00");
+        const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+        raceMonthYear = `${months[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
+      }
+      const matchMonthYear = raceMonthYear === currentMonth;
+      const matchMonthOnly = currentMonth.split(" ").length === 1 && raceMonthYear.startsWith(currentMonth);
+      if (!matchMonthYear && !matchMonthOnly) {
+        return false;
+      }
+    }
+    if (searchQuery.trim() !== "") {
+      const q = searchQuery.toLowerCase().trim();
+      const matchName = race.name ? race.name.toLowerCase().includes(q) : false;
+      const matchCity = race.city ? race.city.toLowerCase().includes(q) : false;
+      const matchOrganizer = race.organizer || race.organizador ? (race.organizer || race.organizador).toLowerCase().includes(q) : false;
+      const matchDescription = race.description ? race.description.toLowerCase().includes(q) : false;
+      if (!matchName && !matchCity && !matchOrganizer && !matchDescription) {
+        return false;
+      }
+    }
+    return true;
+  });
+  filteredList.sort((a, b) => {
+    if (!a.date) return 1;
+    if (!b.date) return -1;
+    return new Date(a.date) - new Date(b.date);
+  });
+  return filteredList;
+}
+function renderSkeletons(container, count = 3) {
+  if (!container) return;
+  let html = "";
+  for (let i = 0; i < count; i++) {
+    html += `
       <div class="bg-surface border border-outline-variant/30 rounded-3xl overflow-hidden shadow-sm animate-pulse">
         <div class="h-48 bg-surface-container-high w-full"></div>
         <div class="p-6 space-y-4">
@@ -900,26 +2559,982 @@ ${m.descripcion}`:x);let y=await n.from("carreras").insert([m]);l=y.data,d=y.err
           </div>
         </div>
       </div>
-    `;e.innerHTML=`<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">${n}</div>`}async function M(){let e=document.getElementById("races-container");(ce==="cards"||!ce)&&e&&(e.classList.remove("hidden"),oa(e,3));let t=await sa(),n=document.getElementById("month-grid-container"),a=document.getElementById("week-grid-container"),i=document.getElementById("day-grid-container");e&&e.classList.add("hidden"),n&&n.classList.add("hidden"),a&&a.classList.add("hidden"),i&&i.classList.add("hidden"),ce==="month"?n&&(n.classList.remove("hidden"),Ct(n,t,ae)):ce==="week"?a&&(a.classList.remove("hidden"),$t(a,t)):ce==="day"?i&&(i.classList.remove("hidden"),At(i,t)):e&&(e.classList.remove("hidden"),kt(e,t,T,z));let o=document.getElementById("races-count");o&&(o.textContent=`${t.length} carrera${t.length===1?"":"s"}`);let s=document.getElementById("agenda-badge"),r=oe().length;s&&(s.textContent=r,r>0?s.classList.remove("hidden"):s.classList.add("hidden"));let l=document.getElementById("calendar-title");l&&(ne==="my-calendar"||ne==="agenda"?l.textContent="Mi Agenda de Carreras Guardadas":l.textContent="Pr\xF3ximas Carreras")}function la(){let e=(t,n,a,i,o,s)=>{let r=document.getElementById(t),l=document.getElementById(n),d=document.getElementById(a),m=document.getElementById(i),g=document.getElementById(o),h=document.getElementById(s);if(!r||!l||!d)return;r.addEventListener("click",()=>l.click()),["dragenter","dragover"].forEach(y=>{r.addEventListener(y,E=>{E.preventDefault(),r.classList.add("border-primary","bg-primary/5")},!1)}),["dragleave","drop"].forEach(y=>{r.addEventListener(y,E=>{E.preventDefault(),r.classList.remove("border-primary","bg-primary/5")},!1)}),r.addEventListener("drop",y=>{let I=y.dataTransfer.files;I&&I.length>0&&x(I[0])}),l.addEventListener("change",y=>{y.target.files&&y.target.files.length>0&&x(y.target.files[0])}),d.addEventListener("input",y=>{let E=y.target.value.trim();E?(g&&(g.src=E),m&&m.classList.remove("hidden")):m&&m.classList.add("hidden")}),h&&h.addEventListener("click",y=>{y.preventDefault(),y.stopPropagation(),l.value="",d.value="",m&&m.classList.add("hidden"),g&&(g.src="")});async function x(y){if(!y.type.startsWith("image/")){B("\u26A0\uFE0F Por favor selecciona un archivo de imagen v\xE1lido.");return}let E=r.innerHTML;r.innerHTML=`
+    `;
+  }
+  container.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">${html}</div>`;
+}
+async function updateCalendar() {
+  const cardsContainer = document.getElementById("races-container");
+  if (activeViewMode === "cards" || !activeViewMode) {
+    if (cardsContainer) {
+      cardsContainer.classList.remove("hidden");
+      renderSkeletons(cardsContainer, 3);
+    }
+  }
+  const filteredRaces = await getFilteredRaces();
+  const monthContainer = document.getElementById("month-grid-container");
+  const weekContainer = document.getElementById("week-grid-container");
+  const dayContainer = document.getElementById("day-grid-container");
+  if (cardsContainer) cardsContainer.classList.add("hidden");
+  if (monthContainer) monthContainer.classList.add("hidden");
+  if (weekContainer) weekContainer.classList.add("hidden");
+  if (dayContainer) dayContainer.classList.add("hidden");
+  if (activeViewMode === "month") {
+    if (monthContainer) {
+      monthContainer.classList.remove("hidden");
+      renderMonthGrid(monthContainer, filteredRaces, currentMonth);
+    }
+  } else if (activeViewMode === "week") {
+    if (weekContainer) {
+      weekContainer.classList.remove("hidden");
+      renderWeekGrid(weekContainer, filteredRaces);
+    }
+  } else if (activeViewMode === "day") {
+    if (dayContainer) {
+      dayContainer.classList.remove("hidden");
+      renderDayGrid(dayContainer, filteredRaces);
+    }
+  } else {
+    if (cardsContainer) {
+      cardsContainer.classList.remove("hidden");
+      renderRaceCards(cardsContainer, filteredRaces, isAdmin);
+    }
+  }
+  const countElem = document.getElementById("races-count");
+  if (countElem) {
+    countElem.textContent = `${filteredRaces.length} carrera${filteredRaces.length === 1 ? "" : "s"}`;
+  }
+  const agendaBadge = document.getElementById("agenda-badge");
+  const bookmarkedCount = getBookmarkedIds().length;
+  if (agendaBadge) {
+    agendaBadge.textContent = bookmarkedCount;
+    if (bookmarkedCount > 0) {
+      agendaBadge.classList.remove("hidden");
+    } else {
+      agendaBadge.classList.add("hidden");
+    }
+  }
+  const calendarTitle = document.getElementById("calendar-title");
+  if (calendarTitle) {
+    if (activeTab === "my-calendar" || activeTab === "agenda") {
+      calendarTitle.textContent = "Mi Agenda de Carreras Guardadas";
+    } else {
+      calendarTitle.textContent = "Pr\xF3ximas Carreras";
+    }
+  }
+}
+function setupImageUploadHandlers() {
+  const configureForm = (zoneId, fileInputId, urlInputId, previewContainerId, previewImgId, removeBtnId) => {
+    const zone = document.getElementById(zoneId);
+    const fileInput = document.getElementById(fileInputId);
+    const urlInput = document.getElementById(urlInputId);
+    const previewContainer = document.getElementById(previewContainerId);
+    const previewImg = document.getElementById(previewImgId);
+    const removeBtn = document.getElementById(removeBtnId);
+    if (!zone || !fileInput || !urlInput) return;
+    zone.addEventListener("click", () => fileInput.click());
+    ["dragenter", "dragover"].forEach((eventName) => {
+      zone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        zone.classList.add("border-primary", "bg-primary/5");
+      }, false);
+    });
+    ["dragleave", "drop"].forEach((eventName) => {
+      zone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        zone.classList.remove("border-primary", "bg-primary/5");
+      }, false);
+    });
+    zone.addEventListener("drop", (e) => {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      if (files && files.length > 0) {
+        processImageFile(files[0]);
+      }
+    });
+    fileInput.addEventListener("change", (e) => {
+      if (e.target.files && e.target.files.length > 0) {
+        processImageFile(e.target.files[0]);
+      }
+    });
+    urlInput.addEventListener("input", (e) => {
+      const val = e.target.value.trim();
+      if (val) {
+        if (previewImg) previewImg.src = val;
+        if (previewContainer) previewContainer.classList.remove("hidden");
+      } else {
+        if (previewContainer) previewContainer.classList.add("hidden");
+      }
+    });
+    if (removeBtn) {
+      removeBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        fileInput.value = "";
+        urlInput.value = "";
+        if (previewContainer) previewContainer.classList.add("hidden");
+        if (previewImg) previewImg.src = "";
+      });
+    }
+    async function processImageFile(file) {
+      if (!file.type.startsWith("image/")) {
+        showNotificationToast("\u26A0\uFE0F Por favor selecciona un archivo de imagen v\xE1lido.");
+        return;
+      }
+      const originalHtml = zone.innerHTML;
+      zone.innerHTML = `
         <span class="material-symbols-outlined text-primary text-3xl animate-spin">sync</span>
         <span class="text-xs font-bold text-primary">Subiendo...</span>
-      `,r.style.pointerEvents="none";let I=new FileReader;I.onload=async D=>{let L=D.target.result;g&&(g.src=L),m&&m.classList.remove("hidden");let Y=L;try{let C=await Et(y);C&&C.success&&C.url?(Y=C.url,B("\u{1F4F8} Imagen subida a Storage correctamente.")):(console.warn("Fallo Storage, usando fallback Base64:",C?.error),B("\u{1F4BE} Imagen procesada localmente."))}catch(C){console.warn("Error subiendo imagen, usando Base64:",C)}d.value=Y,r.innerHTML=E,r.style.pointerEvents="auto"},I.readAsDataURL(y)}};e("form-upload-zone","form-image-file","form-image","form-image-preview-container","form-image-preview","btn-remove-form-image"),e("edit-form-upload-zone","edit-form-image-file","edit-form-image","edit-form-image-preview-container","edit-form-image-preview","btn-remove-edit-image")}function da(){la();let e=["cards","month","week","day"];e.forEach(u=>{let c=document.getElementById(`btn-view-${u}`);c&&c.addEventListener("click",()=>{ce=u,e.forEach(p=>{let f=document.getElementById(`btn-view-${p}`);f&&(p===u?f.className="view-mode-btn px-3.5 py-2 rounded-xl bg-primary text-white font-bold transition-all flex items-center gap-1.5 shadow-sm":f.className="view-mode-btn px-3.5 py-2 rounded-xl text-outline hover:text-primary transition-all flex items-center gap-1.5")}),M()})});let t=document.getElementById("form-is-multiday");t&&t.addEventListener("change",u=>{let c=u.target.checked,p=document.getElementById("form-single-date-container"),f=document.getElementById("form-start-date-container"),b=document.getElementById("form-end-date-container");if(c){p&&p.classList.add("hidden"),f&&f.classList.remove("hidden"),b&&b.classList.remove("hidden");let v=document.getElementById("form-date")?.value;v&&!document.getElementById("form-start-date")?.value&&(document.getElementById("form-start-date").value=v)}else p&&p.classList.remove("hidden"),f&&f.classList.add("hidden"),b&&b.classList.add("hidden")});let n=document.getElementById("edit-form-is-multiday");n&&n.addEventListener("change",u=>{let c=u.target.checked,p=document.getElementById("edit-form-single-date-container"),f=document.getElementById("edit-form-start-date-container"),b=document.getElementById("edit-form-end-date-container");if(c){p&&p.classList.add("hidden"),f&&f.classList.remove("hidden"),b&&b.classList.remove("hidden");let v=document.getElementById("edit-form-date")?.value;v&&!document.getElementById("edit-form-start-date")?.value&&(document.getElementById("edit-form-start-date").value=v)}else p&&p.classList.remove("hidden"),f&&f.classList.add("hidden"),b&&b.classList.add("hidden")});let a=document.getElementById("search-input");a&&a.addEventListener("input",u=>{Xe=u.target.value,M()});let i=document.getElementById("region-select");i&&i.addEventListener("change",u=>{we=u.target.value,M()});let o=document.getElementById("month-select");o&&o.addEventListener("change",u=>{ae=u.target.value,M()});let s=document.getElementById("toggle-past-races");s&&s.addEventListener("change",u=>{Ot=u.target.checked,M()});let r=document.getElementById("discipline-chips");r&&r.addEventListener("click",u=>{let c=u.target.closest("[data-discipline]");c&&(Z=c.getAttribute("data-discipline"),Re(r,Z),M())});let l=["nav-explore","mobile-nav-explore"],d=["nav-agenda","nav-my-calendar","mobile-nav-agenda"],m=["nav-register","nav-publish-btn","hero-publish-btn","mobile-nav-register"],g=["brand-logo","nav-logo"];l.forEach(u=>{let c=document.getElementById(u);c&&c.addEventListener("click",p=>{p.preventDefault(),U("/")})}),d.forEach(u=>{let c=document.getElementById(u);c&&c.addEventListener("click",p=>{p.preventDefault(),U("/agenda")})}),m.forEach(u=>{let c=document.getElementById(u);c&&c.addEventListener("click",p=>{p.preventDefault(),U("/publicar")})}),g.forEach(u=>{let c=document.getElementById(u);c&&c.addEventListener("click",p=>{p.preventDefault(),U("/")})});let h=document.getElementById("btn-back-from-register");h&&h.addEventListener("click",()=>{let u=document.getElementById("race-form");u&&ue(u),H("calendar")});let x=document.getElementById("btn-cancel-register");x&&x.addEventListener("click",()=>{let u=document.getElementById("race-form");u&&ue(u),H("calendar")});let y=document.getElementById("mobile-menu-toggle"),E=document.getElementById("mobile-menu");y&&E&&y.addEventListener("click",()=>{E.classList.toggle("hidden")});let I=document.getElementById("races-container");I&&I.addEventListener("click",async u=>{let c=u.target.closest("[data-bookmark-id]");if(c){u.stopPropagation();let v=c.getAttribute("data-bookmark-id");He(v),await M();return}let p=u.target.closest("[data-edit-id]");if(p){u.stopPropagation();let v=p.getAttribute("data-edit-id");ca(v);return}let f=u.target.closest("[data-delete-id]");if(f){u.stopPropagation();let v=f.getAttribute("data-delete-id");jt(v);return}if(u.target.closest("[data-calendar-trigger], [data-calendar-action]"))return;let b=u.target.closest("[data-race-id], .btn-view-detail");if(b){let v=b.getAttribute("data-race-id");v&&U(`/evento/${v}`)}});let D=document.getElementById("detail-content");D&&D.addEventListener("click",async u=>{if(u.target.closest("#btn-back-to-calendar")){U("/");return}let p=u.target.closest("[data-edit-id]");if(p){let v=p.getAttribute("data-edit-id"),{openEditModal:j}=await Promise.resolve().then(()=>(he(),ve)),A=(await q()).find(_=>String(_.id)===String(v));A&&j(A);return}let f=u.target.closest("[data-delete-id]");if(f){let v=f.getAttribute("data-delete-id");jt(v);return}let b=u.target.closest("[data-bookmark-id]");if(b){let v=b.getAttribute("data-bookmark-id");He(v);let $=(await q()).find(A=>A.id===v);$&&Te(D,$,T,z),await M()}}),document.addEventListener("click",async u=>{let c=u.target.closest("[data-calendar-trigger]");if(c){u.stopPropagation();let f=c.getAttribute("data-calendar-trigger"),b=document.getElementById(`calendar-dropdown-${f}`);document.querySelectorAll(".calendar-dropdown-menu").forEach(v=>{v!==b&&v.classList.add("hidden")}),b&&b.classList.toggle("hidden");return}let p=u.target.closest("[data-calendar-action]");if(p){u.stopPropagation();let f=p.getAttribute("data-calendar-action"),b=p.getAttribute("data-race-id"),v=document.getElementById(`calendar-dropdown-${b}`);v&&v.classList.add("hidden");let $=(await q()).find(A=>String(A.id)===String(b));if(!$)return;if(f==="google"){let A=dt($);window.open(A,"_blank","noopener,noreferrer")}else if(f==="apple"||f==="outlook")ct($),B("\u{1F4C6} Descargando archivo .ics de calendario...");else if(f==="copy"){let A=$.displayDate||$.date,_=`${$.name||$.nombre} \u2014 ${A} en ${$.city||$.ubicacion||$.region}`;try{await navigator.clipboard.writeText(_),B("\u{1F4CB} Fecha copiada al portapapeles")}catch{B("\u{1F4CB} Fecha del evento: "+A)}}return}u.target.closest(".calendar-dropdown-menu")||document.querySelectorAll(".calendar-dropdown-menu").forEach(f=>{f.classList.add("hidden")})});let L=document.getElementById("race-form");L&&(L.noValidate=!0,L.addEventListener("submit",async u=>{u.preventDefault();let c=L.querySelector('[type="submit"]'),p=c?c.innerHTML:"";c&&(c.disabled=!0,c.classList.add("opacity-50","cursor-not-allowed"),c.innerHTML=`
+      `;
+      zone.style.pointerEvents = "none";
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        const base64Data = event.target.result;
+        if (previewImg) previewImg.src = base64Data;
+        if (previewContainer) previewContainer.classList.remove("hidden");
+        let finalUrl = base64Data;
+        try {
+          const uploadRes = await uploadRaceImageSupabase(file);
+          if (uploadRes && uploadRes.success && uploadRes.url) {
+            finalUrl = uploadRes.url;
+            showNotificationToast("\u{1F4F8} Imagen subida a Storage correctamente.");
+          } else {
+            console.warn("Fallo Storage, usando fallback Base64:", uploadRes?.error);
+            showNotificationToast("\u{1F4BE} Imagen procesada localmente.");
+          }
+        } catch (err) {
+          console.warn("Error subiendo imagen, usando Base64:", err);
+        }
+        urlInput.value = finalUrl;
+        zone.innerHTML = originalHtml;
+        zone.style.pointerEvents = "auto";
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  configureForm(
+    "form-upload-zone",
+    "form-image-file",
+    "form-image",
+    "form-image-preview-container",
+    "form-image-preview",
+    "btn-remove-form-image"
+  );
+  configureForm(
+    "edit-form-upload-zone",
+    "edit-form-image-file",
+    "edit-form-image",
+    "edit-form-image-preview-container",
+    "edit-form-image-preview",
+    "btn-remove-edit-image"
+  );
+}
+function setupCalendarExportHandlers() {
+  function closeAllCalDropdowns() {
+    document.querySelectorAll(".cal-export-dropdown").forEach((d) => {
+      d.classList.add("hidden");
+    });
+    document.querySelectorAll(".cal-chevron").forEach((c) => {
+      c.style.transform = "";
+    });
+    document.querySelectorAll(".btn-cal-export").forEach((b) => {
+      b.setAttribute("aria-expanded", "false");
+    });
+  }
+  document.addEventListener("click", async (e) => {
+    const exportBtn = e.target.closest(".btn-cal-export");
+    if (exportBtn) {
+      e.stopPropagation();
+      const wrapper = exportBtn.closest(".cal-export-wrapper");
+      const dropdown = wrapper?.querySelector(".cal-export-dropdown");
+      const chevron = exportBtn.querySelector(".cal-chevron");
+      if (!dropdown) return;
+      const isOpen = !dropdown.classList.contains("hidden");
+      closeAllCalDropdowns();
+      if (!isOpen) {
+        dropdown.classList.remove("hidden");
+        if (chevron) chevron.style.transform = "rotate(180deg)";
+        exportBtn.setAttribute("aria-expanded", "true");
+      }
+      return;
+    }
+    const option = e.target.closest(".cal-option");
+    if (option) {
+      e.stopPropagation();
+      const raceId = option.dataset.raceId;
+      closeAllCalDropdowns();
+      let race = null;
+      if (isSupabaseConfigured()) {
+        race = await fetchRaceByIdSupabase(raceId);
+      }
+      if (!race) {
+        const races = await getAllRaces();
+        race = races.find((r) => String(r.id) === String(raceId));
+      }
+      if (!race) {
+        showNotificationToast("\u26A0\uFE0F No se pudieron obtener los datos de la carrera.");
+        return;
+      }
+      if (option.classList.contains("cal-google")) {
+        const url = buildGoogleCalendarUrl(race);
+        window.open(url, "_blank", "noopener,noreferrer");
+        showNotificationToast("\u{1F4C5} Abriendo Google Calendar...");
+      } else if (option.classList.contains("cal-apple") || option.classList.contains("cal-outlook")) {
+        const ics = generateICSContent(race);
+        const safeName = (race.name || "carrera").replace(/[^a-z0-9]/gi, "_").toLowerCase();
+        downloadICS(ics, safeName);
+        showNotificationToast("\u{1F4E5} Descargando archivo .ics...");
+      } else if (option.classList.contains("cal-copy")) {
+        const dateText = race.displayDate || race.date || race.startDate || race.fecha_inicio || "";
+        const textToCopy = `${race.name} \u2014 ${dateText}${race.city ? ", " + race.city : ""}`;
+        try {
+          await navigator.clipboard.writeText(textToCopy);
+          showNotificationToast("\u{1F4CB} Fecha copiada al portapapeles");
+        } catch {
+          showNotificationToast("\u26A0\uFE0F No se pudo copiar al portapapeles");
+        }
+      }
+      return;
+    }
+    if (!e.target.closest(".cal-export-wrapper")) {
+      closeAllCalDropdowns();
+    }
+  });
+}
+function setupEventHandlers() {
+  setupImageUploadHandlers();
+  setupCalendarExportHandlers();
+  const viewModes = ["cards", "month", "week", "day"];
+  viewModes.forEach((mode) => {
+    const btn = document.getElementById(`btn-view-${mode}`);
+    if (btn) {
+      btn.addEventListener("click", () => {
+        activeViewMode = mode;
+        viewModes.forEach((m) => {
+          const b = document.getElementById(`btn-view-${m}`);
+          if (b) {
+            if (m === mode) {
+              b.className = "view-mode-btn px-3.5 py-2 rounded-xl bg-primary text-white font-bold transition-all flex items-center gap-1.5 shadow-sm";
+            } else {
+              b.className = "view-mode-btn px-3.5 py-2 rounded-xl text-outline hover:text-primary transition-all flex items-center gap-1.5";
+            }
+          }
+        });
+        updateCalendar();
+      });
+    }
+  });
+  const isMultiDayCheck = document.getElementById("form-is-multiday");
+  if (isMultiDayCheck) {
+    isMultiDayCheck.addEventListener("change", (e) => {
+      const checked = e.target.checked;
+      const singleContainer = document.getElementById("form-single-date-container");
+      const startContainer = document.getElementById("form-start-date-container");
+      const endContainer = document.getElementById("form-end-date-container");
+      if (checked) {
+        if (singleContainer) singleContainer.classList.add("hidden");
+        if (startContainer) startContainer.classList.remove("hidden");
+        if (endContainer) endContainer.classList.remove("hidden");
+        const singleVal = document.getElementById("form-date")?.value;
+        if (singleVal && !document.getElementById("form-start-date")?.value) {
+          document.getElementById("form-start-date").value = singleVal;
+        }
+      } else {
+        if (singleContainer) singleContainer.classList.remove("hidden");
+        if (startContainer) startContainer.classList.add("hidden");
+        if (endContainer) endContainer.classList.add("hidden");
+      }
+    });
+  }
+  const editIsMultiDayCheck = document.getElementById("edit-form-is-multiday");
+  if (editIsMultiDayCheck) {
+    editIsMultiDayCheck.addEventListener("change", (e) => {
+      const checked = e.target.checked;
+      const singleContainer = document.getElementById("edit-form-single-date-container");
+      const startContainer = document.getElementById("edit-form-start-date-container");
+      const endContainer = document.getElementById("edit-form-end-date-container");
+      if (checked) {
+        if (singleContainer) singleContainer.classList.add("hidden");
+        if (startContainer) startContainer.classList.remove("hidden");
+        if (endContainer) endContainer.classList.remove("hidden");
+        const singleVal = document.getElementById("edit-form-date")?.value;
+        if (singleVal && !document.getElementById("edit-form-start-date")?.value) {
+          document.getElementById("edit-form-start-date").value = singleVal;
+        }
+      } else {
+        if (singleContainer) singleContainer.classList.remove("hidden");
+        if (startContainer) startContainer.classList.add("hidden");
+        if (endContainer) endContainer.classList.add("hidden");
+      }
+    });
+  }
+  const searchInput = document.getElementById("search-input");
+  if (searchInput) {
+    searchInput.addEventListener("input", (e) => {
+      searchQuery = e.target.value;
+      updateCalendar();
+    });
+  }
+  const regionSelect = document.getElementById("region-select");
+  if (regionSelect) {
+    regionSelect.addEventListener("change", (e) => {
+      currentRegion = e.target.value;
+      updateCalendar();
+    });
+  }
+  const monthSelect = document.getElementById("month-select");
+  if (monthSelect) {
+    monthSelect.addEventListener("change", (e) => {
+      currentMonth = e.target.value;
+      updateCalendar();
+    });
+  }
+  const disciplineChipsContainer = document.getElementById("discipline-chips");
+  if (disciplineChipsContainer) {
+    disciplineChipsContainer.addEventListener("click", (e) => {
+      const chipBtn = e.target.closest("[data-discipline]");
+      if (chipBtn) {
+        currentDiscipline = chipBtn.getAttribute("data-discipline");
+        renderDisciplineChips(disciplineChipsContainer, currentDiscipline);
+        updateCalendar();
+      }
+    });
+  }
+  const navExploreIds = ["nav-explore", "mobile-nav-explore"];
+  const navAgendaIds = ["nav-agenda", "nav-my-calendar", "mobile-nav-agenda"];
+  const navPublishIds = ["nav-register", "nav-publish-btn", "hero-publish-btn", "mobile-nav-register"];
+  const navLogoIds = ["brand-logo", "nav-logo"];
+  navExploreIds.forEach((id) => {
+    const elem = document.getElementById(id);
+    if (elem) {
+      elem.addEventListener("click", (e) => {
+        e.preventDefault();
+        navigateTo("/");
+      });
+    }
+  });
+  navAgendaIds.forEach((id) => {
+    const elem = document.getElementById(id);
+    if (elem) {
+      elem.addEventListener("click", (e) => {
+        e.preventDefault();
+        navigateTo("/agenda");
+      });
+    }
+  });
+  navPublishIds.forEach((id) => {
+    const elem = document.getElementById(id);
+    if (elem) {
+      elem.addEventListener("click", (e) => {
+        e.preventDefault();
+        navigateTo("/publicar");
+      });
+    }
+  });
+  navLogoIds.forEach((id) => {
+    const elem = document.getElementById(id);
+    if (elem) {
+      elem.addEventListener("click", (e) => {
+        e.preventDefault();
+        navigateTo("/");
+      });
+    }
+  });
+  const backFromRegisterBtn = document.getElementById("btn-back-from-register");
+  if (backFromRegisterBtn) {
+    backFromRegisterBtn.addEventListener("click", () => {
+      const raceForm2 = document.getElementById("race-form");
+      if (raceForm2) clearFormErrors(raceForm2);
+      switchView("calendar");
+    });
+  }
+  const cancelRegisterBtn = document.getElementById("btn-cancel-register");
+  if (cancelRegisterBtn) {
+    cancelRegisterBtn.addEventListener("click", () => {
+      const raceForm2 = document.getElementById("race-form");
+      if (raceForm2) clearFormErrors(raceForm2);
+      switchView("calendar");
+    });
+  }
+  const mobileMenuToggle = document.getElementById("mobile-menu-toggle");
+  const mobileMenu = document.getElementById("mobile-menu");
+  if (mobileMenuToggle && mobileMenu) {
+    mobileMenuToggle.addEventListener("click", () => {
+      mobileMenu.classList.toggle("hidden");
+    });
+  }
+  const racesContainer = document.getElementById("races-container");
+  if (racesContainer) {
+    racesContainer.addEventListener("click", async (e) => {
+      const bookmarkBtn = e.target.closest("[data-bookmark-id]");
+      if (bookmarkBtn) {
+        e.stopPropagation();
+        const raceId = bookmarkBtn.getAttribute("data-bookmark-id");
+        toggleBookmark(raceId);
+        await updateCalendar();
+        return;
+      }
+      const editBtn = e.target.closest("[data-edit-id]");
+      if (editBtn) {
+        e.stopPropagation();
+        const raceId = editBtn.getAttribute("data-edit-id");
+        openEditModal2(raceId);
+        return;
+      }
+      const deleteBtn = e.target.closest("[data-delete-id]");
+      if (deleteBtn) {
+        e.stopPropagation();
+        const raceId = deleteBtn.getAttribute("data-delete-id");
+        handleDeleteRace(raceId);
+        return;
+      }
+      const detailBtn = e.target.closest("[data-race-id]");
+      if (detailBtn) {
+        const raceId = detailBtn.getAttribute("data-race-id");
+        if (raceId) {
+          navigateTo(`/evento/${raceId}`);
+        }
+      }
+    });
+  }
+  const detailContainer = document.getElementById("detail-content");
+  if (detailContainer) {
+    detailContainer.addEventListener("click", async (e) => {
+      const backBtn = e.target.closest("#btn-back-to-calendar");
+      if (backBtn) {
+        navigateTo("/");
+        return;
+      }
+      const editBtn = e.target.closest("[data-edit-id]");
+      if (editBtn) {
+        const raceId = editBtn.getAttribute("data-edit-id");
+        const { openEditModal: openEditModal3 } = await Promise.resolve().then(() => (init_admin(), admin_exports));
+        const races = await getAllRaces();
+        const race = races.find((r) => String(r.id) === String(raceId));
+        if (race) openEditModal3(race);
+        return;
+      }
+      const deleteBtn = e.target.closest("[data-delete-id]");
+      if (deleteBtn) {
+        const raceId = deleteBtn.getAttribute("data-delete-id");
+        handleDeleteRace(raceId);
+        return;
+      }
+      const bookmarkBtn = e.target.closest("[data-bookmark-id]");
+      if (bookmarkBtn) {
+        const raceId = bookmarkBtn.getAttribute("data-bookmark-id");
+        toggleBookmark(raceId);
+        const races = await getAllRaces();
+        const race = races.find((r) => r.id === raceId);
+        if (race) {
+          renderDetailView(detailContainer, race, isAdmin);
+        }
+        await updateCalendar();
+      }
+    });
+  }
+  const raceForm = document.getElementById("race-form");
+  if (raceForm) {
+    raceForm.noValidate = true;
+    raceForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const submitBtn = raceForm.querySelector('[type="submit"]');
+      const originalSubmitHtml = submitBtn ? submitBtn.innerHTML : "";
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.classList.add("opacity-50", "cursor-not-allowed");
+        submitBtn.innerHTML = `
           <span class="material-symbols-outlined text-lg animate-spin">sync</span>
           <span>Publicando...</span>
-        `);let f=new FormData(L),b=document.getElementById("form-is-free")?.checked||!1,v=f.get("date")||"",j=document.getElementById("form-is-multiday")?.checked||!1,$=document.getElementById("form-start-date")?.value||"",A=document.getElementById("form-end-date")?.value||"",_=f.get("date")||"",ie={name:f.get("name")||"",discipline:f.get("discipline")||"",isMultiDay:j,date:j&&$||_,startDate:j&&$||_,endDate:j&&(A||$)||_,region:f.get("region")||"",organizador:f.get("organizer")||"",organizer:f.get("organizer")||"",registrationUrl:f.get("registrationUrl")||"",city:f.get("city")||"",distance:f.get("distance")||"",elevation:f.get("elevation")||"",price:b?0:f.get("price")||0,heroImage:f.get("heroImage")||"",description:f.get("description")||"",categories:f.get("categories")||""},re=Ye(ie);if(!re.isValid){Nt(L,re.errors),c&&(c.disabled=!1,c.classList.remove("opacity-50","cursor-not-allowed"),c.innerHTML=p);let w=L.querySelector(".field-error-msg");w&&w.scrollIntoView({behavior:"smooth",block:"center"});return}ue(L);let k=re.sanitizedData,Q="Todos",Ee="",Ze=k.date||"";if(k.date)try{let w=new Date(k.date+"T00:00:00");if(!isNaN(w.getTime())){Q=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"][w.getMonth()];let P=w.getDate(),Be=w.getFullYear();Ee=`${Q} ${Be}`,Ze=`${P} de ${Q}, ${Be}`}}catch{}let Ie=(await q()).filter(w=>{if(!w.date||!k.date)return!1;let ee=w.date===k.date,P=w.region===k.region,Be=w.discipline===k.discipline;return ee&&P&&Be});if(Ie.length>0){let w=Ie.map(P=>`"${P.name}"`).join(", "),ee=document.getElementById("form-conflict-warning");if(ee)ee.innerHTML=`
+        `;
+      }
+      const formData = new FormData(raceForm);
+      const isFree = document.getElementById("form-is-free")?.checked || false;
+      const dateStr = formData.get("date") || "";
+      const isMultiDay = document.getElementById("form-is-multiday")?.checked || false;
+      const startDateVal = document.getElementById("form-start-date")?.value || "";
+      const endDateVal = document.getElementById("form-end-date")?.value || "";
+      const singleDateVal = formData.get("date") || "";
+      const rawFormData = {
+        name: formData.get("name") || "",
+        discipline: formData.get("discipline") || "",
+        isMultiDay,
+        date: isMultiDay ? startDateVal || singleDateVal : singleDateVal,
+        startDate: isMultiDay ? startDateVal || singleDateVal : singleDateVal,
+        endDate: isMultiDay ? endDateVal || startDateVal || singleDateVal : singleDateVal,
+        region: formData.get("region") || "",
+        organizador: formData.get("organizer") || "",
+        organizer: formData.get("organizer") || "",
+        registrationUrl: formData.get("registrationUrl") || "",
+        city: formData.get("city") || "",
+        distance: formData.get("distance") || "",
+        elevation: formData.get("elevation") || "",
+        price: isFree ? 0 : formData.get("price") || 0,
+        heroImage: formData.get("heroImage") || "",
+        description: formData.get("description") || "",
+        categories: formData.get("categories") || ""
+      };
+      const validationResult = validateRaceForm(rawFormData);
+      if (!validationResult.isValid) {
+        renderFormErrors(raceForm, validationResult.errors);
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.classList.remove("opacity-50", "cursor-not-allowed");
+          submitBtn.innerHTML = originalSubmitHtml;
+        }
+        const firstError = raceForm.querySelector(".field-error-msg");
+        if (firstError) firstError.scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
+      clearFormErrors(raceForm);
+      const sanitizedData = validationResult.sanitizedData;
+      let monthName = "Todos";
+      let monthYear = "";
+      let displayDateStr = sanitizedData.date || "";
+      if (sanitizedData.date) {
+        try {
+          const dateObj = /* @__PURE__ */ new Date(sanitizedData.date + "T00:00:00");
+          if (!isNaN(dateObj.getTime())) {
+            const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+            monthName = months[dateObj.getMonth()];
+            const day = dateObj.getDate();
+            const year = dateObj.getFullYear();
+            monthYear = `${monthName} ${year}`;
+            displayDateStr = `${day} de ${monthName}, ${year}`;
+          }
+        } catch (err) {
+        }
+      }
+      const existingRaces = await getAllRaces();
+      const conflicts = existingRaces.filter((r) => {
+        if (!r.date || !sanitizedData.date) return false;
+        const sameDate = r.date === sanitizedData.date;
+        const sameRegion = r.region === sanitizedData.region;
+        const sameDiscipline = r.discipline === sanitizedData.discipline;
+        return sameDate && sameRegion && sameDiscipline;
+      });
+      if (conflicts.length > 0) {
+        const conflictNames = conflicts.map((r) => `"${r.name}"`).join(", ");
+        const conflictWarning2 = document.getElementById("form-conflict-warning");
+        if (conflictWarning2) {
+          conflictWarning2.innerHTML = `
             <span class="material-symbols-outlined text-lg align-middle">warning</span>
-            <strong>Advertencia de Conflicto:</strong> Ya existe(n) ${Ie.length} carrera(s) en esta misma fecha, regi\xF3n y disciplina: ${w}.
+            <strong>Advertencia de Conflicto:</strong> Ya existe(n) ${conflicts.length} carrera(s) en esta misma fecha, regi\xF3n y disciplina: ${conflictNames}.
             Verifica antes de publicar o cambia la fecha/disciplina/regi\xF3n.
-          `,ee.classList.remove("hidden"),ee.scrollIntoView({behavior:"smooth",block:"center"});else{let P=document.createElement("div");P.id="form-conflict-warning",P.className="w-full p-4 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-700 dark:text-amber-300 text-sm font-semibold flex flex-col gap-2 mb-2",P.innerHTML=`
+          `;
+          conflictWarning2.classList.remove("hidden");
+          conflictWarning2.scrollIntoView({ behavior: "smooth", block: "center" });
+        } else {
+          const warnEl = document.createElement("div");
+          warnEl.id = "form-conflict-warning";
+          warnEl.className = "w-full p-4 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-700 dark:text-amber-300 text-sm font-semibold flex flex-col gap-2 mb-2";
+          warnEl.innerHTML = `
             <span class="material-symbols-outlined text-lg align-middle">warning</span>
-            <strong>Advertencia de Conflicto:</strong> Ya existe(n) ${Ie.length} carrera(s) en esta misma fecha, regi\xF3n y disciplina: ${w}.
+            <strong>Advertencia de Conflicto:</strong> Ya existe(n) ${conflicts.length} carrera(s) en esta misma fecha, regi\xF3n y disciplina: ${conflictNames}.
             Verifica antes de publicar o cambia la fecha/disciplina/regi\xF3n.
-          `,L.insertBefore(P,L.firstChild),P.scrollIntoView({behavior:"smooth",block:"center"})}c&&(c.disabled=!1,c.classList.remove("opacity-50","cursor-not-allowed"));return}let Qe=document.getElementById("form-conflict-warning");Qe&&Qe.remove();let et=f.get("categories")||"",Ut=typeof et=="string"?et.split(",").map(w=>w.trim()).filter(Boolean):[],Ft={id:"race-"+Date.now(),name:k.name||"Nueva Carrera",discipline:k.discipline||"Ruta",date:k.date||"",month:Q,monthYear:Ee,displayDate:Ze,region:k.region||"Regi\xF3n Metropolitana de Santiago",city:k.city||"",distance:k.distance||"0 km",elevation:k.elevation||"0 m",price:b?0:Number(k.price)||0,isFree:b,status:"Pendiente",organizer:k.organizador||k.organizer||"",organizador:k.organizador||k.organizer||"",registrationUrl:k.registrationUrl||"",heroImage:k.heroImage||"https://images.unsplash.com/photo-1541625602330-2277a4c46182?auto=format&fit=crop&w=1200&q=80",description:k.description||"",categories:Ut,participants:1},De=z,tt=(document.getElementById("form-organizer-email")?.value||"").trim(),at=(document.getElementById("form-organizer-password")?.value||"").trim();if(!De){if(!tt||!at){B("\u26A0\uFE0F Debes ingresar tu email y contrase\xF1a de organizador para publicar la carrera."),c&&(c.disabled=!1,c.classList.remove("opacity-50","cursor-not-allowed"),c.innerHTML=p),document.getElementById("form-organizer-email")?.focus();return}let w=await bt(tt,at);if(!w.success||!w.userId){B("\u26A0\uFE0F Error al verificar tu cuenta: "+(w.error||"Email o contrase\xF1a incorrectos.")),c&&(c.disabled=!1,c.classList.remove("opacity-50","cursor-not-allowed"),c.innerHTML=p);return}De=w.userId,z=De,je()}try{let w=await Dt(Ft,De);if(w&&w.success===!1)throw new Error(w.error?.message||w.error||"Error al guardar en la base de datos")}catch(w){console.error("Error al guardar la carrera:",w),B("\u26A0\uFE0F Error al publicar la carrera: "+(w.message||w)),c&&(c.disabled=!1,c.classList.remove("opacity-50","cursor-not-allowed"),c.innerHTML=p);return}B("\u2705 \xA1Carrera publicada con \xE9xito! Ya aparece en el calendario. Puedes editarla o eliminarla iniciando sesi\xF3n con tu cuenta de organizador."),L.reset();let nt=document.getElementById("form-single-date-container"),it=document.getElementById("form-start-date-container"),rt=document.getElementById("form-end-date-container");nt&&nt.classList.remove("hidden"),it&&it.classList.add("hidden"),rt&&rt.classList.add("hidden"),c&&(c.disabled=!1,c.classList.remove("opacity-50","cursor-not-allowed"),c.innerHTML=p),ne="all",H("calendar"),await M()}));let Y=document.getElementById("login-modal"),C=document.getElementById("edit-modal");["nav-admin-login","mobile-nav-admin-login"].forEach(u=>{let c=document.getElementById(u);c&&c.addEventListener("click",async p=>{p.preventDefault();let{openLoginModal:f,setAuthChangeCallback:b}=await Promise.resolve().then(()=>(he(),ve));b(v=>{T=v,_e(),v&&M()}),f()})}),["nav-admin-logout","mobile-nav-admin-logout"].forEach(u=>{let c=document.getElementById(u);c&&c.addEventListener("click",async p=>{p.preventDefault(),(await fe()).success&&(T=!1,_e(),U("/"),B("\u{1F512} Sesi\xF3n de administrador cerrada."),await M())})}),["nav-admin-panel","mobile-nav-admin-panel"].forEach(u=>{let c=document.getElementById(u);c&&c.addEventListener("click",p=>{p.preventDefault(),U("/admin")})});let O=document.getElementById("btn-close-edit");O&&O.addEventListener("click",()=>{C&&C.classList.add("hidden")});let W=document.getElementById("btn-cancel-edit");W&&W.addEventListener("click",()=>{C&&C.classList.add("hidden")});let me=document.getElementById("pending-races-list");me&&me.addEventListener("click",async u=>{let c=u.target.closest("[data-approve-id]");if(c){let f=c.getAttribute("data-approve-id");c.disabled=!0;let b=await se(f,"aprobada");b.success?(B("\u2705 Carrera aprobada con \xE9xito. Ya es visible en el calendario."),await zt(),await M()):(B("\u26A0\uFE0F No se pudo aprobar la carrera: "+b.error),c.disabled=!1);return}let p=u.target.closest("[data-reject-id]");if(p){let f=p.getAttribute("data-reject-id");p.disabled=!0;let b=await se(f,"rechazada");b.success?(B("\u274C Propuesta rechazada."),await zt(),await M()):(B("\u26A0\uFE0F No se pudo rechazar la carrera: "+b.error),p.disabled=!1)}});let pe=document.getElementById("edit-form");pe&&pe.addEventListener("submit",async u=>{u.preventDefault();let c=document.getElementById("edit-race-id")?.value;if(!c)return;let p=document.getElementById("btn-save-edit");p&&(p.disabled=!0,p.classList.add("opacity-50"));let f=document.getElementById("edit-form-is-free")?.checked||!1,b=new FormData(pe),v=document.getElementById("edit-form-is-multiday")?.checked||!1,j=document.getElementById("edit-form-start-date")?.value||"",$=document.getElementById("edit-form-end-date")?.value||"",A=b.get("date")||"",_={name:b.get("name")||"",discipline:b.get("discipline")||"",isMultiDay:v,date:v&&j||A,startDate:v&&j||A,endDate:v&&($||j)||A,region:b.get("region")||"",organizador:b.get("organizer")||"",organizer:b.get("organizer")||"",registrationUrl:b.get("registrationUrl")||"",city:b.get("city")||"",distance:b.get("distance")||"",elevation:b.get("elevation")||"",price:f?0:b.get("price")||0,heroImage:b.get("heroImage")||"",description:b.get("description")||"",categories:b.get("categories")||""},ie=Ye(_);if(!ie.isValid){Nt(pe,ie.errors),p&&(p.disabled=!1,p.classList.remove("opacity-50"));return}ue(pe);let re=await Lt(c,ie.sanitizedData);if(re.success){if(B("\u{1F4BE} Cambios guardados con \xE9xito."),C&&C.classList.add("hidden"),await M(),document.getElementById("view-detail")?.classList.contains("hidden")===!1&&Pt===c){let Q=(await q()).find(Ee=>Ee.id===c);Q&&Te(document.getElementById("detail-content"),Q,T,z)}}else B("\u26A0\uFE0F Error al guardar los cambios: "+re.error);p&&(p.disabled=!1,p.classList.remove("opacity-50"))})}function _e(){let e=[document.getElementById("nav-admin-panel"),document.getElementById("mobile-nav-admin-panel")],t=[document.getElementById("nav-admin-logout"),document.getElementById("mobile-nav-admin-logout")],n=[document.getElementById("nav-admin-login"),document.getElementById("mobile-nav-admin-login")];e.forEach(a=>{a&&(T?a.classList.remove("hidden"):a.classList.add("hidden"))}),t.forEach(a=>{a&&(T?a.classList.remove("hidden"):a.classList.add("hidden"))}),n.forEach(a=>{a&&(T?a.classList.add("hidden"):a.classList.remove("hidden"))})}function je(){let e=document.getElementById("nav-organizer-login"),t=document.getElementById("nav-organizer-logout"),n=document.getElementById("mobile-nav-organizer-login"),a=document.getElementById("mobile-nav-organizer-logout"),i=!!z&&!T;[e,n].forEach(o=>{o&&(i?o.classList.add("hidden"):o.classList.remove("hidden"))}),[t,a].forEach(o=>{o&&(i?o.classList.remove("hidden"):o.classList.add("hidden"))})}async function zt(){let e=document.getElementById("pending-races-list"),t=document.getElementById("pending-count");if(!e)return;let n=await ke(),a=Array.isArray(n)?n:n&&n.success?n.data:[];t&&(t.textContent=a.length),Ne(e,a)}async function ca(e){let{ensureAdminElementsMounted:t}=await Promise.resolve().then(()=>(he(),ve));t();let n=document.getElementById("edit-modal");if(!n)return;let i=(await q()).find(x=>String(x.id)===String(e));if(!i)return;document.getElementById("edit-race-id").value=e,document.getElementById("edit-form-name").value=i.name||"",document.getElementById("edit-form-discipline").value=i.discipline||"Ruta";let o=i.startDate||i.fecha_inicio||i.date||"",s=i.endDate||i.fecha_fin||o,r=!!(o&&s&&o!==s),l=document.getElementById("edit-form-is-multiday");if(l){l.checked=r;let x=document.getElementById("edit-form-single-date-container"),y=document.getElementById("edit-form-start-date-container"),E=document.getElementById("edit-form-end-date-container");r?(x&&x.classList.add("hidden"),y&&y.classList.remove("hidden"),E&&E.classList.remove("hidden")):(x&&x.classList.remove("hidden"),y&&y.classList.add("hidden"),E&&E.classList.add("hidden"))}document.getElementById("edit-form-date").value=o,document.getElementById("edit-form-start-date")&&(document.getElementById("edit-form-start-date").value=o),document.getElementById("edit-form-end-date")&&(document.getElementById("edit-form-end-date").value=s),document.getElementById("edit-form-city").value=i.city||"",document.getElementById("edit-form-distance").value=i.distance||"",document.getElementById("edit-form-elevation").value=i.elevation||"",document.getElementById("edit-form-price").value=i.price||0,document.getElementById("edit-form-is-free").checked=!!i.isFree||i.price===0,document.getElementById("edit-form-status").value=i.status||"Inscripciones Abiertas",document.getElementById("edit-form-organizer").value=i.organizer||i.organizador||"",document.getElementById("edit-form-url").value=i.registrationUrl||"",document.getElementById("edit-form-image").value=i.heroImage||"";let d=document.getElementById("edit-form-image-preview-container"),m=document.getElementById("edit-form-image-preview");d&&m&&i.heroImage?(m.src=i.heroImage,d.classList.remove("hidden")):d&&d.classList.add("hidden"),document.getElementById("edit-form-categories").value=Array.isArray(i.categories)?i.categories.join(", "):"",document.getElementById("edit-form-description").value=i.description||"";let g=document.getElementById("edit-form-region");if(g){let x=K.filter(y=>y!=="Todas las regiones");xe(g,x,i.region||x[0])}let h=document.getElementById("edit-form");h&&ue(h),n.classList.remove("hidden")}async function jt(e){if(!confirm("\u26A0\uFE0F \xBFEst\xE1s seguro de que deseas eliminar esta carrera de forma permanente? Esta acci\xF3n no se puede deshacer."))return;let n=await Bt(e);n.success?(B("\u{1F5D1}\uFE0F Carrera eliminada con \xE9xito."),H("calendar"),await M()):B("\u26A0\uFE0F No se pudo eliminar la carrera: "+n.error)}async function _t(){let e=document.getElementById("region-select");e&&xe(e,K,we);let t=K.filter(o=>o!=="Todas las regiones"),n=document.getElementById("form-region");n&&xe(n,t,t[0]);let a=document.getElementById("edit-form-region");a&&xe(a,t,t[0]);let i=document.getElementById("discipline-chips");i&&Re(i,Z),da(),st(async o=>{let{viewName:s,params:r}=o,d=new URLSearchParams(window.location.search).get("disciplina");if(d){Z=d;let m=document.getElementById("discipline-chips");m&&Re(m,Z)}if(s==="admin-panel"){let{ensureAdminElementsMounted:m,loadPendingRacesList:g,openLoginModal:h}=await Promise.resolve().then(()=>(he(),ve));if(m(),!T){h(),U("/");return}H("admin-panel"),await g();return}if(s==="detail"&&r.id){H("detail");let m=document.getElementById("detail-content");m&&(m.innerHTML=`
+          `;
+          raceForm.insertBefore(warnEl, raceForm.firstChild);
+          warnEl.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.classList.remove("opacity-50", "cursor-not-allowed");
+        }
+        return;
+      }
+      const conflictWarning = document.getElementById("form-conflict-warning");
+      if (conflictWarning) conflictWarning.remove();
+      const categoriesStr = formData.get("categories") || "";
+      const categoriesArray = typeof categoriesStr === "string" ? categoriesStr.split(",").map((c) => c.trim()).filter(Boolean) : [];
+      const newRace = {
+        id: "race-" + Date.now(),
+        name: sanitizedData.name || "Nueva Carrera",
+        discipline: sanitizedData.discipline || "Ruta",
+        date: sanitizedData.date || "",
+        month: monthName,
+        monthYear,
+        displayDate: displayDateStr,
+        region: sanitizedData.region || "Regi\xF3n Metropolitana de Santiago",
+        city: sanitizedData.city || "",
+        distance: sanitizedData.distance || "0 km",
+        elevation: sanitizedData.elevation || "0 m",
+        price: isFree ? 0 : Number(sanitizedData.price) || 0,
+        isFree,
+        status: "Pendiente",
+        organizer: sanitizedData.organizador || sanitizedData.organizer || "",
+        organizador: sanitizedData.organizador || sanitizedData.organizer || "",
+        registrationUrl: sanitizedData.registrationUrl || "#",
+        heroImage: sanitizedData.heroImage || "https://images.unsplash.com/photo-1541625602330-2277a4c46182?auto=format&fit=crop&w=1200&q=80",
+        description: sanitizedData.description || "",
+        categories: categoriesArray,
+        participants: 1
+      };
+      try {
+        await saveRace(newRace);
+      } catch (saveErr) {
+        console.error("Error al guardar la carrera:", saveErr);
+        showNotificationToast("\u26A0\uFE0F Ocurri\xF3 un error al guardar la carrera. Int\xE9ntalo de nuevo.");
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.classList.remove("opacity-50", "cursor-not-allowed");
+          submitBtn.innerHTML = originalSubmitHtml;
+        }
+        return;
+      }
+      showNotificationToast("\xA1Propuesta de carrera enviada a moderaci\xF3n! Tu evento ha sido registrado en estado 'pendiente' y se mostrar\xE1 en el calendario p\xFAblico una vez sea revisado y aprobado por el administrador.");
+      raceForm.reset();
+      const singleContainer = document.getElementById("form-single-date-container");
+      const startContainer = document.getElementById("form-start-date-container");
+      const endContainer = document.getElementById("form-end-date-container");
+      if (singleContainer) singleContainer.classList.remove("hidden");
+      if (startContainer) startContainer.classList.add("hidden");
+      if (endContainer) endContainer.classList.add("hidden");
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove("opacity-50", "cursor-not-allowed");
+        submitBtn.innerHTML = originalSubmitHtml;
+      }
+      activeTab = "all";
+      switchView("calendar");
+      await updateCalendar();
+    });
+  }
+  const loginModal = document.getElementById("login-modal");
+  const editModal = document.getElementById("edit-modal");
+  const openLoginBtns = ["nav-admin-login", "mobile-nav-admin-login"];
+  openLoginBtns.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener("click", async (e) => {
+        e.preventDefault();
+        const { openLoginModal: openLoginModal2, setAuthChangeCallback: setAuthChangeCallback2 } = await Promise.resolve().then(() => (init_admin(), admin_exports));
+        setAuthChangeCallback2((loggedIn) => {
+          isAdmin = loggedIn;
+          updateAuthUI();
+          if (loggedIn) updateCalendar();
+        });
+        openLoginModal2();
+      });
+    }
+  });
+  const logoutBtns = ["nav-admin-logout", "mobile-nav-admin-logout"];
+  logoutBtns.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener("click", async (e) => {
+        e.preventDefault();
+        const res = await logoutAdmin();
+        if (res.success) {
+          isAdmin = false;
+          updateAuthUI();
+          navigateTo("/");
+          showNotificationToast("\u{1F512} Sesi\xF3n de administrador cerrada.");
+          await updateCalendar();
+        }
+      });
+    }
+  });
+  const adminPanelBtns = ["nav-admin-panel", "mobile-nav-admin-panel"];
+  adminPanelBtns.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener("click", (e) => {
+        e.preventDefault();
+        navigateTo("/admin");
+      });
+    }
+  });
+  const closeEditBtn = document.getElementById("btn-close-edit");
+  if (closeEditBtn) {
+    closeEditBtn.addEventListener("click", () => {
+      if (editModal) editModal.classList.add("hidden");
+    });
+  }
+  const cancelEditBtn = document.getElementById("btn-cancel-edit");
+  if (cancelEditBtn) {
+    cancelEditBtn.addEventListener("click", () => {
+      if (editModal) editModal.classList.add("hidden");
+    });
+  }
+  const pendingRacesList = document.getElementById("pending-races-list");
+  if (pendingRacesList) {
+    pendingRacesList.addEventListener("click", async (e) => {
+      const approveBtn = e.target.closest("[data-approve-id]");
+      if (approveBtn) {
+        const id = approveBtn.getAttribute("data-approve-id");
+        approveBtn.disabled = true;
+        const res = await updateRaceStatusSupabase(id, "aprobada");
+        if (res.success) {
+          showNotificationToast("\u2705 Carrera aprobada con \xE9xito. Ya es visible en el calendario.");
+          await loadPendingRacesList2();
+          await updateCalendar();
+        } else {
+          showNotificationToast("\u26A0\uFE0F No se pudo aprobar la carrera: " + res.error);
+          approveBtn.disabled = false;
+        }
+        return;
+      }
+      const rejectBtn = e.target.closest("[data-reject-id]");
+      if (rejectBtn) {
+        const id = rejectBtn.getAttribute("data-reject-id");
+        rejectBtn.disabled = true;
+        const res = await updateRaceStatusSupabase(id, "rechazada");
+        if (res.success) {
+          showNotificationToast("\u274C Propuesta rechazada.");
+          await loadPendingRacesList2();
+          await updateCalendar();
+        } else {
+          showNotificationToast("\u26A0\uFE0F No se pudo rechazar la carrera: " + res.error);
+          rejectBtn.disabled = false;
+        }
+      }
+    });
+  }
+  const editForm = document.getElementById("edit-form");
+  if (editForm) {
+    editForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const raceId = document.getElementById("edit-race-id")?.value;
+      if (!raceId) return;
+      const submitBtn = document.getElementById("btn-save-edit");
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.classList.add("opacity-50");
+      }
+      const isFree = document.getElementById("edit-form-is-free")?.checked || false;
+      const formData = new FormData(editForm);
+      const isMultiDay = document.getElementById("edit-form-is-multiday")?.checked || false;
+      const startDateVal = document.getElementById("edit-form-start-date")?.value || "";
+      const endDateVal = document.getElementById("edit-form-end-date")?.value || "";
+      const singleDateVal = formData.get("date") || "";
+      const rawFormData = {
+        name: formData.get("name") || "",
+        discipline: formData.get("discipline") || "",
+        isMultiDay,
+        date: isMultiDay ? startDateVal || singleDateVal : singleDateVal,
+        startDate: isMultiDay ? startDateVal || singleDateVal : singleDateVal,
+        endDate: isMultiDay ? endDateVal || startDateVal || singleDateVal : singleDateVal,
+        region: formData.get("region") || "",
+        organizador: formData.get("organizer") || "",
+        organizer: formData.get("organizer") || "",
+        registrationUrl: formData.get("registrationUrl") || "",
+        city: formData.get("city") || "",
+        distance: formData.get("distance") || "",
+        elevation: formData.get("elevation") || "",
+        price: isFree ? 0 : formData.get("price") || 0,
+        heroImage: formData.get("heroImage") || "",
+        description: formData.get("description") || "",
+        categories: formData.get("categories") || ""
+      };
+      const validationResult = validateRaceForm(rawFormData);
+      if (!validationResult.isValid) {
+        renderFormErrors(editForm, validationResult.errors);
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.classList.remove("opacity-50");
+        }
+        return;
+      }
+      clearFormErrors(editForm);
+      const res = await updateRace(raceId, validationResult.sanitizedData);
+      if (res.success) {
+        showNotificationToast("\u{1F4BE} Cambios guardados con \xE9xito.");
+        if (editModal) editModal.classList.add("hidden");
+        await updateCalendar();
+        if (document.getElementById("view-detail")?.classList.contains("hidden") === false && currentRaceId === raceId) {
+          const races = await getAllRaces();
+          const updatedRace = races.find((r) => r.id === raceId);
+          if (updatedRace) {
+            renderDetailView(document.getElementById("detail-content"), updatedRace, isAdmin);
+          }
+        }
+      } else {
+        showNotificationToast("\u26A0\uFE0F Error al guardar los cambios: " + res.error);
+      }
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove("opacity-50");
+      }
+    });
+  }
+}
+function updateAuthUI() {
+  const adminPanelBtns = [document.getElementById("nav-admin-panel"), document.getElementById("mobile-nav-admin-panel")];
+  const adminLogoutBtns = [document.getElementById("nav-admin-logout"), document.getElementById("mobile-nav-admin-logout")];
+  const adminLoginBtns = [document.getElementById("nav-admin-login"), document.getElementById("mobile-nav-admin-login")];
+  adminPanelBtns.forEach((btn) => {
+    if (btn) {
+      if (isAdmin) btn.classList.remove("hidden");
+      else btn.classList.add("hidden");
+    }
+  });
+  adminLogoutBtns.forEach((btn) => {
+    if (btn) {
+      if (isAdmin) btn.classList.remove("hidden");
+      else btn.classList.add("hidden");
+    }
+  });
+  adminLoginBtns.forEach((btn) => {
+    if (btn) {
+      if (isAdmin) btn.classList.add("hidden");
+      else btn.classList.remove("hidden");
+    }
+  });
+}
+async function loadPendingRacesList2() {
+  const container = document.getElementById("pending-races-list");
+  const countEl = document.getElementById("pending-count");
+  if (!container) return;
+  const res = await fetchPendingRacesSupabase();
+  const pending = Array.isArray(res) ? res : res && res.success ? res.data : [];
+  if (countEl) countEl.textContent = pending.length;
+  renderPendingRaces(container, pending);
+}
+async function openEditModal2(raceId) {
+  const editModal = document.getElementById("edit-modal");
+  if (!editModal) return;
+  const races = await getAllRaces();
+  const race = races.find((r) => r.id === raceId);
+  if (!race) return;
+  document.getElementById("edit-race-id").value = raceId;
+  document.getElementById("edit-form-name").value = race.name || "";
+  document.getElementById("edit-form-discipline").value = race.discipline || "Ruta";
+  const startDate = race.startDate || race.fecha_inicio || race.date || "";
+  const endDate = race.endDate || race.fecha_fin || startDate;
+  const isMultiDay = !!(startDate && endDate && startDate !== endDate);
+  const isMultiDayCheck = document.getElementById("edit-form-is-multiday");
+  if (isMultiDayCheck) {
+    isMultiDayCheck.checked = isMultiDay;
+    const singleContainer = document.getElementById("edit-form-single-date-container");
+    const startContainer = document.getElementById("edit-form-start-date-container");
+    const endContainer = document.getElementById("edit-form-end-date-container");
+    if (isMultiDay) {
+      if (singleContainer) singleContainer.classList.add("hidden");
+      if (startContainer) startContainer.classList.remove("hidden");
+      if (endContainer) endContainer.classList.remove("hidden");
+    } else {
+      if (singleContainer) singleContainer.classList.remove("hidden");
+      if (startContainer) startContainer.classList.add("hidden");
+      if (endContainer) endContainer.classList.add("hidden");
+    }
+  }
+  document.getElementById("edit-form-date").value = startDate;
+  if (document.getElementById("edit-form-start-date")) {
+    document.getElementById("edit-form-start-date").value = startDate;
+  }
+  if (document.getElementById("edit-form-end-date")) {
+    document.getElementById("edit-form-end-date").value = endDate;
+  }
+  document.getElementById("edit-form-city").value = race.city || "";
+  document.getElementById("edit-form-distance").value = race.distance || "";
+  document.getElementById("edit-form-elevation").value = race.elevation || "";
+  document.getElementById("edit-form-price").value = race.price || 0;
+  document.getElementById("edit-form-is-free").checked = !!race.isFree || race.price === 0;
+  document.getElementById("edit-form-status").value = race.status || "Inscripciones Abiertas";
+  document.getElementById("edit-form-organizer").value = race.organizer || race.organizador || "";
+  document.getElementById("edit-form-url").value = race.registrationUrl || "";
+  document.getElementById("edit-form-image").value = race.heroImage || "";
+  const editPreviewContainer = document.getElementById("edit-form-image-preview-container");
+  const editPreviewImg = document.getElementById("edit-form-image-preview");
+  if (editPreviewContainer && editPreviewImg && race.heroImage) {
+    editPreviewImg.src = race.heroImage;
+    editPreviewContainer.classList.remove("hidden");
+  } else if (editPreviewContainer) {
+    editPreviewContainer.classList.add("hidden");
+  }
+  document.getElementById("edit-form-categories").value = Array.isArray(race.categories) ? race.categories.join(", ") : "";
+  document.getElementById("edit-form-description").value = race.description || "";
+  const editRegionSelect = document.getElementById("edit-form-region");
+  if (editRegionSelect) {
+    const filterRegions = REGIONS_CHILE.filter((r) => r !== "Todas las regiones");
+    renderRegionSelect(editRegionSelect, filterRegions, race.region || filterRegions[0]);
+  }
+  const editForm = document.getElementById("edit-form");
+  if (editForm) clearFormErrors(editForm);
+  editModal.classList.remove("hidden");
+}
+async function handleDeleteRace(raceId) {
+  const confirmed = confirm("\u26A0\uFE0F \xBFEst\xE1s seguro de que deseas eliminar esta carrera de forma permanente? Esta acci\xF3n no se puede deshacer.");
+  if (!confirmed) return;
+  const res = await deleteRace(raceId);
+  if (res.success) {
+    showNotificationToast("\u{1F5D1}\uFE0F Carrera eliminada con \xE9xito.");
+    switchView("calendar");
+    await updateCalendar();
+  } else {
+    showNotificationToast("\u26A0\uFE0F No se pudo eliminar la carrera: " + res.error);
+  }
+}
+async function initApp() {
+  const regionSelectContainer = document.getElementById("region-select");
+  if (regionSelectContainer) {
+    renderRegionSelect(regionSelectContainer, REGIONS_CHILE, currentRegion);
+  }
+  const filterRegions = REGIONS_CHILE.filter((r) => r !== "Todas las regiones");
+  const publishRegionSelect = document.getElementById("form-region");
+  if (publishRegionSelect) {
+    renderRegionSelect(publishRegionSelect, filterRegions, filterRegions[0]);
+  }
+  const editRegionSelect = document.getElementById("edit-form-region");
+  if (editRegionSelect) {
+    renderRegionSelect(editRegionSelect, filterRegions, filterRegions[0]);
+  }
+  const disciplineChipsContainer = document.getElementById("discipline-chips");
+  if (disciplineChipsContainer) {
+    renderDisciplineChips(disciplineChipsContainer, currentDiscipline);
+  }
+  setupEventHandlers();
+  initRouter(async (route) => {
+    const { viewName, params } = route;
+    const urlParams = new URLSearchParams(window.location.search);
+    const discParam = urlParams.get("disciplina");
+    if (discParam) {
+      currentDiscipline = discParam;
+      const disciplineChipsContainer2 = document.getElementById("discipline-chips");
+      if (disciplineChipsContainer2) {
+        renderDisciplineChips(disciplineChipsContainer2, currentDiscipline);
+      }
+    }
+    if (viewName === "admin-panel") {
+      const { ensureAdminElementsMounted: ensureAdminElementsMounted2, loadPendingRacesList: loadPendingRacesList3, openLoginModal: openLoginModal2 } = await Promise.resolve().then(() => (init_admin(), admin_exports));
+      ensureAdminElementsMounted2();
+      if (!isAdmin) {
+        openLoginModal2();
+        navigateTo("/");
+        return;
+      }
+      switchView("admin-panel");
+      await loadPendingRacesList3();
+      return;
+    }
+    if (viewName === "detail" && params.id) {
+      switchView("detail");
+      const detailContainer = document.getElementById("detail-content");
+      if (detailContainer) {
+        detailContainer.innerHTML = `
           <div class="py-24 text-center space-y-4">
             <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent mx-auto"></div>
             <p class="text-sm font-bold text-outline">Cargando detalles de la carrera...</p>
           </div>
-        `);let g=null;if(X()&&(g=await ft(r.id)),g||(g=(await q()).find(x=>String(x.id)===String(r.id))),g){Pt=g.id,m&&Te(m,g,T,z);return}else{m&&(m.innerHTML=`
+        `;
+      }
+      let race = null;
+      if (isSupabaseConfigured()) {
+        race = await fetchRaceByIdSupabase(params.id);
+      }
+      if (!race) {
+        const races = await getAllRaces();
+        race = races.find((r) => String(r.id) === String(params.id));
+      }
+      if (race) {
+        currentRaceId = race.id;
+        if (detailContainer) {
+          renderDetailView(detailContainer, race, isAdmin);
+        }
+        return;
+      } else {
+        if (detailContainer) {
+          detailContainer.innerHTML = `
             <div class="py-16 text-center bg-white rounded-3xl border border-dashed border-outline-variant/60 p-8 space-y-4 max-w-lg mx-auto">
               <div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mx-auto text-outline">
                 <span class="material-symbols-outlined text-4xl">search_off</span>
@@ -930,4 +3545,69 @@ ${m.descripcion}`:x);let y=await n.from("carreras").insert([m]);l=y.data,d=y.err
                 Volver al Calendario
               </button>
             </div>
-          `);return}}if(s==="agenda"){ne="my-calendar",H("agenda"),await M();return}if(s==="register"){H("register");return}ne="all",H("calendar"),await M()}),vt().then(async o=>{o&&(await ge(o.id)?(T=!0,z=null,_e()):(T=!1,z=o.id,je(),await M()))}).catch(()=>{T=!1,z=null}),["nav-organizer-login","mobile-nav-organizer-login"].forEach(o=>{let s=document.getElementById(o);s&&s.addEventListener("click",async()=>{let r=prompt("Email de tu cuenta de organizador:");if(!r)return;let l=prompt("Contrase\xF1a:");if(!l)return;let d=await xt(r,l);d.success&&d.userId?(await ge(d.userId)?(T=!0,z=null,_e(),B("\u{1F513} Sesi\xF3n de administrador iniciada.")):(z=d.userId,je(),B("\u2705 Sesi\xF3n de organizador iniciada. Ahora puedes editar tus carreras.")),await M()):B("\u26A0\uFE0F Email o contrase\xF1a incorrectos: "+(d.error||""))})}),["nav-organizer-logout","mobile-nav-organizer-logout"].forEach(o=>{let s=document.getElementById(o);s&&s.addEventListener("click",async()=>{await fe(),z=null,je(),B("\u{1F44B} Sesi\xF3n de organizador cerrada."),await M()})})}var Z,we,ae,Xe,Ot,ne,ce,Pt,T,z,Tt=V(()=>{ot();Le();ut();Ae();Je();We();Ce();Z="Todas",we="Todas las regiones",ae="Todos",Xe="",Ot=!1,ne="all",ce="cards",Pt=null,T=!1,z=null;document.readyState==="loading"?document.addEventListener("DOMContentLoaded",_t):_t()});Tt();export{ue as clearFormErrors,sa as getFilteredRaces,jt as handleDeleteRace,zt as loadPendingRacesList,ca as openEditModal,Nt as renderFormErrors,oa as renderSkeletons,B as showNotificationToast,_e as updateAuthUI,M as updateCalendar,je as updateOrganizerUI};
+          `;
+        }
+        return;
+      }
+    }
+    if (viewName === "agenda") {
+      activeTab = "my-calendar";
+      switchView("agenda");
+      await updateCalendar();
+      return;
+    }
+    if (viewName === "register") {
+      switchView("register");
+      return;
+    }
+    activeTab = "all";
+    switchView("calendar");
+    await updateCalendar();
+  });
+  getCurrentUser().then(async (user) => {
+    if (user) {
+      isAdmin = await checkIsAdmin(user.id);
+      updateAuthUI();
+    }
+  }).catch(() => {
+    isAdmin = false;
+  });
+}
+var currentDiscipline, currentRegion, currentMonth, searchQuery, activeTab, activeViewMode, currentRaceId, isAdmin;
+var init_app = __esm({
+  "js/app.js"() {
+    init_router();
+    init_data();
+    init_storage();
+    init_ui();
+    init_validation();
+    init_supabase();
+    init_calendar_export();
+    currentDiscipline = "Todas";
+    currentRegion = "Todas las regiones";
+    currentMonth = "Todos";
+    searchQuery = "";
+    activeTab = "all";
+    activeViewMode = "cards";
+    currentRaceId = null;
+    isAdmin = false;
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initApp);
+    } else {
+      initApp();
+    }
+  }
+});
+init_app();
+export {
+  clearFormErrors,
+  getFilteredRaces,
+  handleDeleteRace,
+  loadPendingRacesList2 as loadPendingRacesList,
+  openEditModal2 as openEditModal,
+  renderFormErrors,
+  renderSkeletons,
+  showNotificationToast,
+  updateAuthUI,
+  updateCalendar
+};

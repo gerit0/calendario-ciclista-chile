@@ -163,6 +163,21 @@
           <span class="material-symbols-outlined text-lg">logout</span>
           <span>Salir</span>
         </button>
+
+        <!-- Organizer Session Buttons (JS toggles visibility) -->
+        <button id="nav-organizer-login"
+          class="nav-btn px-3 py-2 rounded-lg font-display font-bold text-sm text-outline hover:text-primary hover:bg-surface-container-low transition-colors flex items-center gap-1.5"
+          title="Iniciar sesión como Organizador">
+          <span class="material-symbols-outlined text-lg">person</span>
+          <span>Mi cuenta</span>
+        </button>
+
+        <button id="nav-organizer-logout"
+          class="hidden nav-btn px-3 py-2 rounded-lg font-display font-bold text-sm text-green-700 hover:bg-green-50 transition-colors flex items-center gap-1.5"
+          title="Cerrar sesión de organizador">
+          <span class="material-symbols-outlined text-lg">logout</span>
+          <span>Cerrar sesión</span>
+        </button>
       </nav>
 
       <!-- Mobile Navigation Buttons -->
@@ -208,6 +223,18 @@
         class="hidden w-full text-left px-4 py-2.5 rounded-lg font-display font-bold text-sm text-secondary hover:bg-surface-container flex items-center gap-3">
         <span class="material-symbols-outlined">logout</span>
         Cerrar Sesión Admin
+      </button>
+
+      <!-- Mobile Organizer Buttons -->
+      <button id="mobile-nav-organizer-login"
+        class="w-full text-left px-4 py-2.5 rounded-lg font-display font-bold text-sm text-outline hover:text-primary hover:bg-surface-container flex items-center gap-3">
+        <span class="material-symbols-outlined">person</span>
+        Mi cuenta (Organizador)
+      </button>
+      <button id="mobile-nav-organizer-logout"
+        class="hidden w-full text-left px-4 py-2.5 rounded-lg font-display font-bold text-sm text-green-700 hover:bg-green-50 flex items-center gap-3">
+        <span class="material-symbols-outlined">logout</span>
+        Cerrar sesión organizador
       </button>
     </div>
   </header>
@@ -607,6 +634,43 @@
             class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all"></textarea>
         </div>
 
+        <!-- ─── Sección: Cuenta de Organizador ──────────────────────────── -->
+        <div class="bg-surface-container-low rounded-2xl border border-outline-variant/40 p-5 space-y-4">
+          <div class="flex items-center gap-2 mb-1">
+            <span class="material-symbols-outlined text-xl text-primary">account_circle</span>
+            <h3 class="font-display font-bold text-sm text-primary">Cuenta de Organizador</h3>
+          </div>
+          <p class="text-xs text-outline leading-relaxed">
+            Crea tu cuenta o inicia sesión para poder <strong>editar y eliminar</strong> esta carrera en el futuro.<br>
+            Si ya publicaste carreras antes, usa el mismo email y contraseña.
+          </p>
+          <div id="organizer-logged-in-notice" class="hidden p-3 rounded-xl bg-green-50 border border-green-200 text-green-700 text-xs font-semibold flex items-center gap-2">
+            <span class="material-symbols-outlined text-base">check_circle</span>
+            Sesión activa — tu carrera quedará vinculada a tu cuenta.
+          </div>
+          <div id="organizer-form-fields" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label for="form-organizer-email" class="block font-display font-bold text-xs text-primary mb-1.5">
+                Email <span class="text-secondary">*</span>
+              </label>
+              <input type="email" id="form-organizer-email" name="organizerEmail"
+                placeholder="tu@email.com"
+                autocomplete="email"
+                class="w-full px-4 py-2.5 rounded-xl bg-white border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all">
+            </div>
+            <div>
+              <label for="form-organizer-password" class="block font-display font-bold text-xs text-primary mb-1.5">
+                Contraseña <span class="text-secondary">*</span>
+                <span class="text-outline font-normal">(mín. 6 caracteres)</span>
+              </label>
+              <input type="password" id="form-organizer-password" name="organizerPassword"
+                placeholder="••••••"
+                autocomplete="current-password"
+                class="w-full px-4 py-2.5 rounded-xl bg-white border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all">
+            </div>
+          </div>
+        </div>
+
         <!-- Form Submit Button -->
         <div class="pt-4 flex justify-end gap-4">
           <button type="button" id="btn-cancel-register"
@@ -684,7 +748,7 @@
   </footer>
 
   <!-- Main JavaScript bundle (ESM con importmap para Supabase) -->
-  <script type="module" src="js/bundle.js?v=14"></script>
+  <script type="module" src="js/bundle.js?v=18"></script>
 
 </body>
 
