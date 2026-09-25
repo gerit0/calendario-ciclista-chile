@@ -119,7 +119,7 @@ export function ensureAdminElementsMounted() {
             <p class="text-xs text-outline">Modifica los detalles del evento seleccionado.</p>
           </div>
         </div>
-        <form id="edit-form" class="space-y-6">
+        <form id="edit-form" method="POST" action="javascript:void(0);" class="space-y-6">
           <input type="hidden" id="edit-race-id">
           <div>
             <label for="edit-form-name" class="block font-display font-bold text-sm text-primary mb-2">
@@ -523,6 +523,21 @@ function bindAdminEvents() {
   if (closeEditBtn) {
     closeEditBtn.addEventListener('click', () => {
       document.getElementById('edit-modal')?.classList.add('hidden');
+      if (window.location.pathname.startsWith('/editar/')) {
+        window.history.pushState({}, '', '/');
+        window.dispatchEvent(new Event('popstate'));
+      }
+    });
+  }
+
+  const cancelEditBtn = document.getElementById('btn-cancel-edit');
+  if (cancelEditBtn) {
+    cancelEditBtn.addEventListener('click', () => {
+      document.getElementById('edit-modal')?.classList.add('hidden');
+      if (window.location.pathname.startsWith('/editar/')) {
+        window.history.pushState({}, '', '/');
+        window.dispatchEvent(new Event('popstate'));
+      }
     });
   }
 }

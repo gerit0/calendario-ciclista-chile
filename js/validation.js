@@ -141,7 +141,14 @@ export function validateRaceForm(data) {
   // 10. Campos opcionales (elevation, price, heroImage)
   sanitizedData.elevation = sanitizeHTML(raw.elevation);
   sanitizedData.price = sanitizeHTML(raw.price);
-  sanitizedData.heroImage = sanitizeHTML(raw.heroImage);
+
+  let heroImage = typeof raw.heroImage === 'string' ? raw.heroImage.trim() : '';
+  if (heroImage && heroImage.startsWith('data:')) {
+    errors.heroImage = 'Las imágenes deben subirse al almacenamiento o usar una URL web directa (https://). No se permiten imágenes en base64.';
+  } else if (heroImage && !isValidURL(heroImage)) {
+    errors.heroImage = 'La imagen de portada debe ser una URL válida (ej: https://...).';
+  }
+  sanitizedData.heroImage = sanitizeHTML(heroImage);
 
   return {
     isValid: Object.keys(errors).length === 0,

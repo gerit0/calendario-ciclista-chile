@@ -6,7 +6,7 @@ import { INITIAL_RACES } from './data.js';
 import { 
   isSupabaseConfigured, 
   fetchApprovedRacesSupabase, 
-  createPendingRaceSupabase,
+  createRaceSupabase,
   deleteRaceSupabase,
   updateRaceSupabase
 } from './supabase.js';
@@ -147,18 +147,18 @@ export async function getAllRaces() {
 }
 
 /**
- * Intenta enviar una nueva carrera a Supabase en estado 'pendiente'.
- * Si Supabase no está configurado o si falla la conexión/inserción,
- * guarda la carrera en localStorage con saveCustomRace(newRace).
- * @param {Object} newRace 
+ * Guarda una nueva carrera en Supabase directamente como 'aprobada'.
+ * Requiere userId del organizador autenticado.
+ * @param {Object} newRace
+ * @param {string} userId UID del usuario autenticado
  * @returns {Promise<{ success: boolean, source: string, data?: Object, error?: any }>}
  */
-export async function saveRace(newRace) {
+export async function saveRace(newRace, userId) {
   if (!newRace) return { success: false, source: 'none' };
 
   if (isSupabaseConfigured()) {
     try {
-      const res = await createPendingRaceSupabase(newRace);
+      const res = await createRaceSupabase(newRace, userId);
       if (res && res.success) {
         return { success: true, source: 'supabase', data: res.data };
       }

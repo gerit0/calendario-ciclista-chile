@@ -32,7 +32,12 @@ export function parseCurrentRoute() {
   if (eventMatch) {
     return { viewName: 'detail', params: { id: eventMatch[1] }, path };
   }
-  
+
+  const editMatch = path.match(/^\/editar\/([^/]+)/);
+  if (editMatch) {
+    return { viewName: 'edit', params: { id: editMatch[1] }, path };
+  }
+
   return { viewName: 'calendar', params: {}, path: '/' };
 }
 

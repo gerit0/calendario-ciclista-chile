@@ -250,7 +250,7 @@ export function renderRegionSelect(container, regions = [], activeRegion = 'Toda
  * @param {HTMLElement} container 
  * @param {Array} races 
  */
-export function renderRaceCards(container, races = [], isAdmin = false) {
+export function renderRaceCards(container, races = [], isAdmin = false, currentUserId = null) {
   if (!container) return;
 
   if (races.length === 0) {
@@ -433,7 +433,7 @@ export function renderRaceCards(container, races = [], isAdmin = false) {
               </div>
             </div>
 
-            ${isAdmin ? `
+            ${(isAdmin || (currentUserId && race.creadoPor === currentUserId)) ? `
             <div class="flex gap-2 w-full pt-1">
               <button type="button" data-edit-id="${race.id}" class="flex-grow py-2.5 rounded-xl bg-surface-container border border-outline-variant/60 text-primary font-bold text-xs hover:bg-surface-container-high transition-colors flex items-center justify-center gap-1">
                 <span class="material-symbols-outlined text-sm">edit</span> Editar
@@ -456,9 +456,10 @@ export function renderRaceCards(container, races = [], isAdmin = false) {
  * Renderiza la vista detallada de una carrera en el contenedor especificado
  * @param {HTMLElement} container 
  * @param {Object} race 
- * @param {boolean} isAdmin 
+ * @param {boolean} isAdmin
+ * @param {string|null} currentUserId
  */
-export function renderDetailView(container, race, isAdmin = false) {
+export function renderDetailView(container, race, isAdmin = false, currentUserId = null) {
   if (!container || !race) return;
 
   const bookmarked = isBookmarked(race.id);
@@ -482,6 +483,8 @@ export function renderDetailView(container, race, isAdmin = false) {
     displayStatus = 'En Curso';
   }
 
+  const canEditOrDelete = isAdmin || (currentUserId && race.creadoPor === currentUserId);
+
   container.innerHTML = `
     <div class="space-y-8 animate-fadeIn">
       
@@ -497,7 +500,7 @@ export function renderDetailView(container, race, isAdmin = false) {
         </button>
 
         <div class="flex items-center gap-2">
-          ${isAdmin ? `
+          ${canEditOrDelete ? `
             <button type="button" data-edit-id="${race.id}" class="px-4 py-2.5 rounded-xl bg-surface-container border border-outline-variant/55 text-primary font-display font-bold text-sm flex items-center gap-2 hover:bg-surface-container-high transition-all shadow-sm">
               <span class="material-symbols-outlined text-base">edit</span> Editar
             </button>

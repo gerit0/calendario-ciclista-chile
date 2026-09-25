@@ -29,7 +29,9 @@ import {
   fetchRaceByIdSupabase,
   isSupabaseConfigured,
   updateRaceStatusSupabase,
-  uploadRaceImageSupabase
+  uploadRaceImageSupabase,
+  signUpOrLoginOrganizer,
+  loginOrganizer
 } from './supabase.js';
 
 // 2. Estado de la Aplicación
@@ -42,6 +44,7 @@ let activeTab = "all"; // "all" o "my-calendar"
 let activeViewMode = "cards"; // "cards", "month", "week", "day"
 let currentRaceId = null;
 let isAdmin = false;
+let currentUserId = null; // UID del organizador autenticado (no admin)
 
 /**
  * Limpia todos los mensajes de error del formulario
@@ -300,7 +303,7 @@ export async function updateCalendar() {
     // Modo por defecto: Tarjetas
     if (cardsContainer) {
       cardsContainer.classList.remove('hidden');
-      renderRaceCards(cardsContainer, filteredRaces, isAdmin);
+      renderRaceCards(cardsContainer, filteredRaces, isAdmin, currentUserId);
     }
   }
 
@@ -418,21 +421,26 @@ function setupImageUploadHandlers() {
         if (previewImg) previewImg.src = base64Data;
         if (previewContainer) previewContainer.classList.remove('hidden');
 
-        let finalUrl = base64Data;
         try {
           const uploadRes = await uploadRaceImageSupabase(file);
           if (uploadRes && uploadRes.success && uploadRes.url) {
-            finalUrl = uploadRes.url;
+            urlInput.value = uploadRes.url;
             showNotificationToast('📸 Imagen subida a Storage correctamente.');
           } else {
-            console.warn('Fallo Storage, usando fallback Base64:', uploadRes?.error);
-            showNotificationToast('💾 Imagen procesada localmente.');
+            console.warn('Fallo Storage:', uploadRes?.error);
+            showNotificationToast('⚠️ No se pudo subir la imagen a Storage. Por favor ingresa una URL web directa.');
+            urlInput.value = '';
+            if (previewContainer) previewContainer.classList.add('hidden');
+            if (previewImg) previewImg.src = '';
           }
         } catch (err) {
-          console.warn('Error subiendo imagen, usando Base64:', err);
+          console.warn('Error subiendo imagen:', err);
+          showNotificationToast('⚠️ Error al subir la imagen. Por favor ingresa una URL web directa.');
+          urlInput.value = '';
+          if (previewContainer) previewContainer.classList.add('hidden');
+          if (previewImg) previewImg.src = '';
         }
 
-        urlInput.value = finalUrl;
         zone.innerHTML = originalHtml;
         zone.style.pointerEvents = 'auto';
       };
@@ -677,12 +685,12 @@ function setupEventHandlers() {
         return;
       }
 
-      // Editar Carrera (Admin)
+      // Editar Carrera (Admin u Organizador)
       const editBtn = e.target.closest('[data-edit-id]');
       if (editBtn) {
         e.stopPropagation();
         const raceId = editBtn.getAttribute('data-edit-id');
-        openEditModal(raceId);
+        navigateTo(`/editar/${raceId}`);
         return;
       }
 
@@ -725,10 +733,7 @@ function setupEventHandlers() {
       const editBtn = e.target.closest('[data-edit-id]');
       if (editBtn) {
         const raceId = editBtn.getAttribute('data-edit-id');
-        const { openEditModal } = await import('./admin.js');
-        const races = await getAllRaces();
-        const race = races.find(r => String(r.id) === String(raceId));
-        if (race) openEditModal(race);
+        navigateTo(`/editar/${raceId}`);
         return;
       }
 
@@ -747,7 +752,7 @@ function setupEventHandlers() {
         const races = await getAllRaces();
         const race = races.find(r => r.id === raceId);
         if (race) {
-          renderDetailView(detailContainer, race, isAdmin);
+          renderDetailView(detailContainer, race, isAdmin, currentUserId);
         }
         await updateCalendar();
       }
@@ -979,8 +984,41 @@ function setupEventHandlers() {
         participants: 1
       };
 
+      // 5. Autenticar organizador y guardar la carrera
+      let publisherId = currentUserId; // puede ya estar logueado (sesión activa)
+
+      const organizerEmail = (document.getElementById('form-organizer-email')?.value || '').trim();
+      const organizerPassword = (document.getElementById('form-organizer-password')?.value || '').trim();
+
+      if (!publisherId) {
+        if (!organizerEmail || !organizerPassword) {
+          showNotificationToast('⚠️ Debes ingresar tu email y contraseña de organizador para publicar la carrera.');
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            submitBtn.innerHTML = originalSubmitHtml;
+          }
+          document.getElementById('form-organizer-email')?.focus();
+          return;
+        }
+
+        const authRes = await signUpOrLoginOrganizer(organizerEmail, organizerPassword);
+        if (!authRes.success || !authRes.userId) {
+          showNotificationToast('⚠️ Error al verificar tu cuenta: ' + (authRes.error || 'Email o contraseña incorrectos.'));
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            submitBtn.innerHTML = originalSubmitHtml;
+          }
+          return;
+        }
+        publisherId = authRes.userId;
+        currentUserId = publisherId;
+        updateOrganizerUI();
+      }
+
       try {
-        const saveRes = await saveRace(newRace);
+        const saveRes = await saveRace(newRace, publisherId);
         if (saveRes && saveRes.success === false) {
           throw new Error(saveRes.error?.message || saveRes.error || 'Error al guardar en la base de datos');
         }
@@ -995,8 +1033,8 @@ function setupEventHandlers() {
         return;
       }
 
-      // 5. Mostrar banner flotante de notificación modal/toast en pantalla
-      showNotificationToast("¡Propuesta de carrera enviada a moderación! Tu evento ha sido registrado en estado 'pendiente' y se mostrará en el calendario público una vez sea revisado y aprobado por el administrador.");
+      // 6. Mostrar banner flotante de éxito
+      showNotificationToast('✅ ¡Carrera publicada con éxito! Ya aparece en el calendario. Puedes editarla o eliminarla iniciando sesión con tu cuenta de organizador.');
 
       // 6. Limpiar el formulario y navegar a la vista de calendario
       raceForm.reset();
@@ -1077,6 +1115,9 @@ function setupEventHandlers() {
   if (closeEditBtn) {
     closeEditBtn.addEventListener('click', () => {
       if (editModal) editModal.classList.add('hidden');
+      if (window.location.pathname.startsWith('/editar/')) {
+        navigateTo('/');
+      }
     });
   }
 
@@ -1084,6 +1125,9 @@ function setupEventHandlers() {
   if (cancelEditBtn) {
     cancelEditBtn.addEventListener('click', () => {
       if (editModal) editModal.classList.add('hidden');
+      if (window.location.pathname.startsWith('/editar/')) {
+        navigateTo('/');
+      }
     });
   }
 
@@ -1183,12 +1227,14 @@ function setupEventHandlers() {
         if (editModal) editModal.classList.add('hidden');
         await updateCalendar();
         
-        // Si estábamos viendo el detalle, actualizar la vista
-        if (document.getElementById('view-detail')?.classList.contains('hidden') === false && currentRaceId === raceId) {
+        // Si la navegación activa es /editar/:id, retornar al detalle del evento
+        if (window.location.pathname.startsWith('/editar/')) {
+          navigateTo(`/evento/${raceId}`);
+        } else if (document.getElementById('view-detail')?.classList.contains('hidden') === false && currentRaceId === raceId) {
           const races = await getAllRaces();
-          const updatedRace = races.find(r => r.id === raceId);
+          const updatedRace = races.find(r => String(r.id) === String(raceId));
           if (updatedRace) {
-            renderDetailView(document.getElementById('detail-content'), updatedRace, isAdmin);
+            renderDetailView(document.getElementById('detail-content'), updatedRace, isAdmin, currentUserId);
           }
         }
       } else {
@@ -1201,6 +1247,7 @@ function setupEventHandlers() {
       }
     });
   }
+
 }
 
 /**
@@ -1234,6 +1281,33 @@ export function updateAuthUI() {
 }
 
 /**
+ * Sincroniza los controles de sesión del organizador (no admin) en el DOM.
+ */
+export function updateOrganizerUI() {
+  const loginBtn = document.getElementById('nav-organizer-login');
+  const logoutBtn = document.getElementById('nav-organizer-logout');
+  const mobileLoginBtn = document.getElementById('mobile-nav-organizer-login');
+  const mobileLogoutBtn = document.getElementById('mobile-nav-organizer-logout');
+
+  // Si hay organizador logueado y no es admin: mostrar logout, ocultar login
+  const isOrganizer = !!currentUserId && !isAdmin;
+
+  [loginBtn, mobileLoginBtn].forEach(btn => {
+    if (btn) {
+      if (isOrganizer) btn.classList.add('hidden');
+      else btn.classList.remove('hidden');
+    }
+  });
+
+  [logoutBtn, mobileLogoutBtn].forEach(btn => {
+    if (btn) {
+      if (isOrganizer) btn.classList.remove('hidden');
+      else btn.classList.add('hidden');
+    }
+  });
+}
+
+/**
  * Carga y renderiza la lista de carreras pendientes en el panel de moderación
  */
 export async function loadPendingRacesList() {
@@ -1252,12 +1326,43 @@ export async function loadPendingRacesList() {
  * @param {string} raceId 
  */
 export async function openEditModal(raceId) {
+  // Garantizar que el modal de edición esté inyectado en el DOM antes de usarlo
+  const { ensureAdminElementsMounted } = await import('./admin.js');
+  ensureAdminElementsMounted();
+
   const editModal = document.getElementById('edit-modal');
   if (!editModal) return;
 
-  const races = await getAllRaces();
-  const race = races.find(r => r.id === raceId);
-  if (!race) return;
+  let race = null;
+  if (isSupabaseConfigured()) {
+    try {
+      race = await fetchRaceByIdSupabase(raceId);
+    } catch (e) {
+      console.warn('Error al consultar carrera en Supabase:', e);
+    }
+  }
+  if (!race) {
+    const races = await getAllRaces();
+    race = races.find(r => String(r.id) === String(raceId));
+  }
+
+  if (!race) {
+    showNotificationToast('⚠️ No se encontró la carrera a editar.');
+    if (window.location.pathname.startsWith('/editar/')) {
+      navigateTo('/');
+    }
+    return;
+  }
+
+  // Verificar permisos: Administrador o creador de la carrera
+  const canEdit = isAdmin || (currentUserId && race.creadoPor === currentUserId);
+  if (!canEdit) {
+    showNotificationToast('⚠️ No tienes permisos para editar esta carrera.');
+    if (window.location.pathname.startsWith('/editar/')) {
+      navigateTo(`/evento/${raceId}`);
+    }
+    return;
+  }
 
   // Pre-rellenar id
   document.getElementById('edit-race-id').value = raceId;
@@ -1432,7 +1537,7 @@ async function initApp() {
       if (race) {
         currentRaceId = race.id;
         if (detailContainer) {
-          renderDetailView(detailContainer, race, isAdmin);
+          renderDetailView(detailContainer, race, isAdmin, currentUserId);
         }
         return;
       } else {
@@ -1467,6 +1572,17 @@ async function initApp() {
       return;
     }
 
+    if (viewName === 'edit') {
+      if (params.id) {
+        switchView('calendar');
+        await updateCalendar();
+        await openEditModal(params.id);
+      } else {
+        navigateTo('/');
+      }
+      return;
+    }
+
     // Default view: calendar
     activeTab = 'all';
     switchView('calendar');
@@ -1476,11 +1592,68 @@ async function initApp() {
   // Auth Check Inicial asíncrono en segundo plano
   getCurrentUser().then(async (user) => {
     if (user) {
-      isAdmin = await checkIsAdmin(user.id);
-      updateAuthUI();
+      const adminCheck = await checkIsAdmin(user.id);
+      if (adminCheck) {
+        isAdmin = true;
+        currentUserId = null;
+        updateAuthUI();
+      } else {
+        // Es un organizador (no admin)
+        isAdmin = false;
+        currentUserId = user.id;
+        updateOrganizerUI();
+        await updateCalendar(); // Refrescar para mostrar botones de edición
+      }
     }
   }).catch(() => {
     isAdmin = false;
+    currentUserId = null;
+  });
+
+  // ── Organizer Login button ──────────────────────────────────────────────
+  ['nav-organizer-login', 'mobile-nav-organizer-login'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('click', async () => {
+        const email = prompt('Email de tu cuenta de organizador:');
+        if (!email) return;
+        const password = prompt('Contraseña:');
+        if (!password) return;
+
+        const res = await loginOrganizer(email, password);
+        if (res.success && res.userId) {
+          // Verificar que no sea un admin que intenta iniciar sesión aquí
+          const adminCheck = await checkIsAdmin(res.userId);
+          if (adminCheck) {
+            isAdmin = true;
+            currentUserId = null;
+            updateAuthUI();
+            showNotificationToast('🔓 Sesión de administrador iniciada.');
+          } else {
+            currentUserId = res.userId;
+            updateOrganizerUI();
+            showNotificationToast('✅ Sesión de organizador iniciada. Ahora puedes editar tus carreras.');
+          }
+          await updateCalendar();
+        } else {
+          showNotificationToast('⚠️ Email o contraseña incorrectos: ' + (res.error || ''));
+        }
+      });
+    }
+  });
+
+  // ── Organizer Logout button ─────────────────────────────────────────────
+  ['nav-organizer-logout', 'mobile-nav-organizer-logout'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('click', async () => {
+        await logoutAdmin(); // Ambos usan la misma sesión Supabase Auth
+        currentUserId = null;
+        updateOrganizerUI();
+        showNotificationToast('👋 Sesión de organizador cerrada.');
+        await updateCalendar();
+      });
+    }
   });
 }
 

@@ -503,10 +503,10 @@ export async function updateRaceSupabase(raceId, raceData) {
       ? rawUrl.trim()
       : null;
 
-    // Separamos los campos en dos grupos para evitar URI_TOO_LONG.
-    // Los campos de texto largo (descripcion, hero_image) se actualizan
-    // en una segunda llamada PATCH independiente para mantener cada URL corta.
-    const shortPayload = {
+    const rawImage = raceData.heroImage || raceData.hero_image || null;
+    const cleanImage = (rawImage && typeof rawImage === 'string' && !rawImage.startsWith('data:')) ? rawImage : null;
+
+    const payload = {
       nombre: raceData.name || raceData.nombre,
       fecha: raceData.date || raceData.fecha,
       disciplina: raceData.discipline || raceData.disciplina,
@@ -519,39 +519,26 @@ export async function updateRaceSupabase(raceId, raceData) {
       categoria: Array.isArray(raceData.categories) 
         ? raceData.categories.join(', ') 
         : (raceData.categoria || raceData.categories),
-      precio: raceData.price != null ? Number(raceData.price) : 0
-    };
-
-    const longPayload = {
-      hero_image: raceData.heroImage || raceData.hero_image || null,
+      precio: raceData.price != null ? Number(raceData.price) : 0,
+      hero_image: cleanImage,
       descripcion: raceData.description || raceData.descripcion || null
     };
 
-    // --- Primera llamada: campos cortos ---
-    let { error: err1 } = await client
+    let { error } = await client
       .from('carreras')
-      .update(shortPayload)
+      .update(payload)
       .eq('id', raceId);
 
     // Fallback defensivo: si la tabla no tiene columnas distancia/desnivel en el caché de esquema
-    if (err1 && (err1.code === 'PGRST204' || String(err1.message || err1).includes('column'))) {
-      const fallbackPayload = { ...shortPayload };
+    if (error && (error.code === 'PGRST204' || String(error.message || error).includes('column'))) {
+      const fallbackPayload = { ...payload };
       delete fallbackPayload.distancia;
       delete fallbackPayload.desnivel;
       const retryRes = await client.from('carreras').update(fallbackPayload).eq('id', raceId);
-      err1 = retryRes.error;
+      error = retryRes.error;
     }
 
-    if (err1) throw err1;
-
-    // --- Segunda llamada: campos de texto largo ---
-    const { error: err2 } = await client
-      .from('carreras')
-      .update(longPayload)
-      .eq('id', raceId);
-
-    if (err2) throw err2;
-
+    if (error) throw error;
     return { success: true };
   } catch (err) {
     console.error('Error al actualizar carrera en Supabase:', err);
