@@ -8,7 +8,8 @@ import {
   fetchApprovedRacesSupabase, 
   createRaceSupabase,
   deleteRaceSupabase,
-  updateRaceSupabase
+  updateRaceSupabase,
+  getAuthToken
 } from './supabase.js';
 
 export const BOOKMARKS_KEY = 'calendariociclista_bookmarks';
@@ -156,13 +157,40 @@ export async function getAllRaces() {
 export async function saveRace(newRace, userId) {
   if (!newRace) return { success: false, source: 'none' };
 
+  // 1. Intentar guardar a través de la API Serverless con validación centralizada
+  try {
+    const token = await getAuthToken();
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    const apiRes = await fetch('/api/races', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(newRace)
+    });
+
+    if (apiRes.ok) {
+      const json = await apiRes.json();
+      if (json.success) {
+        return { success: true, source: 'api', data: json.data };
+      }
+    } else {
+      const errJson = await apiRes.json().catch(() => ({}));
+      if (errJson.error) {
+        return { success: false, source: 'api', error: errJson.error, issues: errJson.issues };
+      }
+    }
+  } catch (apiErr) {
+    console.warn('API /api/races no disponible, ejecutando fallback directo a Supabase:', apiErr);
+  }
+
+  // 2. Fallback directo a Supabase
   if (isSupabaseConfigured()) {
     try {
       const res = await createRaceSupabase(newRace, userId);
       if (res && res.success) {
         return { success: true, source: 'supabase', data: res.data };
       }
-      // Si Supabase responde con error explícito de inserción, retornar la falla
       if (res && res.error) {
         return { success: false, source: 'supabase', error: res.error };
       }
@@ -187,13 +215,34 @@ export async function deleteRace(raceId) {
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   const isUUID = uuidRegex.test(raceId);
 
-  if (isUUID && isSupabaseConfigured()) {
+  if (isUUID) {
+    // 1. Intentar eliminar vía API
     try {
-      const res = await deleteRaceSupabase(raceId);
-      if (res.success) return { success: true, source: 'supabase' };
-      return { success: false, error: res.error };
-    } catch (err) {
-      return { success: false, error: err.message || err };
+      const token = await getAuthToken();
+      const headers = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      const apiRes = await fetch(`/api/races/${raceId}`, {
+        method: 'DELETE',
+        headers
+      });
+
+      if (apiRes.ok) {
+        const json = await apiRes.json();
+        if (json.success) return { success: true, source: 'api' };
+      }
+    } catch (apiErr) {
+      console.warn('API DELETE /api/races/:id falló, intentando Supabase directo:', apiErr);
+    }
+
+    if (isSupabaseConfigured()) {
+      try {
+        const res = await deleteRaceSupabase(raceId);
+        if (res.success) return { success: true, source: 'supabase' };
+        return { success: false, error: res.error };
+      } catch (err) {
+        return { success: false, error: err.message || err };
+      }
     }
   }
 
@@ -237,13 +286,40 @@ export async function updateRace(raceId, raceData) {
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   const isUUID = uuidRegex.test(raceId);
 
-  if (isUUID && isSupabaseConfigured()) {
+  if (isUUID) {
+    // 1. Intentar actualizar vía API Serverless con validación Zod
     try {
-      const res = await updateRaceSupabase(raceId, raceData);
-      if (res.success) return { success: true, source: 'supabase' };
-      return { success: false, error: res.error };
-    } catch (err) {
-      return { success: false, error: err.message || err };
+      const token = await getAuthToken();
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      const apiRes = await fetch(`/api/races/${raceId}`, {
+        method: 'PATCH',
+        headers,
+        body: JSON.stringify(raceData)
+      });
+
+      if (apiRes.ok) {
+        const json = await apiRes.json();
+        if (json.success) return { success: true, source: 'api', data: json.data };
+      } else {
+        const errJson = await apiRes.json().catch(() => ({}));
+        if (errJson.error) {
+          return { success: false, source: 'api', error: errJson.error, issues: errJson.issues };
+        }
+      }
+    } catch (apiErr) {
+      console.warn('API PATCH /api/races/:id falló, intentando Supabase directo:', apiErr);
+    }
+
+    if (isSupabaseConfigured()) {
+      try {
+        const res = await updateRaceSupabase(raceId, raceData);
+        if (res.success) return { success: true, source: 'supabase' };
+        return { success: false, error: res.error };
+      } catch (err) {
+        return { success: false, error: err.message || err };
+      }
     }
   }
 

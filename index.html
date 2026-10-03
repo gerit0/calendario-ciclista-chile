@@ -419,7 +419,7 @@
         </div>
       </div>
 
-      <form id="race-form" class="bg-white p-6 sm:p-8 rounded-3xl border border-outline-variant/40 shadow-sm space-y-6">
+      <form id="race-form" method="POST" action="javascript:void(0);" onsubmit="event.preventDefault();" class="bg-white p-6 sm:p-8 rounded-3xl border border-outline-variant/40 shadow-sm space-y-6">
 
         <!-- Advertencia de conflicto de fechas (oculta por defecto, mostrada por JS) -->
         <div id="form-conflict-warning" class="hidden w-full p-4 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-850 text-sm font-semibold flex flex-col gap-1">
@@ -760,7 +760,7 @@
         <h3 class="font-display font-black text-2xl text-primary">Ingreso Admin</h3>
         <p class="text-xs text-outline leading-tight">Inicia sesión con tus credenciales de Supabase para habilitar la edición de carreras.</p>
       </div>
-      <form id="login-form" method="POST" action="javascript:void(0);" class="space-y-4">
+      <form id="login-form" method="POST" action="javascript:void(0);" onsubmit="event.preventDefault();" class="space-y-4">
         <div id="login-error-container" class="hidden p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-700 text-xs font-semibold flex items-center gap-1.5">
           <span class="material-symbols-outlined text-base">error</span>
           <span id="login-error-msg">Credenciales incorrectas</span>
@@ -798,7 +798,7 @@
           <p class="text-xs text-outline">Modifica los detalles del evento seleccionado.</p>
         </div>
       </div>
-      <form id="edit-form" method="POST" action="javascript:void(0);" class="space-y-6">
+      <form id="edit-form" method="POST" action="javascript:void(0);" onsubmit="event.preventDefault();" class="space-y-6">
         <input type="hidden" id="edit-race-id">
         <div>
           <label for="edit-form-name" class="block font-display font-bold text-sm text-primary mb-2">
@@ -1010,7 +1010,7 @@
   </div>
 
   <!-- Main JavaScript bundle (ESM con importmap para Supabase) -->
-  <script type="module" src="js/bundle.js?v=19"></script>
+  <script type="module" src="/js/bundle.js?v=1e29a961"></script>
 
 </body>
 

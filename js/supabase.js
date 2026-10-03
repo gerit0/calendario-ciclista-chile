@@ -213,9 +213,16 @@ export async function createRaceSupabase(raceData, userId) {
       ? rawUrl.trim()
       : null;
 
+    const rawImage = raceData.hero_image || raceData.heroImage || null;
+    const cleanImage = (rawImage && typeof rawImage === 'string' && !rawImage.startsWith('data:')) ? rawImage : null;
+    const startDate = raceData.startDate || raceData.fecha_inicio || raceData.date || raceData.fecha;
+    const endDate = raceData.endDate || raceData.fecha_fin || startDate;
+
     const payload = {
       nombre: raceData.nombre || raceData.name,
-      fecha: raceData.fecha || raceData.date,
+      fecha: startDate,
+      fecha_inicio: startDate,
+      fecha_fin: endDate,
       disciplina: raceData.disciplina || raceData.discipline,
       region: raceData.region || null,
       ubicacion: raceData.ubicacion || raceData.city || null,
@@ -227,8 +234,9 @@ export async function createRaceSupabase(raceData, userId) {
         ? raceData.categories.join(', ')
         : (raceData.categoria || raceData.categories || null),
       precio: raceData.precio != null ? raceData.precio : (raceData.price != null ? raceData.price : 0),
-      hero_image: raceData.hero_image || raceData.heroImage || null,
+      hero_image: cleanImage,
       descripcion: raceData.descripcion || raceData.description || null,
+      status: raceData.status || 'Inscripciones Abiertas',
       estado: 'aprobada',
       creado_por: userId
     };
@@ -388,6 +396,22 @@ export async function getCurrentUser() {
 }
 
 /**
+ * Obtiene el access_token JWT de la sesión activa en Supabase.
+ * @returns {Promise<string|null>}
+ */
+export async function getAuthToken() {
+  const client = getSupabase();
+  if (!client) return null;
+
+  try {
+    const { data } = await client.auth.getSession();
+    return data?.session?.access_token || null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Verifica si un usuario tiene rol de administrador en la tabla `usuarios_admin`.
  * @param {string} userId 
  * @returns {Promise<boolean>}
@@ -505,10 +529,14 @@ export async function updateRaceSupabase(raceId, raceData) {
 
     const rawImage = raceData.heroImage || raceData.hero_image || null;
     const cleanImage = (rawImage && typeof rawImage === 'string' && !rawImage.startsWith('data:')) ? rawImage : null;
+    const startDate = raceData.startDate || raceData.fecha_inicio || raceData.date || raceData.fecha;
+    const endDate = raceData.endDate || raceData.fecha_fin || startDate;
 
     const payload = {
       nombre: raceData.name || raceData.nombre,
-      fecha: raceData.date || raceData.fecha,
+      fecha: startDate,
+      fecha_inicio: startDate,
+      fecha_fin: endDate,
       disciplina: raceData.discipline || raceData.disciplina,
       region: raceData.region,
       ubicacion: raceData.city || raceData.ubicacion,
@@ -521,7 +549,8 @@ export async function updateRaceSupabase(raceId, raceData) {
         : (raceData.categoria || raceData.categories),
       precio: raceData.price != null ? Number(raceData.price) : 0,
       hero_image: cleanImage,
-      descripcion: raceData.description || raceData.descripcion || null
+      descripcion: raceData.description || raceData.descripcion || null,
+      status: raceData.status || null
     };
 
     let { error } = await client

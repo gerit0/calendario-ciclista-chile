@@ -4,8 +4,12 @@
   "description": "Calendario Nacional de Ciclismo Chile – Plataforma open para Gran Fondo, MTB, Gravel y más.",
   "private": true,
   "scripts": {
-    "dev": "npx serve . -p 3000",
-    "test": "node qa_test_runner.js"
+    "dev": "npx serve . -p 3000 -s",
+    "build": "node scripts/build.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "lint": "eslint ."
   },
   "keywords": [
     "ciclismo",
@@ -17,11 +21,19 @@
   ],
   "license": "UNLICENSED",
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@supabase/supabase-js": "^2.110.7",
+    "@testing-library/dom": "^10.4.2",
     "axios": "^1.18.1",
-    "puppeteer-core": "^25.3.0"
+    "esbuild": "^0.28.2",
+    "eslint": "^10.12.0",
+    "jsdom": "^30.1.1",
+    "puppeteer-core": "^25.3.0",
+    "vitest": "^5.0.3"
   },
   "dependencies": {
-    "nodemailer": "^9.0.3"
+    "busboy": "^1.6.0",
+    "nodemailer": "^9.0.3",
+    "zod": "^4.6.5"
   }
 }

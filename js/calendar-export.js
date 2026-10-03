@@ -107,8 +107,9 @@ export function buildGoogleCalendarUrl(race) {
   const dist = race.distance || race.distancia || 'N/A';
   const elev = race.elevation || race.desnivel || 'N/A';
   const rawDesc = race.description || race.descripcion || '';
-  
-  const details = `Disciplina: ${discipline}\nDistancia: ${dist} | Desnivel: ${elev}\n${rawDesc}\n\nMás información: https://calendariociclista.vercel.app/evento/${race.id}`;
+  const truncatedDesc = rawDesc.length > 1000 ? (rawDesc.slice(0, 997) + '...') : rawDesc;
+  const eventUrl = race.id ? `https://calendariociclista.vercel.app/evento/${race.id}` : 'https://calendariociclista.vercel.app';
+  const details = `Disciplina: ${discipline}\nDistancia: ${dist} | Desnivel: ${elev}\n\n${truncatedDesc}\n\nMás información: ${eventUrl}`;
 
   const baseUrl = 'https://calendar.google.com/calendar/render';
   const params = new URLSearchParams({

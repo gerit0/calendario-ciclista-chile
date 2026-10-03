@@ -4,6 +4,7 @@
  */
 
 import { isBookmarked } from './storage.js';
+import { escapeHTML } from './validation.js';
 
 /**
  * Parsea una cadena de fecha YYYY-MM-DD a objeto Date a las 00:00:00 hora local
@@ -310,7 +311,7 @@ export function renderRaceCards(container, races = [], isAdmin = false, currentU
         <div class="relative h-48 w-full overflow-hidden bg-surface-container">
           <img 
             src="${race.heroImage || 'https://images.unsplash.com/photo-1541625602330-2277a4c46182?auto=format&fit=crop&w=800&q=80'}" 
-            alt="${race.name}" 
+            alt="${escapeHTML(race.name)}" 
             loading="lazy"
             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           >
@@ -320,7 +321,7 @@ export function renderRaceCards(container, races = [], isAdmin = false, currentU
           <div class="absolute top-3 left-3 flex flex-wrap gap-1.5 z-10">
             <span class="px-3 py-1 rounded-lg text-xs font-bold shadow-md flex items-center gap-1 ${disciplineBadgeClass}">
               <span class="material-symbols-outlined text-sm">${getDisciplineIcon(race.discipline)}</span>
-              ${race.discipline}
+              ${escapeHTML(race.discipline)}
             </span>
             ${multiDayBadgeHTML}
             ${freeBadgeHTML}
@@ -342,10 +343,10 @@ export function renderRaceCards(container, races = [], isAdmin = false, currentU
           <div class="absolute bottom-3 left-3 right-3 text-white z-10 flex items-center justify-between text-xs">
             <span class="font-bold flex items-center gap-1 bg-black/40 backdrop-blur-sm px-2.5 py-1 rounded-md">
               <span class="material-symbols-outlined text-sm text-tertiary-fixed">calendar_today</span>
-              ${race.displayDate || race.date}
+              ${escapeHTML(race.displayDate || race.date)}
             </span>
             <span class="font-medium bg-black/40 backdrop-blur-sm px-2.5 py-1 rounded-md truncate max-w-[50%]">
-              ${race.city}
+              ${escapeHTML(race.city)}
             </span>
           </div>
 
@@ -365,28 +366,28 @@ export function renderRaceCards(container, races = [], isAdmin = false, currentU
 
             <!-- Título de la Carrera -->
             <h3 class="font-display font-bold text-xl text-primary group-hover:text-secondary transition-colors line-clamp-2 leading-snug">
-              ${race.name}
+              ${escapeHTML(race.name)}
             </h3>
 
             <!-- Especificaciones técnicas (Distancia & Desnivel) -->
             <div class="flex items-center gap-4 text-xs font-semibold text-outline pt-1">
               <span class="flex items-center gap-1">
                 <span class="material-symbols-outlined text-base">straighten</span>
-                ${race.distance}
+                ${escapeHTML(race.distance || 'N/A')}
               </span>
               <span class="flex items-center gap-1">
                 <span class="material-symbols-outlined text-base">landscape</span>
-                ${race.elevation}
+                ${escapeHTML(race.elevation || 'N/A')}
               </span>
               <span class="flex items-center gap-1 truncate">
                 <span class="material-symbols-outlined text-base">map</span>
-                ${race.region.replace('Región de ', '').replace("Región del Libertador General ", "").replace("Región del ", "")}
+                ${escapeHTML((race.region || '').replace('Región de ', '').replace("Región del Libertador General ", "").replace("Región del ", ""))}
               </span>
             </div>
 
             <!-- Descripción corta -->
             <p class="text-xs text-gray-600 line-clamp-2 leading-relaxed pt-1">
-              ${race.description}
+              ${escapeHTML(race.description || '')}
             </p>
           </div>
 
@@ -526,7 +527,7 @@ export function renderDetailView(container, race, isAdmin = false, currentUserId
         <div class="relative h-72 sm:h-96 w-full">
           <img 
             src="${race.heroImage || 'https://images.unsplash.com/photo-1541625602330-2277a4c46182?auto=format&fit=crop&w=1600&q=80'}" 
-            alt="${race.name}" 
+            alt="${escapeHTML(race.name)}" 
             class="w-full h-full object-cover"
           >
           <div class="absolute inset-0 bg-gradient-to-t from-primary via-primary/60 to-transparent"></div>
@@ -535,7 +536,7 @@ export function renderDetailView(container, race, isAdmin = false, currentUserId
           <div class="absolute top-6 left-6 flex flex-wrap gap-2 z-10">
             <span class="px-3.5 py-1.5 rounded-xl text-xs font-extrabold shadow-lg flex items-center gap-1.5 ${disciplineBadgeClass}">
               <span class="material-symbols-outlined text-base">${getDisciplineIcon(race.discipline)}</span>
-              ${race.discipline}
+              ${escapeHTML(race.discipline)}
             </span>
             ${detailTimeBadgeHTML}
             ${race.isFree ? `<span class="px-3.5 py-1.5 rounded-xl text-xs font-black bg-tertiary-fixed text-primary shadow-lg">Evento Gratuito</span>` : ''}
@@ -545,10 +546,10 @@ export function renderDetailView(container, race, isAdmin = false, currentUserId
           <div class="absolute bottom-6 left-6 right-6 z-10 space-y-3">
             <div class="flex items-center gap-2 text-tertiary-fixed font-display font-bold text-xs uppercase tracking-widest">
               <span class="material-symbols-outlined text-sm">location_on</span>
-              ${race.city}, ${race.region}
+              ${escapeHTML(race.city)}, ${escapeHTML(race.region)}
             </div>
             <h1 class="text-2xl sm:text-4xl md:text-5xl font-display font-black tracking-tight text-white leading-tight">
-              ${race.name}
+              ${escapeHTML(race.name)}
             </h1>
           </div>
 
@@ -569,7 +570,7 @@ export function renderDetailView(container, race, isAdmin = false, currentUserId
                 Fecha
               </span>
               <span class="font-display font-bold text-sm sm:text-base text-primary">
-                ${race.displayDate || race.date}
+                ${escapeHTML(race.displayDate || race.date)}
               </span>
             </div>
 
@@ -579,7 +580,7 @@ export function renderDetailView(container, race, isAdmin = false, currentUserId
                 Distancia
               </span>
               <span class="font-display font-bold text-sm sm:text-base text-primary">
-                ${race.distance}
+                ${escapeHTML(race.distance || 'N/A')}
               </span>
             </div>
 
@@ -589,7 +590,7 @@ export function renderDetailView(container, race, isAdmin = false, currentUserId
                 Desnivel
               </span>
               <span class="font-display font-bold text-sm sm:text-base text-primary">
-                ${race.elevation}
+                ${escapeHTML(race.elevation || 'N/A')}
               </span>
             </div>
 
@@ -611,7 +612,7 @@ export function renderDetailView(container, race, isAdmin = false, currentUserId
               Descripción del Evento
             </h3>
             <p class="text-gray-700 text-base leading-relaxed whitespace-pre-line">
-              ${race.description}
+              ${escapeHTML(race.description || '')}
             </p>
           </div>
 

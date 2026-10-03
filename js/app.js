@@ -20,6 +20,7 @@ import {
   getRaceTimeStatus
 } from './ui.js';
 import { validateRaceForm } from './validation.js';
+import { uploadImage } from './image-utils.js';
 import { 
   loginAdmin, 
   logoutAdmin, 
@@ -382,6 +383,13 @@ function setupImageUploadHandlers() {
 
     urlInput.addEventListener('input', (e) => {
       const val = e.target.value.trim();
+      if (val.startsWith('data:')) {
+        showNotificationToast('⚠️ No se permiten imágenes en formato base64. Sube el archivo o usa una URL directa.');
+        e.target.value = '';
+        if (previewContainer) previewContainer.classList.add('hidden');
+        if (previewImg) previewImg.src = '';
+        return;
+      }
       if (val) {
         if (previewImg) previewImg.src = val;
         if (previewContainer) previewContainer.classList.remove('hidden');
@@ -402,7 +410,7 @@ function setupImageUploadHandlers() {
     }
 
     async function processImageFile(file) {
-      if (!file.type.startsWith('image/')) {
+      if (!file || !file.type.startsWith('image/')) {
         showNotificationToast('⚠️ Por favor selecciona un archivo de imagen válido.');
         return;
       }
@@ -410,42 +418,33 @@ function setupImageUploadHandlers() {
       const originalHtml = zone.innerHTML;
       zone.innerHTML = `
         <span class="material-symbols-outlined text-primary text-3xl animate-spin">sync</span>
-        <span class="text-xs font-bold text-primary">Subiendo...</span>
+        <span class="text-xs font-bold text-primary">Optimizando y subiendo...</span>
       `;
       zone.style.pointerEvents = 'none';
 
-      const reader = new FileReader();
-      reader.onload = async (event) => {
-        const base64Data = event.target.result;
-
-        if (previewImg) previewImg.src = base64Data;
-        if (previewContainer) previewContainer.classList.remove('hidden');
-
-        try {
-          const uploadRes = await uploadRaceImageSupabase(file);
-          if (uploadRes && uploadRes.success && uploadRes.url) {
-            urlInput.value = uploadRes.url;
-            showNotificationToast('📸 Imagen subida a Storage correctamente.');
-          } else {
-            console.warn('Fallo Storage:', uploadRes?.error);
-            showNotificationToast('⚠️ No se pudo subir la imagen a Storage. Por favor ingresa una URL web directa.');
-            urlInput.value = '';
-            if (previewContainer) previewContainer.classList.add('hidden');
-            if (previewImg) previewImg.src = '';
-          }
-        } catch (err) {
-          console.warn('Error subiendo imagen:', err);
-          showNotificationToast('⚠️ Error al subir la imagen. Por favor ingresa una URL web directa.');
+      try {
+        const uploadRes = await uploadImage(file);
+        if (uploadRes && uploadRes.success && uploadRes.url) {
+          urlInput.value = uploadRes.url;
+          if (previewImg) previewImg.src = uploadRes.url;
+          if (previewContainer) previewContainer.classList.remove('hidden');
+          showNotificationToast('📸 Imagen optimizada y subida correctamente.');
+        } else {
+          showNotificationToast('⚠️ No se pudo subir la imagen: ' + (uploadRes?.error || 'Verifica el tamaño o formato'));
           urlInput.value = '';
           if (previewContainer) previewContainer.classList.add('hidden');
           if (previewImg) previewImg.src = '';
         }
-
+      } catch (err) {
+        console.warn('Error subiendo imagen:', err);
+        showNotificationToast('⚠️ Error al procesar imagen: ' + err.message);
+        urlInput.value = '';
+        if (previewContainer) previewContainer.classList.add('hidden');
+        if (previewImg) previewImg.src = '';
+      } finally {
         zone.innerHTML = originalHtml;
         zone.style.pointerEvents = 'auto';
-      };
-
-      reader.readAsDataURL(file);
+      }
     }
   };
 
@@ -865,6 +864,7 @@ function setupEventHandlers() {
         distance: formData.get('distance') || '',
         elevation: formData.get('elevation') || '',
         price: isFree ? 0 : formData.get('price') || 0,
+        status: 'Inscripciones Abiertas',
         heroImage: formData.get('heroImage') || '',
         description: formData.get('description') || '',
         categories: formData.get('categories') || ''
@@ -1205,6 +1205,7 @@ function setupEventHandlers() {
         distance: formData.get('distance') || '',
         elevation: formData.get('elevation') || '',
         price: isFree ? 0 : formData.get('price') || 0,
+        status: formData.get('status') || document.getElementById('edit-form-status')?.value || 'Inscripciones Abiertas',
         heroImage: formData.get('heroImage') || '',
         description: formData.get('description') || '',
         categories: formData.get('categories') || ''
@@ -1481,6 +1482,33 @@ async function initApp() {
 
   setupEventHandlers();
 
+  // Detectar y normalizar enlaces antiguos malformados con query params inflados
+  const currentSearch = window.location.search || '';
+  if (currentSearch && (currentSearch.includes('heroImage') || currentSearch.includes('name=') || currentSearch.length > 500)) {
+    window.history.replaceState({}, '', window.location.pathname || '/');
+    showNotificationToast('ℹ️ Enlace antiguo normalizado. Mostrando el calendario.');
+  }
+
+  // Verificación de Autenticación Inicial antes de procesar la ruta inicial
+  try {
+    const user = await getCurrentUser();
+    if (user) {
+      const adminCheck = await checkIsAdmin(user.id);
+      if (adminCheck) {
+        isAdmin = true;
+        currentUserId = null;
+        updateAuthUI();
+      } else {
+        isAdmin = false;
+        currentUserId = user.id;
+        updateOrganizerUI();
+      }
+    }
+  } catch (err) {
+    isAdmin = false;
+    currentUserId = null;
+  }
+
   // Inicializar Enrutador History API de forma inmediata
   initRouter(async (route) => {
     const { viewName, params } = route;
@@ -1587,27 +1615,6 @@ async function initApp() {
     activeTab = 'all';
     switchView('calendar');
     await updateCalendar();
-  });
-
-  // Auth Check Inicial asíncrono en segundo plano
-  getCurrentUser().then(async (user) => {
-    if (user) {
-      const adminCheck = await checkIsAdmin(user.id);
-      if (adminCheck) {
-        isAdmin = true;
-        currentUserId = null;
-        updateAuthUI();
-      } else {
-        // Es un organizador (no admin)
-        isAdmin = false;
-        currentUserId = user.id;
-        updateOrganizerUI();
-        await updateCalendar(); // Refrescar para mostrar botones de edición
-      }
-    }
-  }).catch(() => {
-    isAdmin = false;
-    currentUserId = null;
   });
 
   // ── Organizer Login button ──────────────────────────────────────────────

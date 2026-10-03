@@ -1,19 +1,20 @@
 /**
  * Módulo de Sanitización y Validación (js/validation.js)
- * Proporciona funciones para sanitizar cadenas HTML, validar URLs y validar formularios de eventos ciclistas.
+ * Conecta el esquema Zod compartido (shared/schema.js) con la interfaz de usuario.
  */
 
-const VALID_DISCIPLINES = ['Ruta', 'MTB', 'Gravel', 'Pista', 'BMX', 'Virtual'];
+import { raceSchema, sanitizePlainText, VALID_DISCIPLINES } from '../shared/schema.js';
+import { ALLOWED_CATEGORIES, normalizeCategories } from '../shared/categories.js';
+
+export { VALID_DISCIPLINES, ALLOWED_CATEGORIES, normalizeCategories, sanitizePlainText };
 
 /**
- * Sanitiza una cadena escapando entidades HTML peligrosas (&, <, >, ", ')
- * y eliminando espacios sobrantes en los extremos.
- * @param {*} str - Valor a sanitizar.
- * @returns {string} Cadena sanitizada o '' si no es una cadena de texto.
+ * Escapa entidades HTML peligrosas para renderizado seguro en el DOM.
+ * @param {*} str
+ * @returns {string}
  */
-export function sanitizeHTML(str) {
+export function escapeHTML(str) {
   if (typeof str !== 'string') return '';
-  
   const map = {
     '&': '&amp;',
     '<': '&lt;',
@@ -21,26 +22,24 @@ export function sanitizeHTML(str) {
     '"': '&quot;',
     "'": '&#39;'
   };
-
-  return str.trim().replace(/[&<>"']/g, match => map[match]);
+  return str.replace(/[&<>"']/g, match => map[match]);
 }
 
+// Mantener compatibilidad con llamadas anteriores a sanitizeHTML
+export const sanitizeHTML = escapeHTML;
+
 /**
- * Valida si una URL es válida y utiliza un protocolo seguro (http: o https:).
- * Permite cadenas vacías (URL opcional).
- * Retorna false para esquemas maliciosos como javascript:, data:, etc.
- * @param {string} urlStr - Cadena de URL a validar.
- * @returns {boolean} true si es vacía/opcional o es una URL válida con http/https.
+ * Valida si una URL es sintácticamente válida con protocolo seguro.
+ * @param {string} urlStr
+ * @returns {boolean}
  */
 export function isValidURL(urlStr) {
   if (!urlStr || typeof urlStr !== 'string') return true;
   let trimmed = urlStr.trim();
   if (trimmed === '') return true;
-
   if (!/^https?:\/\//i.test(trimmed)) {
     trimmed = 'https://' + trimmed;
   }
-
   try {
     const parsed = new URL(trimmed);
     return parsed.protocol === 'http:' || parsed.protocol === 'https:';
@@ -50,109 +49,32 @@ export function isValidURL(urlStr) {
 }
 
 /**
- * Valida y sanitiza los datos introducidos en el formulario de creación/edición de carrera.
- * @param {Object} data - Objeto con los datos del formulario.
- * @returns {{ isValid: boolean, errors: Object, sanitizedData: Object }} Objeto con el resultado de la validación.
+ * Valida y sanitiza el formulario de carrera usando el esquema Zod unificado.
+ * @param {Object} data - Datos crudos del formulario.
+ * @returns {{ isValid: boolean, errors: Record<string, string>, sanitizedData: Object }}
  */
 export function validateRaceForm(data) {
-  const raw = data || {};
+  const parseResult = raceSchema.safeParse(data);
+
+  if (parseResult.success) {
+    return {
+      isValid: true,
+      errors: {},
+      sanitizedData: parseResult.data
+    };
+  }
+
   const errors = {};
-  const sanitizedData = {};
-
-  // 1. name (3 a 100 caracteres)
-  const name = sanitizeHTML(raw.name);
-  sanitizedData.name = name;
-  if (!name || name.length < 3 || name.length > 100) {
-    errors.name = 'El nombre de la carrera debe tener entre 3 y 100 caracteres.';
+  for (const issue of parseResult.error.issues) {
+    const field = issue.path[0] || 'general';
+    if (!errors[field]) {
+      errors[field] = issue.message;
+    }
   }
-
-  // 2. discipline (debe ser una de: 'Ruta', 'MTB', 'Gravel', 'Pista', 'BMX', 'Virtual')
-  const discipline = typeof raw.discipline === 'string' ? raw.discipline.trim() : '';
-  sanitizedData.discipline = discipline;
-  if (!VALID_DISCIPLINES.includes(discipline)) {
-    errors.discipline = 'Debe seleccionar una disciplina válida (Ruta, MTB, Gravel, Pista, BMX, Virtual).';
-  }
-
-  // 3. date / startDate / endDate (formato AAAA-MM-DD)
-  const isMultiDay = raw.isMultiDay === true || raw.isMultiDay === 'on' || raw.isMultiDay === 'true';
-  const dateStr = typeof raw.date === 'string' ? raw.date.trim() : '';
-  const startDateStr = (isMultiDay && typeof raw.startDate === 'string' && raw.startDate.trim() !== '') ? raw.startDate.trim() : dateStr;
-  const endDateStr = (isMultiDay && typeof raw.endDate === 'string' && raw.endDate.trim() !== '') ? raw.endDate.trim() : startDateStr;
-
-  const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-  
-  sanitizedData.date = startDateStr || dateStr;
-  sanitizedData.startDate = startDateStr || dateStr;
-  sanitizedData.endDate = endDateStr || startDateStr || dateStr;
-
-  if (!sanitizedData.startDate || !dateRegex.test(sanitizedData.startDate) || isNaN(Date.parse(sanitizedData.startDate))) {
-    errors.date = 'La fecha de inicio debe tener un formato válido (AAAA-MM-DD).';
-  } else if (isMultiDay && (!sanitizedData.endDate || !dateRegex.test(sanitizedData.endDate) || isNaN(Date.parse(sanitizedData.endDate)))) {
-    errors.endDate = 'La fecha de término debe tener un formato válido (AAAA-MM-DD).';
-  } else if (isMultiDay && sanitizedData.endDate < sanitizedData.startDate) {
-    errors.endDate = 'La fecha de término no puede ser anterior a la fecha de inicio.';
-  }
-
-  // 4. region (obligatorio)
-  const region = sanitizeHTML(raw.region);
-  sanitizedData.region = region;
-  if (!region) {
-    errors.region = 'La región es obligatoria.';
-  }
-
-  // 5. organizador (2 a 100 caracteres)
-  const organizador = sanitizeHTML(raw.organizador);
-  sanitizedData.organizador = organizador;
-  if (!organizador || organizador.length < 2 || organizador.length > 100) {
-    errors.organizador = 'El organizador debe tener entre 2 y 100 caracteres.';
-  }
-
-  // 6. registrationUrl (valida con isValidURL)
-  let registrationUrl = typeof raw.registrationUrl === 'string' ? raw.registrationUrl.trim() : '';
-  if (registrationUrl && !/^https?:\/\//i.test(registrationUrl)) {
-    registrationUrl = 'https://' + registrationUrl;
-  }
-  sanitizedData.registrationUrl = registrationUrl;
-  if (!isValidURL(registrationUrl)) {
-    errors.registrationUrl = 'La URL de inscripción debe ser una URL válida (ej: https://ejemplo.cl).';
-  }
-
-  // 7. city (obligatorio, 1 a 100 caracteres)
-  const city = sanitizeHTML(raw.city);
-  sanitizedData.city = city;
-  if (!city || city.length < 1 || city.length > 100) {
-    errors.city = 'La ciudad / comuna es obligatoria (máximo 100 caracteres).';
-  }
-
-  // 8. distance (obligatorio, 1 a 30 caracteres)
-  const distance = sanitizeHTML(raw.distance);
-  sanitizedData.distance = distance;
-  if (!distance || distance.length < 1 || distance.length > 30) {
-    errors.distance = 'La distancia es obligatoria (ej: 120 km) y no puede superar 30 caracteres.';
-  }
-
-  // 9. description (obligatorio, 10 a 2000 caracteres)
-  const description = sanitizeHTML(raw.description);
-  sanitizedData.description = description;
-  if (!description || description.length < 10 || description.length > 2000) {
-    errors.description = 'La descripción es obligatoria (entre 10 y 2000 caracteres).';
-  }
-
-  // 10. Campos opcionales (elevation, price, heroImage)
-  sanitizedData.elevation = sanitizeHTML(raw.elevation);
-  sanitizedData.price = sanitizeHTML(raw.price);
-
-  let heroImage = typeof raw.heroImage === 'string' ? raw.heroImage.trim() : '';
-  if (heroImage && heroImage.startsWith('data:')) {
-    errors.heroImage = 'Las imágenes deben subirse al almacenamiento o usar una URL web directa (https://). No se permiten imágenes en base64.';
-  } else if (heroImage && !isValidURL(heroImage)) {
-    errors.heroImage = 'La imagen de portada debe ser una URL válida (ej: https://...).';
-  }
-  sanitizedData.heroImage = sanitizeHTML(heroImage);
 
   return {
-    isValid: Object.keys(errors).length === 0,
+    isValid: false,
     errors,
-    sanitizedData
+    sanitizedData: null
   };
 }

@@ -75,7 +75,7 @@ export function ensureAdminElementsMounted() {
           <h3 class="font-display font-black text-2xl text-primary">Ingreso Admin</h3>
           <p class="text-xs text-outline leading-tight">Inicia sesión con tus credenciales de Supabase para habilitar la edición de carreras.</p>
         </div>
-        <form id="login-form" class="space-y-4">
+        <form id="login-form" method="POST" action="javascript:void(0);" onsubmit="event.preventDefault();" class="space-y-4">
           <div id="login-error-container" class="hidden p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-700 text-xs font-semibold flex items-center gap-1.5">
             <span class="material-symbols-outlined text-base">error</span>
             <span id="login-error-msg">Credenciales incorrectas</span>
@@ -119,7 +119,7 @@ export function ensureAdminElementsMounted() {
             <p class="text-xs text-outline">Modifica los detalles del evento seleccionado.</p>
           </div>
         </div>
-        <form id="edit-form" method="POST" action="javascript:void(0);" class="space-y-6">
+        <form id="edit-form" method="POST" action="javascript:void(0);" onsubmit="event.preventDefault();" class="space-y-6">
           <input type="hidden" id="edit-race-id">
           <div>
             <label for="edit-form-name" class="block font-display font-bold text-sm text-primary mb-2">

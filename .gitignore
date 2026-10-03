@@ -7,3 +7,9 @@ node_modules/
 Thumbs.db
 
 .vercel
+backups/
+test-results/
+playwright-report/
+scratch/
+screenshot_*.png
+supabase/.temp/
