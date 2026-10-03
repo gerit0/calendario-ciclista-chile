@@ -423,18 +423,29 @@ function bindPendingRaceActionEvents() {
   if (!container) return;
 
   container.querySelectorAll('.btn-approve-race, [data-approve-id]').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
+    btn.addEventListener('click', async (_e) => {
       const raceId = btn.getAttribute('data-id') || btn.getAttribute('data-approve-id') || btn.dataset.id;
       if (!raceId) return;
       btn.disabled = true;
       btn.textContent = 'Aprobando...';
       const res = await updateRaceStatusSupabase(raceId, 'aprobada');
       if (res.success) {
-        showNotificationToast('✅ Carrera aprobada con éxito. Ahora es visible en el calendario público.');
+        showNotificationToast(res.message || '✅ Carrera aprobada con éxito. Ahora es visible en el calendario público.');
         await loadPendingRacesList();
       } else {
-        const errorMsg = res.error?.message || (typeof res.error === 'string' ? res.error : JSON.stringify(res.error));
-        alert('Error al aprobar la carrera: ' + errorMsg);
+        const rawError = res.error?.message || (typeof res.error === 'string' ? res.error : JSON.stringify(res.error || ''));
+        console.error('Detalle técnico de error al aprobar carrera:', res.error);
+
+        let friendlyMsg = 'No se pudo aprobar la carrera. Por favor, reintenta.';
+        if (rawError.includes('check_no_base64_hero_image') || rawError.includes('imagen')) {
+          friendlyMsg = 'La imagen de la carrera presentó un problema de formato. Por favor, reintenta o edítala.';
+        } else if (rawError.includes('permisos') || rawError.includes('Acceso denegado') || rawError.includes('403')) {
+          friendlyMsg = 'No tienes permisos de administrador para realizar esta acción.';
+        } else if (rawError.includes('Sesión') || rawError.includes('401')) {
+          friendlyMsg = 'Tu sesión ha expirado. Por favor, vuelve a iniciar sesión.';
+        }
+
+        showNotificationToast('⚠️ ' + friendlyMsg);
         btn.disabled = false;
         btn.textContent = 'Aprobar';
       }
@@ -442,7 +453,7 @@ function bindPendingRaceActionEvents() {
   });
 
   container.querySelectorAll('.btn-reject-race, [data-reject-id]').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
+    btn.addEventListener('click', async (_e) => {
       const raceId = btn.getAttribute('data-id') || btn.getAttribute('data-reject-id') || btn.dataset.id;
       if (!raceId) return;
       if (!confirm('¿Estás seguro de que deseas rechazar esta propuesta?')) return;
@@ -450,11 +461,20 @@ function bindPendingRaceActionEvents() {
       btn.textContent = 'Rechazando...';
       const res = await updateRaceStatusSupabase(raceId, 'rechazada');
       if (res.success) {
-        showNotificationToast('🚫 Carrera rechazada.');
+        showNotificationToast(res.message || '🚫 Carrera rechazada.');
         await loadPendingRacesList();
       } else {
-        const errorMsg = res.error?.message || (typeof res.error === 'string' ? res.error : JSON.stringify(res.error));
-        alert('Error al rechazar la carrera: ' + errorMsg);
+        const rawError = res.error?.message || (typeof res.error === 'string' ? res.error : JSON.stringify(res.error || ''));
+        console.error('Detalle técnico de error al rechazar carrera:', res.error);
+
+        let friendlyMsg = 'No se pudo rechazar la carrera. Por favor, reintenta.';
+        if (rawError.includes('permisos') || rawError.includes('Acceso denegado') || rawError.includes('403')) {
+          friendlyMsg = 'No tienes permisos de administrador para realizar esta acción.';
+        } else if (rawError.includes('Sesión') || rawError.includes('401')) {
+          friendlyMsg = 'Tu sesión ha expirado. Por favor, vuelve a iniciar sesión.';
+        }
+
+        showNotificationToast('⚠️ ' + friendlyMsg);
         btn.disabled = false;
         btn.textContent = 'Rechazar';
       }

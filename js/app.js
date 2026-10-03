@@ -1141,11 +1141,23 @@ function setupEventHandlers() {
         approveBtn.disabled = true;
         const res = await updateRaceStatusSupabase(id, 'aprobada');
         if (res.success) {
-          showNotificationToast("✅ Carrera aprobada con éxito. Ya es visible en el calendario.");
+          showNotificationToast(res.message || "✅ Carrera aprobada con éxito. Ya es visible en el calendario.");
           await loadPendingRacesList();
           await updateCalendar();
         } else {
-          showNotificationToast("⚠️ No se pudo aprobar la carrera: " + res.error);
+          const rawError = res.error?.message || (typeof res.error === 'string' ? res.error : JSON.stringify(res.error || ''));
+          console.error('Detalle técnico de error al aprobar carrera:', res.error);
+
+          let friendlyMsg = 'No se pudo aprobar la carrera. Por favor, reintenta.';
+          if (rawError.includes('check_no_base64_hero_image') || rawError.includes('imagen')) {
+            friendlyMsg = 'La imagen de la carrera presentó un problema de formato. Por favor, reintenta o edítala.';
+          } else if (rawError.includes('permisos') || rawError.includes('Acceso denegado') || rawError.includes('403')) {
+            friendlyMsg = 'No tienes permisos de administrador para realizar esta acción.';
+          } else if (rawError.includes('Sesión') || rawError.includes('401')) {
+            friendlyMsg = 'Tu sesión ha expirado. Por favor, vuelve a iniciar sesión.';
+          }
+
+          showNotificationToast("⚠️ " + friendlyMsg);
           approveBtn.disabled = false;
         }
         return;
@@ -1157,11 +1169,21 @@ function setupEventHandlers() {
         rejectBtn.disabled = true;
         const res = await updateRaceStatusSupabase(id, 'rechazada');
         if (res.success) {
-          showNotificationToast("❌ Propuesta rechazada.");
+          showNotificationToast(res.message || "🚫 Propuesta rechazada.");
           await loadPendingRacesList();
           await updateCalendar();
         } else {
-          showNotificationToast("⚠️ No se pudo rechazar la carrera: " + res.error);
+          const rawError = res.error?.message || (typeof res.error === 'string' ? res.error : JSON.stringify(res.error || ''));
+          console.error('Detalle técnico de error al rechazar carrera:', res.error);
+
+          let friendlyMsg = 'No se pudo rechazar la carrera. Por favor, reintenta.';
+          if (rawError.includes('permisos') || rawError.includes('Acceso denegado') || rawError.includes('403')) {
+            friendlyMsg = 'No tienes permisos de administrador para realizar esta acción.';
+          } else if (rawError.includes('Sesión') || rawError.includes('401')) {
+            friendlyMsg = 'Tu sesión ha expirado. Por favor, vuelve a iniciar sesión.';
+          }
+
+          showNotificationToast("⚠️ " + friendlyMsg);
           rejectBtn.disabled = false;
         }
       }

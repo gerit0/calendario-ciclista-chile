@@ -466,18 +466,60 @@ export async function fetchPendingRacesSupabase() {
 
 /**
  * Actualiza el estado de una carrera (ej. 'aprobada', 'rechazada').
+ * Prioriza el uso de la API Serverless con validación y conversión de imágenes.
  * @param {string} raceId 
  * @param {'aprobada'|'rechazada'|'pendiente'} status 
- * @returns {Promise<{ success: boolean, error?: any }>}
+ * @returns {Promise<{ success: boolean, message?: string, data?: any, error?: any }>}
  */
 export async function updateRaceStatusSupabase(raceId, status) {
+  if (!raceId) return { success: false, error: 'ID de carrera no válido.' };
+
+  const token = await getAuthToken();
+
+  // 1. Intentar actualizar a través de la API Serverless con verificación de administrador
+  if (status === 'aprobada' || status === 'rechazada') {
+    const action = status === 'aprobada' ? 'approve' : 'reject';
+    try {
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      const apiRes = await fetch(`/api/races/${raceId}/${action}`, {
+        method: 'POST',
+        headers
+      });
+
+      const json = await apiRes.json().catch(() => ({}));
+      if (apiRes.ok && json.success) {
+        return {
+          success: true,
+          message: json.message || `Carrera ${status} con éxito.`,
+          data: json.data
+        };
+      }
+      if (!apiRes.ok) {
+        return {
+          success: false,
+          error: json.error || `Error ${apiRes.status}: ${apiRes.statusText}`
+        };
+      }
+    } catch (apiErr) {
+      console.warn(`API /api/races/${raceId}/${action} no disponible, intentando fallback directo a Supabase:`, apiErr);
+    }
+  }
+
+  // 2. Fallback directo a Supabase
   const client = getSupabase();
   if (!client) return { success: false, error: 'Supabase no está configurado.' };
 
   try {
+    const updatePayload = { estado: status };
+    if (status === 'aprobada') {
+      updatePayload.status = 'Inscripciones Abiertas';
+    }
+
     const { error } = await client
       .from('carreras')
-      .update({ estado: status })
+      .update(updatePayload)
       .eq('id', raceId);
 
     if (error) throw error;

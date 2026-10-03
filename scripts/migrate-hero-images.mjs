@@ -57,7 +57,8 @@ if (!isDryRun && !process.env.SUPABASE_SERVICE_ROLE_KEY) {
 const TARGET_RACE_IDS = [
   'fe28c1f8-56dc-485b-a406-46d7132e89b7', // Curico Tour 2026
   '4e7f73ed-a65a-4889-bd0c-fd3164339c6b', // Ruta del Acido
-  'a1a081da-c9c7-496f-a383-f796b524eb3f'  // Maule Centro 2027
+  'a1a081da-c9c7-496f-a383-f796b524eb3f', // Maule Centro 2027
+  'ffb56586-e413-41ed-a097-5e075bfd5d7e'  // Vuelta Union Ciclista Curico (pendiente)
 ];
 
 const supabase = createClient(SUPABASE_URL, SERVICE_KEY, {
@@ -94,8 +95,8 @@ async function run() {
   console.log(`   ${backupFile}\n`);
 
   // 2. Filtrar las carreras objetivo
-  const targetRaces = allRaces.filter(r => TARGET_RACE_IDS.includes(r.id));
-  console.log(`🔍 Paso 2: Analizando las 3 carreras objetivo (${targetRaces.length} encontradas)...`);
+  const targetRaces = allRaces.filter(r => (r.hero_image && r.hero_image.startsWith('data:image/')) || TARGET_RACE_IDS.includes(r.id));
+  console.log(`🔍 Paso 2: Analizando carreras objetivo (${targetRaces.length} encontradas)...`);
 
   const summary = [];
 

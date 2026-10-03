@@ -225,4 +225,79 @@ test.describe('Flujo E2E: Edición de Carrera y Prevención de Bug 414 URI_TOO_L
     await expect(toast).toContainText('Enlace antiguo normalizado');
   });
 
+  test('4. Flujo de moderación: Aprobar carrera pendiente con base64 procesa vía API, muestra toast y jamás dispara alert()', async ({ page }) => {
+    let alertCalled = false;
+    page.on('dialog', async dialog => {
+      alertCalled = true;
+      await dialog.dismiss();
+    });
+
+    const pendingRaceId = 'ffb56586-e413-41ed-a097-5e075bfd5d7e';
+    const pendingRace = {
+      ...mockRace,
+      id: pendingRaceId,
+      nombre: 'Vuelta Union Ciclista Curico',
+      estado: 'pendiente',
+      hero_image: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='
+    };
+
+    // Mock API de aprobación
+    let approveApiCalled = false;
+    await page.route(`**/api/races/${pendingRaceId}/approve`, async (route) => {
+      approveApiCalled = true;
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          success: true,
+          message: 'Carrera aprobada con éxito.',
+          data: {
+            ...pendingRace,
+            estado: 'aprobada',
+            hero_image: 'https://storage.supabase.co/race-images/races/migrated.png'
+          }
+        })
+      });
+    });
+
+    // Interceptar llamadas de carreras para que retorne la pendiente cuando se pida estado=pendiente
+    await page.route('**/rest/v1/carreras*', async (route) => {
+      const url = route.request().url();
+      if (url.includes('estado=eq.pendiente')) {
+        return route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify([pendingRace])
+        });
+      }
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([mockRace])
+      });
+    });
+
+    // Cargar panel de administración
+    await page.goto('/admin');
+
+    // Esperar a que aparezca la propuesta pendiente
+    const approveBtn = page.locator(`[data-approve-id="${pendingRaceId}"]`).first();
+    await expect(approveBtn).toBeVisible({ timeout: 10000 });
+
+    // Pulsar Aprobar
+    await approveBtn.click();
+
+    // Verificar notificación amigable en UI
+    const toast = page.locator('#toast-notification');
+    await expect(toast).toBeVisible({ timeout: 10000 });
+    await expect(toast).toContainText('Carrera aprobada');
+
+    // Verificar que se llamó a la API serverless
+    expect(approveApiCalled).toBe(true);
+
+    // Regla de Oro: NUNCA se disparó alert() crudo
+    expect(alertCalled).toBe(false);
+  });
+
 });
+
