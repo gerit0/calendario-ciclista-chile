@@ -243,7 +243,8 @@ export async function createRaceSupabase(raceData, userId) {
 
     const insertPromise = client
       .from('carreras')
-      .insert([payload]);
+      .insert([payload])
+      .select('*');
 
     const timeoutPromise = new Promise((_, reject) =>
       setTimeout(() => reject(new Error('TIMEOUT_EXCEEDED')), 6000)
@@ -267,7 +268,7 @@ export async function createRaceSupabase(raceData, userId) {
           : specHeader;
       }
 
-      const retryRes = await client.from('carreras').insert([fallbackPayload]);
+      const retryRes = await client.from('carreras').insert([fallbackPayload]).select('*');
       data = retryRes.data;
       error = retryRes.error;
     }
@@ -277,9 +278,13 @@ export async function createRaceSupabase(raceData, userId) {
       return { success: false, error: error.message || error };
     }
 
+    if (!data || data.length === 0) {
+      return { success: false, error: 'No se pudo crear la carrera: la base de datos no confirmó la inserción.' };
+    }
+
     return {
       success: true,
-      data: (data && data.length > 0) ? data[0] : null
+      data: mapSupabaseToFrontend(data[0])
     };
   } catch (err) {
     console.error('Excepción al crear carrera en Supabase:', err);
@@ -540,12 +545,16 @@ export async function deleteRaceSupabase(raceId) {
   if (!client) return { success: false, error: 'Supabase no está configurado.' };
 
   try {
-    const { error } = await client
+    const { data, error } = await client
       .from('carreras')
       .delete()
-      .eq('id', raceId);
+      .eq('id', raceId)
+      .select('*');
 
     if (error) throw error;
+    if (!data || data.length === 0) {
+      return { success: false, error: 'No tienes permiso para eliminar esta carrera o no existe.' };
+    }
     return { success: true };
   } catch (err) {
     console.error('Error al eliminar carrera de Supabase:', err);
@@ -557,7 +566,7 @@ export async function deleteRaceSupabase(raceId) {
  * Modifica los datos de una carrera existente.
  * @param {string} raceId 
  * @param {Object} raceData 
- * @returns {Promise<{ success: boolean, error?: any }>}
+ * @returns {Promise<{ success: boolean, data?: Object, error?: any }>}
  */
 export async function updateRaceSupabase(raceId, raceData) {
   const client = getSupabase();
@@ -595,22 +604,35 @@ export async function updateRaceSupabase(raceId, raceData) {
       status: raceData.status || null
     };
 
-    let { error } = await client
+    let { data, error } = await client
       .from('carreras')
       .update(payload)
-      .eq('id', raceId);
+      .eq('id', raceId)
+      .select('*');
 
     // Fallback defensivo: si la tabla no tiene columnas distancia/desnivel en el caché de esquema
     if (error && (error.code === 'PGRST204' || String(error.message || error).includes('column'))) {
       const fallbackPayload = { ...payload };
       delete fallbackPayload.distancia;
       delete fallbackPayload.desnivel;
-      const retryRes = await client.from('carreras').update(fallbackPayload).eq('id', raceId);
+      const retryRes = await client.from('carreras').update(fallbackPayload).eq('id', raceId).select('*');
+      data = retryRes.data;
       error = retryRes.error;
     }
 
     if (error) throw error;
-    return { success: true };
+
+    if (!data || data.length === 0) {
+      return {
+        success: false,
+        error: 'No tienes permiso o la carrera no existe (0 filas afectadas).'
+      };
+    }
+
+    return {
+      success: true,
+      data: mapSupabaseToFrontend(data[0])
+    };
   } catch (err) {
     console.error('Error al actualizar carrera en Supabase:', err);
     return { success: false, error: err.message || err };

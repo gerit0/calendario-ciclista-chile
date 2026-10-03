@@ -1254,14 +1254,26 @@ function setupEventHandlers() {
         if (window.location.pathname.startsWith('/editar/')) {
           navigateTo(`/evento/${raceId}`);
         } else if (document.getElementById('view-detail')?.classList.contains('hidden') === false && currentRaceId === raceId) {
-          const races = await getAllRaces();
-          const updatedRace = races.find(r => String(r.id) === String(raceId));
+          const updatedRace = res.data || (await getAllRaces()).find(r => String(r.id) === String(raceId));
           if (updatedRace) {
             renderDetailView(document.getElementById('detail-content'), updatedRace, isAdmin, currentUserId);
           }
         }
       } else {
-        showNotificationToast("⚠️ Error al guardar los cambios: " + res.error);
+        const rawError = res.error?.message || (typeof res.error === 'string' ? res.error : JSON.stringify(res.error || ''));
+        console.error('Error al guardar cambios de la carrera:', res.error);
+
+        let friendlyMsg = 'No se pudieron guardar los cambios.';
+        if (rawError.includes('permiso') || rawError.includes('403') || rawError.includes('permisos')) {
+          friendlyMsg = 'No tienes permiso para editar esta carrera o no existe.';
+        } else if (rawError.includes('Sesión') || rawError.includes('401') || rawError.includes('Autenticación')) {
+          friendlyMsg = 'Tu sesión ha expirado o no has iniciado sesión.';
+        } else if (rawError.includes('check_no_base64_hero_image') || rawError.includes('imagen')) {
+          friendlyMsg = 'La imagen no tiene un formato válido (no se permite base64).';
+        } else if (res.error) {
+          friendlyMsg = typeof res.error === 'string' ? res.error : (res.error.message || friendlyMsg);
+        }
+        showNotificationToast("⚠️ " + friendlyMsg);
       }
 
       if (submitBtn) {

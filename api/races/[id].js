@@ -138,9 +138,13 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: 'Error al guardar los cambios en la base de datos.', details: updateErr.message });
       }
 
+      if (!updatedData) {
+        return res.status(403).json({ error: 'No se pudo actualizar la carrera: no tienes permisos o la carrera no existe.' });
+      }
+
       return res.status(200).json({
         success: true,
-        data: mapDbToFrontend(updatedData || { id: raceId, ...dbPayload })
+        data: mapDbToFrontend(updatedData)
       });
     } catch (err) {
       return res.status(500).json({ error: 'Excepción durante la actualización.', details: err.message });
@@ -182,13 +186,18 @@ export default async function handler(req, res) {
         return res.status(403).json({ error: 'No tienes permisos para eliminar esta carrera.' });
       }
 
-      const { error: delErr } = await supabase
+      const { data: deletedData, error: delErr } = await supabase
         .from('carreras')
         .delete()
-        .eq('id', raceId);
+        .eq('id', raceId)
+        .select('*');
 
       if (delErr) {
         return res.status(500).json({ error: 'Error al eliminar la carrera.', details: delErr.message });
+      }
+
+      if (!deletedData || deletedData.length === 0) {
+        return res.status(403).json({ error: 'No se pudo eliminar la carrera: permisos insuficientes o ya eliminada.' });
       }
 
       return res.status(200).json({ success: true });

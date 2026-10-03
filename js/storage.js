@@ -179,6 +179,7 @@ export async function saveRace(newRace, userId) {
       if (errJson.error) {
         return { success: false, source: 'api', error: errJson.error, issues: errJson.issues };
       }
+      return { success: false, source: 'api', error: `Error ${apiRes.status}: ${apiRes.statusText}` };
     }
   } catch (apiErr) {
     console.warn('API /api/races no disponible, ejecutando fallback directo a Supabase:', apiErr);
@@ -301,12 +302,15 @@ export async function updateRace(raceId, raceData) {
 
       if (apiRes.ok) {
         const json = await apiRes.json();
-        if (json.success) return { success: true, source: 'api', data: json.data };
+        if (json.success && json.data) {
+          return { success: true, source: 'api', data: json.data };
+        }
       } else {
         const errJson = await apiRes.json().catch(() => ({}));
         if (errJson.error) {
           return { success: false, source: 'api', error: errJson.error, issues: errJson.issues };
         }
+        return { success: false, source: 'api', error: `Error ${apiRes.status}: ${apiRes.statusText}` };
       }
     } catch (apiErr) {
       console.warn('API PATCH /api/races/:id falló, intentando Supabase directo:', apiErr);
@@ -315,8 +319,10 @@ export async function updateRace(raceId, raceData) {
     if (isSupabaseConfigured()) {
       try {
         const res = await updateRaceSupabase(raceId, raceData);
-        if (res.success) return { success: true, source: 'supabase' };
-        return { success: false, error: res.error };
+        if (res.success && res.data) {
+          return { success: true, source: 'supabase', data: res.data };
+        }
+        return { success: false, source: 'supabase', error: res.error || 'No se pudo actualizar la carrera en Supabase.' };
       } catch (err) {
         return { success: false, error: err.message || err };
       }

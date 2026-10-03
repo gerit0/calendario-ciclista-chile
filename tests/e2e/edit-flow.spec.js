@@ -299,5 +299,117 @@ test.describe('Flujo E2E: Edición de Carrera y Prevención de Bug 414 URI_TOO_L
     expect(alertCalled).toBe(false);
   });
 
+  test('5. Admin edita carrera publicada, guarda y al recargar (/evento/:id) los cambios persisten y se visualizan actualizados', async ({ page }) => {
+    let currentServerRace = { ...mockRace };
+
+    // Interceptar llamadas a Supabase carreras para reflejar el estado mutado
+    await page.route('**/rest/v1/carreras*', async (route) => {
+      const acceptHeader = route.request().headers()['accept'] || '';
+      const isSingle = acceptHeader.includes('application/vnd.pgrst.object+json');
+      return route.fulfill({
+        status: 200,
+        contentType: isSingle ? 'application/vnd.pgrst.object+json' : 'application/json',
+        body: JSON.stringify(isSingle ? currentServerRace : [currentServerRace])
+      });
+    });
+
+    // Interceptar la API de guardado PATCH
+    await page.route(`**/api/races/${SAMPLE_RACE_ID}`, async (route) => {
+      if (route.request().method() === 'PATCH') {
+        const payload = route.request().postDataJSON();
+        currentServerRace = {
+          ...currentServerRace,
+          nombre: payload.name,
+          precio: payload.price,
+          ubicacion: payload.city
+        };
+        return route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            success: true,
+            data: {
+              ...currentServerRace,
+              id: SAMPLE_RACE_ID,
+              name: currentServerRace.nombre,
+              price: currentServerRace.precio,
+              city: currentServerRace.ubicacion
+            }
+          })
+        });
+      }
+      return route.continue();
+    });
+
+    // 1. Navegar al modal de edición
+    await page.goto(`/editar/${SAMPLE_RACE_ID}`);
+    const editModal = page.locator('#edit-modal');
+    await expect(editModal).toBeVisible({ timeout: 10000 });
+
+    // 2. Modificar nombre y ciudad
+    await page.fill('#edit-form-name', 'Curico Tour 2026 - Edición Bicentenario');
+    await page.fill('#edit-form-city', 'Molina');
+
+    // 3. Guardar cambios
+    const saveButton = page.locator('#btn-save-edit');
+    await saveButton.click();
+
+    // 4. Verificar toast de éxito
+    const toast = page.locator('#toast-notification');
+    await expect(toast).toContainText('Cambios guardados con éxito', { timeout: 10000 });
+
+    // 5. Recargar la página en la vista de detalle del evento para verificar persistencia real
+    await page.goto(`/evento/${SAMPLE_RACE_ID}`);
+    await page.waitForLoadState('domcontentloaded');
+
+    // 6. Verificar que la vista detalle muestra los nuevos datos actualizados
+    await expect(page.locator('text=Curico Tour 2026 - Edición Bicentenario').first()).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('text=Molina').first()).toBeVisible();
+  });
+
+  test('6. Simulación de fallo silencioso (0 filas afectadas / 403): La UI muestra toast de error y jamás dice "guardado con éxito", preservando los inputs', async ({ page }) => {
+    // Interceptar PATCH simulando rechazo por 0 filas / RLS (HTTP 403)
+    await page.route(`**/api/races/${SAMPLE_RACE_ID}`, async (route) => {
+      if (route.request().method() === 'PATCH') {
+        return route.fulfill({
+          status: 403,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            error: 'No se pudo actualizar la carrera: no tienes permisos o la carrera no existe.'
+          })
+        });
+      }
+      return route.continue();
+    });
+
+    // 1. Abrir modal de edición
+    await page.goto(`/editar/${SAMPLE_RACE_ID}`);
+    const editModal = page.locator('#edit-modal');
+    await expect(editModal).toBeVisible({ timeout: 10000 });
+
+    // 2. Modificar un campo
+    await page.fill('#edit-form-name', 'Intento No Autorizado de Modificación');
+
+    // 3. Guardar cambios
+    const saveButton = page.locator('#btn-save-edit');
+    await saveButton.click();
+
+    // 4. Verificar que se muestra toast de advertencia/error
+    const toast = page.locator('#toast-notification');
+    await expect(toast).toBeVisible({ timeout: 10000 });
+    await expect(toast).toContainText('No tienes permiso para editar esta carrera');
+    await expect(toast).not.toContainText('Cambios guardados con éxito');
+
+    // 5. El modal debe seguir visible (no se cierra perdiendo el trabajo)
+    await expect(editModal).toBeVisible();
+
+    // 6. El formulario mantiene lo que el usuario escribió (no se resetea)
+    const nameInput = page.locator('#edit-form-name');
+    await expect(nameInput).toHaveValue('Intento No Autorizado de Modificación');
+
+    // 7. El botón vuelve a estar habilitado
+    await expect(saveButton).toBeEnabled();
+  });
+
 });
 

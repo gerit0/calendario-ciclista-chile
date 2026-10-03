@@ -167,11 +167,18 @@ export default async function handler(req, res) {
       });
     }
 
+    if (!updatedRace) {
+      return res.status(403).json({
+        success: false,
+        error: 'No se pudo aprobar la carrera: no se afectó ninguna fila (permisos insuficientes o carrera inexistente).'
+      });
+    }
+
     return res.status(200).json({
       success: true,
       message: imageWarning ? `Carrera aprobada con éxito. (${imageWarning})` : 'Carrera aprobada con éxito.',
       warning: imageWarning,
-      data: mapDbToFrontend(updatedRace || { ...race, ...updatePayload })
+      data: mapDbToFrontend(updatedRace)
     });
   } catch (err) {
     console.error('Excepción al aprobar carrera:', err);

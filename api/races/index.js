@@ -103,9 +103,13 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: 'Error al registrar la carrera en la base de datos.', details: error.message });
       }
 
+      if (!data) {
+        return res.status(403).json({ error: 'No se pudo registrar la carrera: permisos insuficientes o la base de datos no confirmó la inserción.' });
+      }
+
       return res.status(201).json({
         success: true,
-        data: mapDbToFrontend(data || dbPayload)
+        data: mapDbToFrontend(data)
       });
     } catch (err) {
       return res.status(500).json({ error: 'Excepción al registrar carrera.', details: err.message });
