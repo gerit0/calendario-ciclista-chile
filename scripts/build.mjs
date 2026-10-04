@@ -29,6 +29,24 @@ async function build() {
   fs.writeFileSync(htmlPath, html, 'utf8');
 
   console.log(`🚀 index.html actualizado con script: js/bundle.js?v=${hash}`);
+
+  // Sincronizar directorio public/ como respaldo de seguridad para Vercel
+  try {
+    if (!fs.existsSync('public')) {
+      fs.mkdirSync('public', { recursive: true });
+    }
+    fs.copyFileSync(htmlPath, path.resolve('public/index.html'));
+    if (!fs.existsSync('public/js')) {
+      fs.mkdirSync('public/js', { recursive: true });
+    }
+    fs.copyFileSync('js/bundle.js', path.resolve('public/js/bundle.js'));
+    if (fs.existsSync('js/bundle.js.map')) {
+      fs.copyFileSync('js/bundle.js.map', path.resolve('public/js/bundle.js.map'));
+    }
+    console.log('📂 Carpeta public/ sincronizada para máxima compatibilidad con Vercel.');
+  } catch (syncErr) {
+    console.warn('Advertencia al sincronizar public/:', syncErr.message);
+  }
 }
 
 build().catch(err => {

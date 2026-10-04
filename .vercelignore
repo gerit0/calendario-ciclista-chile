@@ -1,0 +1,15 @@
+node_modules
+tests
+scripts
+.git
+.github
+athletic_performance_system
+calendario_principal_veloflow
+detalle_de_carrera_veloflow
+registrar_carrera_veloflow
+docs
+*.test.js
+*.spec.js
+playwright.config.mjs
+vitest.config.js
+eslint.config.js
