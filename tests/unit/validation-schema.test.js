@@ -127,4 +127,37 @@ describe('1. Pruebas Unitarias: Esquema de Validación Zod (raceSchema y validat
     expect(result.isValid).toBe(true);
     expect(result.sanitizedData.price).toBe(0);
   });
+
+  describe('validación de rulesUrl (bases de la carrera)', () => {
+    it('acepta una URL válida en rulesUrl', () => {
+      const payload = {
+        ...validBasePayload,
+        rulesUrl: 'https://drive.google.com/file/d/123/view'
+      };
+      const result = validateRaceForm(payload);
+      expect(result.isValid).toBe(true);
+      expect(result.sanitizedData.rulesUrl).toBe('https://drive.google.com/file/d/123/view');
+    });
+
+    it('acepta rulesUrl como cadena vacía o undefined', () => {
+      const payloadEmpty = { ...validBasePayload, rulesUrl: '' };
+      const resEmpty = validateRaceForm(payloadEmpty);
+      expect(resEmpty.isValid).toBe(true);
+      expect(resEmpty.sanitizedData.rulesUrl).toBe('');
+
+      const payloadUndef = { ...validBasePayload };
+      delete payloadUndef.rulesUrl;
+      const resUndef = validateRaceForm(payloadUndef);
+      expect(resUndef.isValid).toBe(true);
+    });
+
+    it('rechaza rulesUrl si no es una URL válida con error en el campo rulesUrl', () => {
+      const payload = { ...validBasePayload, rulesUrl: 'no-es-una-url' };
+      const result = validateRaceForm(payload);
+      expect(result.isValid).toBe(false);
+      expect(result.errors.rulesUrl).toBeDefined();
+      expect(result.errors.rulesUrl).toMatch(/debe ser una URL válida/i);
+    });
+  });
 });
+

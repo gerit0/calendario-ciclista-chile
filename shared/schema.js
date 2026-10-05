@@ -101,6 +101,8 @@ export const raceSchema = z.object({
       }
     }, { message: 'La URL de inscripción debe ser una URL válida (http/https).' }),
 
+  rulesUrl: z.string().trim().url({ message: 'El enlace a las bases debe ser una URL válida (http/https).' }).or(z.literal('')).optional(),
+
   distance: distanceElevationSchema,
   elevation: distanceElevationSchema,
 
