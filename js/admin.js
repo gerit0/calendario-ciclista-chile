@@ -259,6 +259,13 @@ export function ensureAdminElementsMounted() {
                 class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all">
             </div>
           </div>
+          <div>
+            <label for="edit-form-rules-url" class="block font-display font-bold text-sm text-primary mb-2">
+              Bases de la Competencia <span class="text-xs text-outline/80 font-normal">(Opcional)</span>
+            </label>
+            <input type="url" id="edit-form-rules-url" name="rulesUrl" placeholder="https://drive.google.com/... o enlace a PDF"
+              class="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary transition-all">
+          </div>
           <div class="space-y-2">
             <label class="block font-display font-bold text-sm text-primary">
               Imagen de Portada <span class="text-xs text-outline/80 font-normal">(Opcional)</span>
@@ -374,6 +381,9 @@ export function openEditModal(race) {
   document.getElementById('edit-form-status').value = race.status || 'Inscripciones Abiertas';
   document.getElementById('edit-form-organizer').value = race.organizer || race.organizador || '';
   document.getElementById('edit-form-url').value = race.registrationUrl || '';
+  if (document.getElementById('edit-form-rules-url')) {
+    document.getElementById('edit-form-rules-url').value = race.rulesUrl || '';
+  }
   document.getElementById('edit-form-image').value = race.heroImage || '';
   document.getElementById('edit-form-categories').value = Array.isArray(race.categories) ? race.categories.join(', ') : (race.categories || '');
   document.getElementById('edit-form-description').value = race.description || '';

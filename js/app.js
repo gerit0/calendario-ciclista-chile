@@ -80,6 +80,7 @@ export function renderFormErrors(form, errors) {
     organizador: 'organizer',
     organizer: 'organizer',
     registrationUrl: 'registrationUrl',
+    rulesUrl: 'rules-url',
     city: 'city',
     distance: 'distance',
     description: 'description'
@@ -860,6 +861,7 @@ function setupEventHandlers() {
         organizador: formData.get('organizer') || '',
         organizer: formData.get('organizer') || '',
         registrationUrl: formData.get('registrationUrl') || '',
+        rulesUrl: formData.get('rulesUrl') || '',
         city: formData.get('city') || '',
         distance: formData.get('distance') || '',
         elevation: formData.get('elevation') || '',
@@ -978,6 +980,7 @@ function setupEventHandlers() {
         organizer: sanitizedData.organizador || sanitizedData.organizer || '',
         organizador: sanitizedData.organizador || sanitizedData.organizer || '',
         registrationUrl: sanitizedData.registrationUrl || '',
+        rulesUrl: sanitizedData.rulesUrl || formData.get('rulesUrl') || '',
         heroImage: sanitizedData.heroImage || 'https://images.unsplash.com/photo-1541625602330-2277a4c46182?auto=format&fit=crop&w=1200&q=80',
         description: sanitizedData.description || '',
         categories: categoriesArray,
@@ -1223,6 +1226,7 @@ function setupEventHandlers() {
         organizador: formData.get('organizer') || '',
         organizer: formData.get('organizer') || '',
         registrationUrl: formData.get('registrationUrl') || '',
+        rulesUrl: formData.get('rulesUrl') || document.getElementById('edit-form-rules-url')?.value || '',
         city: formData.get('city') || '',
         distance: formData.get('distance') || '',
         elevation: formData.get('elevation') || '',
@@ -1443,6 +1447,9 @@ export async function openEditModal(raceId) {
   document.getElementById('edit-form-status').value = race.status || 'Inscripciones Abiertas';
   document.getElementById('edit-form-organizer').value = race.organizer || race.organizador || '';
   document.getElementById('edit-form-url').value = race.registrationUrl || '';
+  if (document.getElementById('edit-form-rules-url')) {
+    document.getElementById('edit-form-rules-url').value = race.rulesUrl || '';
+  }
   document.getElementById('edit-form-image').value = race.heroImage || '';
   
   const editPreviewContainer = document.getElementById('edit-form-image-preview-container');

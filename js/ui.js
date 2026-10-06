@@ -687,6 +687,19 @@ export function renderDetailView(container, race, isAdmin = false, currentUserId
               </a>
             `}
 
+            ${race.rulesUrl ? `
+              <a 
+                href="${escapeHTML(race.rulesUrl)}" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                class="w-full bg-surface-container hover:bg-surface-container-high text-primary font-display font-bold text-sm py-3.5 px-4 rounded-2xl flex items-center justify-center gap-2 transition-all border border-outline-variant/50 shadow-sm mt-3"
+              >
+                <span class="material-symbols-outlined text-lg text-secondary">description</span>
+                Ver Bases de la Competencia
+                <span class="material-symbols-outlined text-sm text-outline">open_in_new</span>
+              </a>
+            ` : ''}
+
             <!-- Dropdown Añadir a mi calendario (Vista Detalle) -->
             <div class="relative inline-block w-full pt-1">
               <button 
