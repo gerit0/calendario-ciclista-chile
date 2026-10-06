@@ -157,6 +157,21 @@ export function formatPrice(price, isFree) {
 }
 
 /**
+ * Sanitiza el texto contra XSS y autovincula URLs de forma segura.
+ * @param {string} text 
+ * @returns {string}
+ */
+export function formatDescriptionWithLinks(text) {
+  if (!text) return '';
+  const escaped = escapeHTML(String(text));
+  const urlRegex = /(https?:\/\/[^\s<]+)/g;
+  return escaped.replace(urlRegex, (url) => {
+    return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-secondary font-semibold underline hover:opacity-80 break-all">${url}</a>`;
+  });
+}
+
+
+/**
  * Retorna las clases de color de badge según la disciplina
  * @param {string} discipline 
  * @returns {string} Tailwind CSS classes
@@ -606,14 +621,12 @@ export function renderDetailView(container, race, isAdmin = false, currentUserId
           </div>
 
           <!-- Descripción del Evento -->
-          <div class="bg-white p-6 sm:p-8 rounded-3xl border border-outline-variant/40 shadow-sm space-y-4">
+          <div class="bg-white p-6 sm:p-8 rounded-3xl border border-outline-variant/40 shadow-sm space-y-4 break-words [overflow-wrap:anywhere] overflow-hidden">
             <h3 class="font-display font-bold text-xl text-primary flex items-center gap-2">
               <span class="material-symbols-outlined text-secondary">description</span>
               Descripción del Evento
             </h3>
-            <p class="text-gray-700 text-base leading-relaxed whitespace-pre-line">
-              ${escapeHTML(race.description || '')}
-            </p>
+            <p class="text-gray-700 text-base leading-relaxed whitespace-pre-line break-words [overflow-wrap:anywhere]">${formatDescriptionWithLinks(race.description || '')}</p>
           </div>
 
           <!-- Categorías Disponibles -->
