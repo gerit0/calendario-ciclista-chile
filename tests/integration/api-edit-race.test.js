@@ -104,6 +104,16 @@ describe('Fase 3: Pruebas de Integración y Anti-Silencio para Edición de Carre
                 if (updateBehavior === 'error') {
                   return { data: null, error: { message: 'DB connection failure' } };
                 }
+                if (updateBehavior === 'column_error_link_bases') {
+                  if ('link_bases' in payload) {
+                    return {
+                      data: null,
+                      error: { code: 'PGRST204', message: "Could not find the 'link_bases' column of 'carreras' in the schema cache" }
+                    };
+                  }
+                  dbRow = { ...dbRow, ...payload };
+                  return { data: { ...dbRow }, error: null };
+                }
                 if (updateBehavior === 'constraint_base64' || (payload.hero_image && payload.hero_image.startsWith('data:'))) {
                   return {
                     data: null,
@@ -313,5 +323,49 @@ describe('Fase 3: Pruebas de Integración y Anti-Silencio para Edición de Carre
     expect(res.body.success).toBe(true);
     expect(dbRow.link_bases).toBe('https://drive.google.com/file/d/bases-curico/view');
     expect(res.body.data.rulesUrl).toBe('https://drive.google.com/file/d/bases-curico/view');
+  });
+
+  it('8. Limpieza de rulesUrl: enviar string vacío actualiza link_bases a null en la BD', async () => {
+    dbRow.link_bases = 'https://drive.google.com/file/d/bases-viejas/view';
+
+    const payload = {
+      ...baseValidPayload,
+      rulesUrl: ''
+    };
+
+    const { req, res } = createMockHttp({
+      method: 'PATCH',
+      headers: { authorization: 'Bearer admin-jwt' },
+      body: payload
+    });
+
+    await raceIdHandler(req, res);
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(dbRow.link_bases).toBeNull();
+    expect(res.body.data.rulesUrl).toBe('');
+  });
+
+  it('9. Fallback defensivo PGRST204: Si link_bases no existe en el esquema, el reintento se ejecuta y tiene éxito', async () => {
+    updateBehavior = 'column_error_link_bases';
+
+    const payload = {
+      ...baseValidPayload,
+      rulesUrl: 'https://drive.google.com/file/d/bases-curico/view'
+    };
+
+    const { req, res } = createMockHttp({
+      method: 'PATCH',
+      headers: { authorization: 'Bearer admin-jwt' },
+      body: payload
+    });
+
+    await raceIdHandler(req, res);
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.success).toBe(true);
+    // En el reintento sin link_bases, dbRow permanece null (no se guardó link_bases)
+    expect(dbRow.link_bases).toBeNull();
   });
 });
