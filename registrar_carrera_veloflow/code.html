@@ -1,0 +1,324 @@
+<!DOCTYPE html><html lang="es" class="light"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet"><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">try{
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-low": "#f3f4f4",
+                    "surface-variant": "#e1e3e3",
+                    "tertiary": "#171b00",
+                    "on-background": "#191c1c",
+                    "surface-container-highest": "#e1e3e3",
+                    "outline": "#747878",
+                    "on-tertiary-fixed-variant": "#434b00",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container": "#edeeee",
+                    "on-error": "#ffffff",
+                    "inverse-surface": "#2e3131",
+                    "on-primary-fixed-variant": "#464747",
+                    "primary-container": "#2d2e2e",
+                    "on-secondary-container": "#6c1900",
+                    "on-tertiary-fixed": "#1a1e00",
+                    "primary-fixed": "#e3e2e2",
+                    "on-primary-container": "#959595",
+                    "on-surface-variant": "#444748",
+                    "on-tertiary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "error": "#ba1a1a",
+                    "on-surface": "#191c1c",
+                    "on-secondary-fixed-variant": "#862201",
+                    "secondary": "#a73918",
+                    "on-secondary-fixed": "#3b0900",
+                    "on-tertiary-container": "#8e9e00",
+                    "primary": "#181919",
+                    "primary-fixed-dim": "#c7c6c6",
+                    "on-primary-fixed": "#1b1c1c",
+                    "background": "#f8f9f9",
+                    "secondary-fixed-dim": "#ffb5a0",
+                    "surface-container-high": "#e7e8e8",
+                    "secondary-container": "#fe7952",
+                    "inverse-primary": "#c7c6c6",
+                    "surface": "#f8f9f9",
+                    "inverse-on-surface": "#f0f1f1",
+                    "secondary-fixed": "#ffdbd1",
+                    "surface-bright": "#f8f9f9",
+                    "outline-variant": "#c4c7c7",
+                    "tertiary-fixed": "#d8ef00",
+                    "on-error-container": "#93000a",
+                    "on-secondary": "#ffffff",
+                    "tertiary-fixed-dim": "#bdd200",
+                    "on-primary": "#ffffff",
+                    "surface-tint": "#5e5e5e",
+                    "surface-dim": "#d9dada",
+                    "tertiary-container": "#2b3100"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "stack-md": "16px",
+                    "stack-lg": "32px",
+                    "container-max": "1280px",
+                    "margin-desktop": "40px",
+                    "margin-mobile": "16px",
+                    "gutter": "24px",
+                    "stack-sm": "8px",
+                    "base": "8px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Montserrat"],
+                    "body-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "label-md": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "headline-md": ["Montserrat"],
+                    "headline-lg": ["Montserrat"]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "1", "fontWeight": "500"}],
+                    "headline-md": ["20px", {"lineHeight": "1.3", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    }catch(_e){}</script><meta charset="utf-8"></head><body class="bg-background text-on-surface font-body-md">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant/30">
+<div class="flex justify-between items-center h-16 px-margin-desktop max-w-container-max mx-auto">
+<div class="flex items-center gap-8">
+<span class="font-display-lg text-display-lg font-black tracking-tighter text-primary">Calendario Ciclista</span>
+<nav class="hidden md:flex items-center gap-6">
+<a href="#" class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors">Calendar</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Disciplines</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Organizers</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full">notifications</button>
+<button class="material-symbols-outlined p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full">settings</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a cycling official wearing a sleek black jersey, captured with high-contrast studio lighting against a minimal grey background. The image has a sharp, high-performance aesthetic consistent with a premium sports timing platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCOL4QVJe2kQ_-8IDBQHKkwB2xBcm2nGxbeZLlFzA8yauMvCzY29W5hOgYGmbfr4CUbitir4M_Zss5iyTcguq2ZNg9rV4vZjbMWBoRrHbqFzaR9wAMXySb09WI7fqsB4E0XYbaROknEX7rryeVDki6W-9Bda1NfcEhwrp-pDSj0TLlyyznjZuFbTy0q4FhHMKBLn5OUwdOf6FocC0TYsmA7LYXFeg07SnIC_aiWeoOWoQhVuu9DosvO-A">
+</div>
+</div>
+</div>
+</header>
+<main class="pt-32 pb-stack-lg px-margin-mobile md:px-margin-desktop max-w-4xl mx-auto">
+<!-- Progress Header -->
+<div class="mb-stack-lg">
+<h1 class="font-headline-lg text-headline-lg mb-2">Publicar Nueva Carrera</h1>
+<p class="text-on-surface-variant">Complete los detalles técnicos para integrar su evento en el sistema Calendario Ciclista.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+<!-- Form Container -->
+<form class="md:col-span-8 space-y-12" id="race-form">
+<!-- Sección: Información Básica -->
+<section class="space-y-6">
+<div class="flex items-center gap-3 border-b border-outline-variant pb-2">
+<span class="material-symbols-outlined text-primary">info</span>
+<h2 class="font-headline-md text-headline-md">Información Básica</h2>
+</div>
+<div class="grid grid-cols-1 gap-6">
+<div class="space-y-2">
+<label class="font-label-md text-label-md block">NOMBRE DE LA CARRERA</label>
+<input class="w-full p-3 bg-surface border border-primary form-input-focus" placeholder="Ej: Gran Fondo de los Andes" required="" type="text">
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="space-y-2">
+<label class="font-label-md text-label-md block">FECHA DE INICIO</label>
+<input class="w-full p-3 bg-surface border border-primary form-input-focus" id="race-date" required="" type="date">
+</div>
+<div class="space-y-2">
+<label class="font-label-md text-label-md block">FECHA DE FIN</label>
+<input class="w-full p-3 bg-surface border border-primary form-input-focus" required="" type="date">
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-label-md text-label-md block">HORA DE SALIDA</label>
+<input class="w-full p-3 bg-surface border border-primary form-input-focus" required="" type="time">
+</div>
+</div>
+</section>
+<!-- Sección: Conflict Detection (Dynamic Alert) -->
+<div class="hidden opacity-0 transform translate-y-2 transition-all duration-300" id="conflict-alert">
+<div class="bg-error-container p-4 border-l-4 border-error flex items-start gap-4">
+<span class="material-symbols-outlined text-error mt-1" style="font-variation-settings: 'FILL' 1;">warning</span>
+<div>
+<p class="font-bold text-on-error-container">¡Alerta de Cruce!</p>
+<p class="text-on-error-container">Ya existe una carrera (<span class="italic">Giro de la Sabana</span>) programada para esta fecha.</p>
+</div>
+</div>
+</div>
+<!-- Sección: Ubicación y Disciplina -->
+<section class="space-y-6">
+<div class="flex items-center gap-3 border-b border-outline-variant pb-2">
+<span class="material-symbols-outlined text-primary">distance</span>
+<h2 class="font-headline-md text-headline-md">Ubicación y Disciplina</h2>
+</div>
+<div class="space-y-4">
+<label class="font-label-md text-label-md block">DISCIPLINA</label>
+<div class="flex flex-wrap gap-3">
+<div class="discipline-chip">
+<input checked="" class="hidden" id="road" name="discipline" type="radio">
+<label class="px-6 py-2 border border-primary cursor-pointer font-label-md hover:bg-surface-container transition-all block" for="road">RUTA</label>
+</div>
+<div class="discipline-chip-mtb">
+<input class="hidden" id="mtb" name="discipline" type="radio">
+<label class="px-6 py-2 border border-secondary cursor-pointer font-label-md hover:bg-secondary/5 transition-all block" for="mtb">MTB</label>
+</div>
+<div class="discipline-chip">
+<input class="hidden" id="gravel" name="discipline" type="radio">
+<label class="px-6 py-2 border border-primary cursor-pointer font-label-md hover:bg-surface-container transition-all block" for="gravel">GRAVEL</label>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="space-y-2">
+<label class="font-label-md text-label-md block">REGIÓN / DEPARTAMENTO</label>
+<select class="w-full p-3 bg-surface border border-primary form-input-focus">
+<option>Cundinamarca</option>
+<option>Antioquia</option>
+<option>Boyacá</option>
+<option>Valle del Cauca</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="font-label-md text-label-md block">UBICACIÓN EXACTA</label>
+<input class="w-full p-3 bg-surface border border-primary form-input-focus" placeholder="Ej: Parque Principal Sopó" type="text">
+</div>
+</div>
+</section>
+<!-- Sección: Detalles del Organiz-->
+<section class="space-y-6">
+<div class="flex items-center gap-3 border-b border-outline-variant pb-2">
+<span class="material-symbols-outlined text-primary">badge</span>
+<h2 class="font-headline-md text-headline-md">Detalles del Organizador</h2>
+</div>
+<div class="grid grid-cols-1 gap-6">
+<div class="space-y-2">
+<label class="font-label-md text-label-md block">NOMBRE DEL ORGANIZADOR / CLUB</label>
+<input class="w-full p-3 bg-surface border border-primary form-input-focus" placeholder="Ej: Club Ciclista Elite" required="" type="text">
+</div>
+<div class="space-y-2">
+<label class="font-label-md text-label-md block">LINK DE INSCRIPCIÓN</label>
+<div class="flex">
+<span class="bg-surface-container-high px-3 flex items-center border border-r-0 border-primary">
+<span class="material-symbols-outlined text-on-surface-variant">link</span>
+</span>
+<input class="w-full p-3 bg-surface border border-primary form-input-focus" placeholder="https://..." type="url">
+</div>
+</div>
+</div>
+</section>
+<!-- Action Button -->
+<div class="pt-8">
+<button class="w-full md:w-auto bg-primary text-on-primary px-12 py-4 font-headline-md text-headline-md flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-95 transition-all" type="submit">
+                        Publicar Carrera
+                        <span class="material-symbols-outlined">send</span>
+</button>
+</div>
+</form>
+<!-- Sidebar Info -->
+<aside class="md:col-span-4 space-y-6">
+<div class="bg-surface-container-low p-6 border border-outline-variant/30">
+<h3 class="font-headline-md text-headline-md mb-4">Guía de Publicación</h3>
+<ul class="space-y-4">
+<li class="flex gap-3">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<p class="text-label-md">Verifique la fecha para evitar colisiones con eventos UCI.</p>
+</li>
+<li class="flex gap-3">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<p class="text-label-md">Asegúrese de que el link de inscripción esté activo.</p>
+</li>
+<li class="flex gap-3">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<p class="text-label-md">Las imágenes se podrán añadir tras la validación inicial.</p>
+</li>
+</ul>
+</div>
+<div class="relative aspect-square w-full bg-surface-container-highest flex items-center justify-center overflow-hidden border border-outline-variant/30">
+<div class="absolute inset-0 bg-cover bg-center opacity-60" data-alt="A macro detail shot of a professional road bike tire on asphalt, showing textures and the precision of the mechanics. The color palette is strictly high-contrast monochrome with deep charcoal and crisp white, emphasizing engineered reliability and the grit of the sport." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCCVkTlMFuMetUR-3VoLhAnkPiVj67UlrfDg7eZj5gCR-RESVuwQXxPCG0XHy2bmKtAgBl5IkODalJPR43SSO3jCNLbQdsbRv2ZtlRLX3IvOXtw3coz-Hx6KBznlhaupVmXDZi0bIW4MYvKzh01WmFJCYLdVF8cKamZTG39aIPHLgWX9vrOqiWXkvLen2Djo2qsxn7Ra6kg7eb8sMLEKiUQH4iz7-WZSAjXX26IMMSj-ApeQENfDoObGA')"></div>
+<div class="relative z-10 text-center p-6">
+<span class="material-symbols-outlined text-primary text-5xl mb-2">location_on</span>
+<p class="font-label-md text-primary bg-white/90 px-2 py-1">VISTA PREVIA DEL MAPA</p>
+</div>
+</div>
+</aside>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-primary py-stack-lg mt-stack-lg">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin-desktop max-w-container-max mx-auto">
+<div class="mb-8 md:mb-0">
+<span class="font-display-lg text-display-lg text-on-primary font-black tracking-tighter">Calendario Ciclista</span>
+<p class="text-on-primary/70 font-label-sm mt-2">© 2024 Calendario Ciclista CYCLING LOGISTICS</p>
+</div>
+<div class="flex flex-wrap justify-center gap-8">
+<a class="font-label-sm text-label-sm text-on-primary/70 hover:text-on-primary transition-all" href="#">© 2024 Calendario Ciclista CYCLING LOGISTICS</a>
+<a class="font-label-sm text-label-sm text-on-primary/70 hover:text-on-primary transition-all" href="#">© 2024 Calendario Ciclista CYCLING LOGISTICS</a>
+<a class="font-label-sm text-label-sm text-on-primary/70 hover:text-on-primary transition-all" href="#">© 2024 Calendario Ciclista CYCLING LOGISTICS</a>
+<a class="font-label-sm text-label-sm text-on-primary/70 hover:text-on-primary transition-all" href="#">© 2024 Calendario Ciclista CYCLING LOGISTICS</a>
+</div>
+</div>
+</footer>
+<script>
+        // Conflict Detection Logic
+        const dateInput = document.getElementById('race-date');
+        const conflictAlert = document.getElementById('conflict-alert');
+
+        // Simulated data: Oct 15 corresponds to the prompt requirement
+        // We check if the input value matches a "busy" date
+        dateInput.addEventListener('change', (e) => {
+            const selectedDate = e.target.value;
+            // Simplified check for "Oct 15" - note: date input format is YYYY-MM-DD
+            if (selectedDate.includes('-10-15')) {
+                conflictAlert.classList.remove('hidden');
+                setTimeout(() => {
+                    conflictAlert.classList.remove('opacity-0', 'translate-y-2');
+                }, 10);
+            } else {
+                conflictAlert.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => {
+                    conflictAlert.classList.add('hidden');
+                }, 300);
+            }
+        });
+
+        // Form Submission micro-interaction
+        const form = document.getElementById('race-form');
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">refresh</span> PROCESANDO...';
+            btn.classList.add('opacity-80');
+            
+            setTimeout(() => {
+                alert('¡Carrera enviada con éxito para revisión técnica!');
+                btn.innerHTML = originalContent;
+                btn.classList.remove('opacity-80');
+                form.reset();
+                conflictAlert.classList.add('hidden');
+            }, 1500);
+        });
+
+        // Sticky Header Effect
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 20) {
+                header.classList.add('shadow-sm');
+            } else {
+                header.classList.remove('shadow-sm');
+            }
+        });
+    </script>
+
+</body></html>

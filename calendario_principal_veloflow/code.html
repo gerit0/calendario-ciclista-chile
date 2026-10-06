@@ -1,0 +1,419 @@
+<!DOCTYPE html><html lang="es" class="light"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&amp;family=Inter:wght@400;500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet"><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">try{
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-low": "#f3f4f4",
+                    "surface-variant": "#e1e3e3",
+                    "tertiary": "#171b00",
+                    "on-background": "#191c1c",
+                    "surface-container-highest": "#e1e3e3",
+                    "outline": "#747878",
+                    "on-tertiary-fixed-variant": "#434b00",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container": "#edeeee",
+                    "on-error": "#ffffff",
+                    "inverse-surface": "#2e3131",
+                    "on-primary-fixed-variant": "#464747",
+                    "primary-container": "#2d2e2e",
+                    "on-secondary-container": "#6c1900",
+                    "on-tertiary-fixed": "#1a1e00",
+                    "primary-fixed": "#e3e2e2",
+                    "on-primary-container": "#959595",
+                    "on-surface-variant": "#444748",
+                    "on-tertiary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "error": "#ba1a1a",
+                    "on-surface": "#191c1c",
+                    "on-secondary-fixed-variant": "#862201",
+                    "secondary": "#a73918",
+                    "on-secondary-fixed": "#3b0900",
+                    "on-tertiary-container": "#8e9e00",
+                    "primary": "#181919",
+                    "primary-fixed-dim": "#c7c6c6",
+                    "on-primary-fixed": "#1b1c1c",
+                    "background": "#f8f9f9",
+                    "secondary-fixed-dim": "#ffb5a0",
+                    "surface-container-high": "#e7e8e8",
+                    "secondary-container": "#fe7952",
+                    "inverse-primary": "#c7c6c6",
+                    "surface": "#f8f9f9",
+                    "inverse-on-surface": "#f0f1f1",
+                    "secondary-fixed": "#ffdbd1",
+                    "surface-bright": "#f8f9f9",
+                    "outline-variant": "#c4c7c7",
+                    "tertiary-fixed": "#d8ef00",
+                    "on-error-container": "#93000a",
+                    "on-secondary": "#ffffff",
+                    "tertiary-fixed-dim": "#bdd200",
+                    "on-primary": "#ffffff",
+                    "surface-tint": "#5e5e5e",
+                    "surface-dim": "#d9dada",
+                    "tertiary-container": "#2b3100"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "stack-md": "16px",
+                    "stack-lg": "32px",
+                    "container-max": "1280px",
+                    "margin-desktop": "40px",
+                    "margin-mobile": "16px",
+                    "gutter": "24px",
+                    "stack-sm": "8px",
+                    "base": "8px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Montserrat"],
+                    "body-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "label-md": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "headline-md": ["Montserrat"],
+                    "headline-lg-mobile": ["Montserrat"],
+                    "headline-lg": ["Montserrat"]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "1", "fontWeight": "500"}],
+                    "headline-md": ["20px", {"lineHeight": "1.3", "fontWeight": "700"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    }catch(_e){}</script><meta charset="utf-8"></head><body class="font-body-md">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 dark:bg-surface-container-highest/80 backdrop-blur-md border-b border-outline-variant/30 dark:border-outline/20">
+<div class="flex justify-between items-center h-16 px-margin-desktop max-w-container-max mx-auto">
+<div class="flex items-center gap-stack-lg">
+<span class="font-display-lg text-display-lg font-black tracking-tighter text-primary dark:text-primary-fixed">Calendario Ciclista</span>
+<nav class="hidden md:flex items-center gap-6">
+<a href="#" class="font-label-md text-label-md text-primary dark:text-primary-fixed font-bold border-b-2 border-secondary dark:border-secondary-fixed pb-1">Calendar</a>
+<a href="#" class="font-label-md text-label-md text-on-surface-variant dark:text-outline hover:text-primary dark:hover:text-primary-fixed transition-colors">Disciplines</a>
+<a href="#" class="font-label-md text-label-md text-on-surface-variant dark:text-outline hover:text-primary dark:hover:text-primary-fixed transition-colors">Organizers</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input type="text" placeholder="Buscar carreras..." class="pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent outline-none text-label-md w-64">
+</div>
+<button class="hidden lg:flex items-center gap-2 px-4 py-2 bg-primary text-on-primary rounded-lg font-label-md hover:opacity-90 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[20px]">add</span>
+                    Add Race
+                </button>
+<div class="flex items-center gap-2">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-all">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-all">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant ml-2">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="A professional headshot of a cyclist in racing gear, sharp focus, clean studio background, high contrast lighting emphasizing the textures of the technical fabric, modern minimalist aesthetic, dominant blacks and greys with a subtle yellow highlight." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCb67Ltx6AFEsulfOE5LiHLWQfWZFaqPrJgzYCTQ-XT8Y2XIYyzyIEq1w579yL_jxap3k7ivUn_GEMW7owA88y5LwXE8rl7gtsV5jpVJgkMmFnCsZpNVUhM8qOk3JkQ757uAIQAgNhSQ0RkP2Il5hcxto9cPzTVid5OO1YAcWB19EhszdNInbV172vaFJzT8x8cT7lWvSuqWUYqdgyNg6k1PEAMzA1gQ-nsCRhUDp1x0_1iM0Xd39gYyQ">
+</div>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Shell -->
+<div class="flex min-h-screen pt-16">
+<!-- SideNavBar (Desktop) -->
+<aside class="hidden md:flex flex-col h-[calc(100vh-64px)] w-64 sticky top-16 bg-surface-container-low dark:bg-surface-container-lowest border-r border-outline-variant py-stack-lg">
+<div class="px-6 mb-stack-lg">
+<h2 class="font-headline-md text-headline-md text-primary">Race Center</h2>
+<p class="font-label-sm text-label-sm text-outline">Pro Timing System</p>
+</div>
+<nav class="flex-1">
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary/10 dark:bg-secondary-container/20 text-secondary dark:text-secondary-fixed border-r-4 border-secondary translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-label-md text-label-md">All Races</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-outline hover:bg-surface-variant/50 transition-colors" href="#">
+<span class="material-symbols-outlined">directions_bike</span>
+<span class="font-label-md text-label-md">Road Racing</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-outline hover:bg-surface-variant/50 transition-colors" href="#">
+<span class="material-symbols-outlined">terrain</span>
+<span class="font-label-md text-label-md">MTB Trails</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-outline hover:bg-surface-variant/50 transition-colors" href="#">
+<span class="material-symbols-outlined">event_available</span>
+<span class="font-label-md text-label-md">My Schedule</span>
+</a>
+</nav>
+<div class="px-4 mt-auto space-y-2">
+<button class="w-full py-3 bg-secondary text-on-secondary rounded-lg font-label-md shadow-sm hover:opacity-90 transition-all">
+                    Filter Events
+                </button>
+<div class="pt-stack-lg border-t border-outline-variant/30">
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant dark:text-outline hover:bg-surface-variant/50 transition-colors" href="#">
+<span class="material-symbols-outlined">map</span>
+<span class="font-label-md text-label-md">Region</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant dark:text-outline hover:bg-surface-variant/50 transition-colors" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-md text-label-md">Support</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 p-margin-mobile md:p-margin-desktop max-w-5xl mx-auto w-full">
+<!-- Dashboard Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-stack-lg">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-primary tracking-tight">Race Calendar</h1>
+<p class="text-on-surface-variant mt-1">Explora los próximos eventos y competiciones oficiales.</p>
+</div>
+<!-- View Toggle -->
+<div class="flex p-1 bg-surface-container-high rounded-xl w-fit">
+<button class="px-6 py-2 rounded-lg font-label-md text-on-surface-variant transition-all hover:text-primary" id="monthlyToggle">Monthly View</button>
+<button class="px-6 py-2 bg-surface-container-lowest shadow-sm rounded-lg font-label-md text-primary transition-all" id="listToggle">List View</button>
+</div>
+</div>
+<!-- Dashboard Layout: Sidebar + Feed -->
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-gutter items-start">
+<!-- Filter Sidebar (Contextual) -->
+<div class="lg:col-span-1 space-y-stack-lg bg-surface-container-low/50 p-6 rounded-xl border border-outline-variant/30">
+<div>
+<h3 class="font-label-md text-label-md text-primary mb-4 uppercase tracking-widest">Disciplina</h3>
+<div class="space-y-3">
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="rounded border-outline-variant text-secondary focus:ring-secondary w-5 h-5" type="checkbox">
+<span class="font-body-md text-on-surface-variant group-hover:text-primary transition-colors">Ruta (Road)</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="rounded border-outline-variant text-secondary focus:ring-secondary w-5 h-5" type="checkbox">
+<span class="font-body-md text-on-surface-variant group-hover:text-primary transition-colors">MTB</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="rounded border-outline-variant text-secondary focus:ring-secondary w-5 h-5" type="checkbox">
+<span class="font-body-md text-on-surface-variant group-hover:text-primary transition-colors">Gravel</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="rounded border-outline-variant text-secondary focus:ring-secondary w-5 h-5" type="checkbox">
+<span class="font-body-md text-on-surface-variant group-hover:text-primary transition-colors">Ciclocrós (CX)</span>
+</label>
+</div>
+</div>
+<div>
+<h3 class="font-label-md text-label-md text-primary mb-4 uppercase tracking-widest">Región</h3>
+<select class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg p-3 font-body-md focus:ring-2 focus:ring-secondary focus:border-transparent outline-none">
+<option>Todas las regiones</option>
+<option>Andes</option>
+<option>Costa Central</option>
+<option>Sierras del Norte</option>
+<option>Patagonia</option>
+</select>
+</div>
+<div>
+<h3 class="font-label-md text-label-md text-primary mb-4 uppercase tracking-widest">Mes</h3>
+<div class="flex flex-wrap gap-2">
+<button class="px-3 py-1 bg-primary text-on-primary rounded-full text-label-sm">Octubre</button>
+<button class="px-3 py-1 bg-surface-container-high text-on-surface-variant rounded-full text-label-sm hover:bg-outline-variant/30 transition-colors">Noviembre</button>
+<button class="px-3 py-1 bg-surface-container-high text-on-surface-variant rounded-full text-label-sm hover:bg-outline-variant/30 transition-colors">Diciembre</button>
+</div>
+</div>
+</div>
+<!-- Race Feed -->
+<div class="lg:col-span-3 space-y-4">
+<!-- Race Card 1 -->
+<article class="group bg-surface-container-lowest border border-outline-variant/50 rounded-xl overflow-hidden flex flex-col sm:flex-row hover:shadow-lg transition-all duration-300">
+<div class="w-full sm:w-48 h-40 sm:h-auto relative overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A cinematic low-angle shot of professional cyclists climbing a steep mountain pass in the Andes. Sharp sunlight creates dramatic shadows, vivid blue sky, high-performance racing atmosphere. The color palette is dominated by tarmac grey, jersey primary colors, and mountain greens." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkJW_8-Lm-qEfuudvNHCxudXJWqfiRFqA8ST2LxugYPir0KIuopTdjWAM4QLO1dAYVpuoL5crVGIXzDPW_q046gN5h-b561v2vOZBocyVjX6N-Qin8X3dieEXcvKiz9KZnLUuVdPcbQC-8Vz7V4FeEgnDX_M507Vzb3qaGqAF-aepq5vruZIXVMvujq5zAQglklMwH9ej_FraxiN1TLmG6c3DH3FgjGhtetRVBb392T1M9jKM50RY1jw">
+<div class="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent sm:hidden"></div>
+<div class="absolute bottom-4 left-4 text-on-primary sm:hidden">
+<p class="font-bold text-lg">Oct 24-25</p>
+</div>
+</div>
+<div class="flex-1 p-6 flex flex-col justify-between">
+<div>
+<div class="flex items-start justify-between mb-2">
+<h2 class="font-headline-md text-headline-md text-primary">Clásica de los Andes</h2>
+<span class="px-3 py-1 bg-primary text-on-primary text-[10px] font-bold uppercase tracking-tighter rounded-full">RUTA</span>
+</div>
+<div class="flex flex-wrap gap-x-6 gap-y-2 text-on-surface-variant">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+<span class="font-label-md text-label-md">24 - 25 de Octubre, 2024</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+<span class="font-label-md text-label-md">Mendoza, Región Andes</span>
+</div>
+</div>
+<p class="mt-4 text-on-surface-variant font-body-md line-clamp-2 italic border-l-2 border-secondary pl-3">
+                                    "La carrera de montaña más exigente del calendario nacional con 3,500m de desnivel acumulado."
+                                </p>
+</div>
+<div class="mt-6 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-surface-container-high border border-outline-variant flex items-center justify-center overflow-hidden">
+<span class="material-symbols-outlined text-[14px]">stars</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline">Organiza: Andes Pro Cycling</span>
+</div>
+<button class="px-5 py-2 border-2 border-primary text-primary font-label-md hover:bg-primary hover:text-on-primary transition-all rounded-lg active:scale-95">Ver Detalles</button>
+</div>
+</div>
+</article>
+<!-- Race Card 2 -->
+<article class="group bg-surface-container-lowest border border-outline-variant/50 rounded-xl overflow-hidden flex flex-col sm:flex-row hover:shadow-lg transition-all duration-300">
+<div class="w-full sm:w-48 h-40 sm:h-auto relative overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A gritty, action-packed close up of a mountain bike wheel splashing through mud on a dense forest trail. Terracotta earth tones, misty forest background, high-speed photography capturing individual mud droplets. High precision and functional design aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC4TufUP6EOHFGVB5fIteNdd5_IttCaKGA1a7Of9lgpPEpndQ-5nyQ3i-eJWLAwDzjBzDLeO_cHCuzydgVCDBVcrr4mFU-AhlKRsaXOn4VIaYvn9XSkEpOyI2ROCtgP0lN4TwkYv7r_sd8PLlVPtG2e_jrThPECzL719DNULMEpSUoE5oTrvGiA2fmt0ZFfEu6780gH7NrKKyVtG2KAMNRL0G4gHQgFS33NmiCuWrCr_S9bO_4s9jI9gA">
+<div class="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent sm:hidden"></div>
+<div class="absolute bottom-4 left-4 text-on-primary sm:hidden">
+<p class="font-bold text-lg">Oct 31</p>
+</div>
+</div>
+<div class="flex-1 p-6 flex flex-col justify-between">
+<div>
+<div class="flex items-start justify-between mb-2">
+<h2 class="font-headline-md text-headline-md text-primary">Desafío Sierra Brava</h2>
+<span class="px-3 py-1 bg-secondary text-on-secondary text-[10px] font-bold uppercase tracking-tighter rounded-full">MTB</span>
+</div>
+<div class="flex flex-wrap gap-x-6 gap-y-2 text-on-surface-variant">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+<span class="font-label-md text-label-md">31 de Octubre, 2024</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+<span class="font-label-md text-label-md">Córdoba, Sierras del Norte</span>
+</div>
+</div>
+<p class="mt-4 text-on-surface-variant font-body-md line-clamp-2 italic border-l-2 border-secondary pl-3">
+                                    "Un recorrido técnico por senderos rocosos y bosques nativos. Solo para valientes."
+                                </p>
+</div>
+<div class="mt-6 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-surface-container-high border border-outline-variant flex items-center justify-center overflow-hidden">
+<span class="material-symbols-outlined text-[14px]">shield</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline">Organiza: MTB Federation</span>
+</div>
+<button class="px-5 py-2 border-2 border-primary text-primary font-label-md hover:bg-primary hover:text-on-primary transition-all rounded-lg active:scale-95">Ver Detalles</button>
+</div>
+</div>
+</article>
+<!-- Race Card 3 -->
+<article class="group bg-surface-container-lowest border border-outline-variant/50 rounded-xl overflow-hidden flex flex-col sm:flex-row hover:shadow-lg transition-all duration-300">
+<div class="w-full sm:w-48 h-40 sm:h-auto relative overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Coastal sunrise over a winding paved road along a cliffside. A single cyclist in the distance, long shadows, soft orange and purple sky, serene but high-momentum atmosphere. Clean lines, minimalist composition, professional cycling travel aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCCETsJ8Tj9zWkcYviTvZeo3RHL4ZfWThEAvMkdeJFSRspwp1hlu90H3BC0vzRb30OSWUYs_TfXsNfOIa4i5nyJq-iHd8id_yTuDS4paYlkOBWij4DdUF5EpvNIQCiVQIJPKqsULZnkoNVG8DXBkC60Jp7j6iO3RmQLvVP52svMIO3CPFZzic7C8JyJeKzT-NkZZoEnJWsO9CgqgAxxsSo_VaHIBnX3XSnSQ6n5-XfURx2pISrW4ftUmw">
+<div class="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent sm:hidden"></div>
+<div class="absolute bottom-4 left-4 text-on-primary sm:hidden">
+<p class="font-bold text-lg">Nov 12</p>
+</div>
+</div>
+<div class="flex-1 p-6 flex flex-col justify-between">
+<div>
+<div class="flex items-start justify-between mb-2">
+<h2 class="font-headline-md text-headline-md text-primary">Gran Fondo Costa Central</h2>
+<span class="px-3 py-1 bg-primary text-on-primary text-[10px] font-bold uppercase tracking-tighter rounded-full">RUTA</span>
+</div>
+<div class="flex flex-wrap gap-x-6 gap-y-2 text-on-surface-variant">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+<span class="font-label-md text-label-md">12 de Noviembre, 2024</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+<span class="font-label-md text-label-md">Viña del Mar, Costa</span>
+</div>
+</div>
+<p class="mt-4 text-on-surface-variant font-body-md line-clamp-2 italic border-l-2 border-secondary pl-3">
+                                    "La clásica costera vuelve con un trazado rápido al nivel del mar."
+                                </p>
+</div>
+<div class="mt-6 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-surface-container-high border border-outline-variant flex items-center justify-center overflow-hidden">
+<span class="material-symbols-outlined text-[14px]">flag</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline">Organiza: Velo Club Central</span>
+</div>
+<button class="px-5 py-2 border-2 border-primary text-primary font-label-md hover:bg-primary hover:text-on-primary transition-all rounded-lg active:scale-95">Ver Detalles</button>
+</div>
+</div>
+</article>
+</div>
+</div>
+</main>
+</div>
+<!-- Footer -->
+<footer class="w-full py-stack-lg bg-primary dark:bg-inverse-surface mt-stack-lg">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin-desktop max-w-container-max mx-auto">
+<div class="mb-6 md:mb-0">
+<span class="font-display-lg text-display-lg text-on-primary">Calendario Ciclista</span>
+<p class="font-label-sm text-label-sm text-on-primary/70 mt-2 uppercase tracking-widest">© 2024 CALENDARIO CICLISTA LOGISTICS</p>
+</div>
+<div class="flex flex-wrap justify-center gap-8">
+<a class="font-label-sm text-label-sm text-on-primary/70 dark:text-inverse-on-surface/70 hover:text-on-primary hover:underline transition-all" href="#">Privacy Policy</a>
+<a class="font-label-sm text-label-sm text-on-primary/70 dark:text-inverse-on-surface/70 hover:text-on-primary hover:underline transition-all" href="#">Technical Specs</a>
+<a class="font-label-sm text-label-sm text-on-primary/70 dark:text-inverse-on-surface/70 hover:text-on-primary hover:underline transition-all" href="#">Race Submission</a>
+<a class="font-label-sm text-label-sm text-on-primary/70 dark:text-inverse-on-surface/70 hover:text-on-primary hover:underline transition-all" href="#">API Access</a>
+</div>
+</div>
+</footer>
+<!-- Mobile Bottom NavBar -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-surface-container-lowest border-t border-outline-variant/30 flex justify-around items-center z-50">
+<a class="flex flex-col items-center gap-1 text-secondary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">calendar_today</span>
+<span class="text-[10px] font-bold">Carreras</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">explore</span>
+<span class="text-[10px]">Explorar</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">directions_bike</span>
+<span class="text-[10px]">Mi Perfil</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">menu</span>
+<span class="text-[10px]">Más</span>
+</a>
+</nav>
+<script>
+        // Simple View Toggle Logic
+        const monthlyToggle = document.getElementById('monthlyToggle');
+        const listToggle = document.getElementById('listToggle');
+
+        monthlyToggle.addEventListener('click', () => {
+            monthlyToggle.classList.add('bg-surface-container-lowest', 'shadow-sm', 'text-primary');
+            monthlyToggle.classList.remove('text-on-surface-variant');
+            listToggle.classList.remove('bg-surface-container-lowest', 'shadow-sm', 'text-primary');
+            listToggle.classList.add('text-on-surface-variant');
+        });
+
+        listToggle.addEventListener('click', () => {
+            listToggle.classList.add('bg-surface-container-lowest', 'shadow-sm', 'text-primary');
+            listToggle.classList.remove('text-on-surface-variant');
+            monthlyToggle.classList.remove('bg-surface-container-lowest', 'shadow-sm', 'text-primary');
+            monthlyToggle.classList.add('text-on-surface-variant');
+        });
+
+        // Add a subtle scroll effect for the header
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 20) {
+                header.classList.add('shadow-md');
+            } else {
+                header.classList.remove('shadow-md');
+            }
+        });
+    </script>
+
+</body></html>

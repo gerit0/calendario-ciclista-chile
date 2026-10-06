@@ -80,7 +80,7 @@ export function renderFormErrors(form, errors) {
     organizador: 'organizer',
     organizer: 'organizer',
     registrationUrl: 'registrationUrl',
-    rulesUrl: 'rules-url',
+    rulesUrl: 'rulesUrl',
     city: 'city',
     distance: 'distance',
     description: 'description'
@@ -89,8 +89,11 @@ export function renderFormErrors(form, errors) {
   for (const [key, errorMsg] of Object.entries(errors)) {
     let fieldName = fieldMap[key] || key;
     let inputElem = form.querySelector(`[name="${fieldName}"]`) || 
+                    form.querySelector(`[name="${key}"]`) ||
                     form.querySelector(`#form-${fieldName}`) ||
-                    form.querySelector(`#edit-form-${fieldName}`);
+                    form.querySelector(`#edit-form-${fieldName}`) ||
+                    form.querySelector(`#form-rules-url`) ||
+                    form.querySelector(`#edit-form-rules-url`);
 
     // Si el campo de fecha única está oculto por ser multi-día, redirigir al campo de fecha de inicio
     if (isMultiDay && (key === 'date' || key === 'startDate')) {

@@ -1,0 +1,307 @@
+<!DOCTYPE html><html lang="es" class="light"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet"><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">try{
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-low": "#f3f4f4",
+                        "surface-variant": "#e1e3e3",
+                        "tertiary": "#171b00",
+                        "on-background": "#191c1c",
+                        "surface-container-highest": "#e1e3e3",
+                        "outline": "#747878",
+                        "on-tertiary-fixed-variant": "#434b00",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container": "#edeeee",
+                        "on-error": "#ffffff",
+                        "inverse-surface": "#2e3131",
+                        "on-primary-fixed-variant": "#464747",
+                        "primary-container": "#2d2e2e",
+                        "on-secondary-container": "#6c1900",
+                        "on-tertiary-fixed": "#1a1e00",
+                        "primary-fixed": "#e3e2e2",
+                        "on-primary-container": "#959595",
+                        "on-surface-variant": "#444748",
+                        "on-tertiary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "error": "#ba1a1a",
+                        "on-surface": "#191c1c",
+                        "on-secondary-fixed-variant": "#862201",
+                        "secondary": "#a73918",
+                        "on-secondary-fixed": "#3b0900",
+                        "on-tertiary-container": "#8e9e00",
+                        "primary": "#181919",
+                        "primary-fixed-dim": "#c7c6c6",
+                        "on-primary-fixed": "#1b1c1c",
+                        "background": "#f8f9f9",
+                        "secondary-fixed-dim": "#ffb5a0",
+                        "surface-container-high": "#e7e8e8",
+                        "secondary-container": "#fe7952",
+                        "inverse-primary": "#c7c6c6",
+                        "surface": "#f8f9f9",
+                        "inverse-on-surface": "#f0f1f1",
+                        "secondary-fixed": "#ffdbd1",
+                        "surface-bright": "#f8f9f9",
+                        "outline-variant": "#c4c7c7",
+                        "tertiary-fixed": "#d8ef00",
+                        "on-error-container": "#93000a",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed-dim": "#bdd200",
+                        "on-primary": "#ffffff",
+                        "surface-tint": "#5e5e5e",
+                        "surface-dim": "#d9dada",
+                        "tertiary-container": "#2b3100"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "stack-md": "16px",
+                        "stack-lg": "32px",
+                        "container-max": "1280px",
+                        "margin-desktop": "40px",
+                        "margin-mobile": "16px",
+                        "gutter": "24px",
+                        "stack-sm": "8px",
+                        "base": "8px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Montserrat"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-md": ["Montserrat"],
+                        "headline-lg-mobile": ["Montserrat"],
+                        "headline-lg": ["Montserrat"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "1", "fontWeight": "500" }],
+                        "headline-md": ["20px", { "lineHeight": "1.3", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }]
+                    }
+                },
+            },
+        }
+    }catch(_e){}</script><meta charset="utf-8"></head><body class="bg-background text-on-background font-body-md selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-surface/80 dark:bg-surface-container-highest/80 backdrop-blur-md border-b border-outline-variant/30 dark:border-outline/20">
+<div class="flex justify-between items-center h-16 px-margin-desktop max-w-container-max mx-auto">
+<div class="flex items-center gap-stack-lg">
+<span class="font-display-lg text-display-lg font-black tracking-tighter text-primary">Calendario Ciclista</span>
+<div class="hidden md:flex gap-6 items-center">
+<a href="#" class="font-label-md text-label-md text-primary font-bold border-b-2 border-secondary pb-1">Calendar</a>
+<a href="#" class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors">Disciplines</a>
+<a href="#" class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors">Organizers</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="hidden md:block bg-primary text-on-primary px-6 py-2 font-label-md text-label-md rounded-lg hover:bg-secondary transition-all active:scale-95 duration-150">Add Race</button>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer p-2 hover:bg-surface-container-high rounded-full transition-all">notifications</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer p-2 hover:bg-surface-container-high rounded-full transition-all">settings</span>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a cyclist with a minimalist background, high-contrast studio lighting, and sharp focus, reflecting a high-performance athlete persona in a modern digital UI environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhH8mGeNUSMwSDC7IcXbswb1fzvsJgTKaF5cz7UpCAEupZxRKczWS8G8SseKvvNxkvV80lVarsfVejNmoy3Bxf5wc9sYiR55KNuFDP8dKASnKAgKoW_S1c6059npBnCeibS5QMylpdRWBHiMuDiQfaWwtu209Y5iaRZDekog0VtLMwugZGN7apjfiAtvNKXp3LuCPkIy_d62aoGkklK1kgpJ4yiL4WLxsXofcWUJhHAV4EQ6NK7yB-qw">
+</div>
+</div>
+</div>
+</div>
+</nav>
+<main class="pt-16">
+<!-- Hero Section -->
+<section class="relative h-[60vh] min-h-[400px] w-full overflow-hidden">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="A dynamic, wide-angle shot of a mountain biker kicking up dust on a sharp turn during a high-speed descent on a rugged forest trail. Sunlight filters through the dense canopy, creating dramatic shadows and highlighting the grit and energy of competitive MTB racing. The scene uses a cinematic, high-contrast color palette with earthy greens and deep blacks." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAjXg0DAztLVrqIRe5O6EAnaOuJPRlzdHnLn6udJwDD26ERkWi8soY-VyWswIsQF2fxFROmAIGeyBcI8RqG8zyfEYIBE15SzYNVAHfDfuWHm4J23ef_vbYZDYgov7zuQc0yNzfI0kHO7qmHaKyy1DvpuAsTcV3nd1vnLJp0PEt-t1lmGE690pzqj8kOzImbc63dqtFiZ2xlMY6InMB_TvY4VLW2gE_yiYT3nkCEhM2ld7zsFyKyuCGbJg')"></div>
+<div class="absolute inset-0 hero-gradient flex flex-col justify-end px-margin-desktop pb-stack-lg">
+<div class="max-w-container-max mx-auto w-full">
+<div class="inline-flex items-center gap-2 bg-secondary text-on-primary px-3 py-1 rounded-sm mb-4 font-label-md text-label-md">
+<span class="material-symbols-outlined text-[18px]">terrain</span>
+                        MTB RACING
+                    </div>
+<h1 class="font-display-lg text-display-lg md:text-[64px] text-on-primary mb-2 uppercase tracking-tighter">Desafío Sierra Brava</h1>
+<p class="font-headline-md text-headline-md text-on-primary/80 max-w-2xl">La prueba definitiva de resistencia y técnica en el corazón del sistema montañoso central.</p>
+</div>
+</div>
+</section>
+<!-- Main Content Grid -->
+<div class="max-w-container-max mx-auto px-margin-desktop py-stack-lg">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Left Column: Details -->
+<div class="lg:col-span-8 space-y-stack-lg">
+<!-- Stats Row -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 p-stack-md bg-surface-container-low border border-outline-variant/30 rounded-lg">
+<div class="flex flex-col gap-1">
+<span class="text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">Fecha</span>
+<div class="flex items-center gap-2 text-primary font-bold">
+<span class="material-symbols-outlined text-[20px]">calendar_today</span>
+<span class="font-body-md text-body-md">15 Oct, 2024</span>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">Disciplina</span>
+<div class="flex items-center gap-2 text-primary font-bold">
+<span class="material-symbols-outlined text-[20px]">directions_bike</span>
+<span class="font-body-md text-body-md">MTB / Trail</span>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">Región</span>
+<div class="flex items-center gap-2 text-primary font-bold">
+<span class="material-symbols-outlined text-[20px]">map</span>
+<span class="font-body-md text-body-md">Sierra Brava</span>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">Organizador</span>
+<div class="flex items-center gap-2 text-primary font-bold">
+<span class="material-symbols-outlined text-[20px]">verified</span>
+<span class="font-body-md text-body-md">VeloEvents</span>
+</div>
+</div>
+</div>
+<!-- Description -->
+<div class="space-y-stack-md">
+<h2 class="font-headline-lg text-headline-lg border-l-4 border-secondary pl-4">Descripción del Evento</h2>
+<div class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed space-y-4">
+<p class="">Prepárate para enfrentar el **Desafío Sierra Brava**, una competición que pondrá a prueba no solo tus piernas, sino tu temple técnico. El recorrido atraviesa senderos técnicos vírgenes, ascensos verticales exigentes y descensos que requieren una precisión de fábrica.</p>
+<p class="">Con más de 1,200m de desnivel acumulado, esta carrera se ha consolidado como la joya de la corona del calendario regional de MTB.</p>
+</div>
+</div>
+<!-- Categories & Technical -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<div class="p-stack-md border border-outline-variant bg-white rounded-lg">
+<h3 class="font-headline-md text-headline-md mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">category</span>
+                                Categorías
+                            </h3>
+<ul class="space-y-3">
+<li class="flex justify-between items-center py-2 border-b border-outline-variant/30">
+<span class="font-label-md text-label-md">XC Marathon (60km)</span>
+<span class="bg-surface-container-high px-2 py-1 text-[10px] font-bold rounded">OPEN</span>
+</li>
+<li class="flex justify-between items-center py-2 border-b border-outline-variant/30">
+<span class="font-label-md text-label-md">Enduro Sprint (25km)</span>
+<span class="bg-surface-container-high px-2 py-1 text-[10px] font-bold rounded">PRO</span>
+</li>
+<li class="flex justify-between items-center py-2">
+<span class="font-label-md text-label-md">E-Bike Experience</span>
+<span class="bg-surface-container-high px-2 py-1 text-[10px] font-bold rounded">FUN</span>
+</li>
+</ul>
+</div>
+<div class="p-stack-md border border-outline-variant bg-white rounded-lg">
+<h3 class="font-headline-md text-headline-md mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">trending_up</span>
+                                Ficha Técnica
+                            </h3>
+<div class="space-y-4">
+<div class="flex items-center gap-3">
+<div class="w-12 h-1 bg-secondary rounded-full"></div>
+<span class="font-label-md text-label-md">Dificultad Técnica: <strong class="text-primary">Muy Alta</strong></span>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-8 h-1 bg-secondary rounded-full"></div>
+<span class="font-label-md text-label-md">Exigencia Física: <strong class="text-primary">Alta</strong></span>
+</div>
+<p class="text-label-sm text-on-surface-variant italic">Se requiere equipo de protección completo y bicicleta en condiciones óptimas de competición.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Sidebar Actions & Map -->
+<div class="lg:col-span-4 space-y-gutter">
+<!-- CTA Card -->
+<div class="p-stack-lg bg-primary text-on-primary rounded-xl shadow-xl sticky top-24">
+<div class="mb-stack-md">
+<span class="text-label-sm text-on-primary/60 uppercase tracking-widest">Precio de Inscripción</span>
+<div class="text-[40px] font-black tracking-tighter">€45.00</div>
+</div>
+<div class="flex flex-col gap-4">
+<button class="w-full bg-secondary-container text-on-secondary-container font-headline-md text-headline-md py-4 rounded-lg hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2">
+                                Inscribirse Ahora
+                                <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<button class="w-full border border-on-primary/30 text-on-primary font-label-md text-label-md py-4 rounded-lg hover:bg-white/10 transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">calendar_add_on</span>
+                                Agregar a mi calendario
+                            </button>
+</div>
+<div class="mt-stack-lg pt-stack-md border-t border-on-primary/10 flex items-center justify-between">
+<div class="flex -space-x-2">
+<img class="w-8 h-8 rounded-full border-2 border-primary" data-alt="Avatar of a cyclist" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDUsHIpj76BdwGY63ebE-RMLW8qfxM9QPOWrbPaaT8VsQCVrbn_QymHDSDDHbygZMOEXRXiZGaGkYqvZNO-Zs_ThNHokWAI91nafOKla_G2EDOjdy9ox2kYGqYZgWXPBb5AVSMVVZJjzU2nVa72oNPDuPHPOq1jjaIJFVTAn6vYc5y7Sltufn5eWAUS2PC-k4jFfGDwodN-klyj2FSxxq7lSnGuxkxd_B16s6C4QvQc7FFyk4BHyQqcSg">
+<img class="w-8 h-8 rounded-full border-2 border-primary" data-alt="Avatar of another cyclist" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAAQabBrSYKYYO6lRAAOHd5DmQ9g_oL53vLN8IfdrBldlR15p67__lhTmY0FY5ofUv7hJXcqku813HuMtKalJGBlCpB94ycB6I7u9NkRYaMCMLXottYzxVufuwgN2waGsgHXOdkwDb34871IzunF_K3ySQditJP4-XQ6Sqh-ZMKEQZrq-xneDrbwPwoiAfSceROtpkSNKXe7gBQV3J0lbUXFEazZfVJ4rrR_xfWAalLtJQOWL9dNvfe0Q">
+<img class="w-8 h-8 rounded-full border-2 border-primary" data-alt="Avatar of a third cyclist" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDptV5DVhInDZpr2lL1FOF552ji2i9RTJiz7Jict8HdsMBcuurkWY42RtwkXajkapMj6Pm1lflHKKnLdt7DO_tA_4BLPvjp3FwjgwYNT7qGqPN5kFkSNty7OsL7r8I8udG-KfJz6UaAQvVu9pmvX8lXJ_7wbac7vXpV0fs34xkDYiAkd9mC58C3uZ1wZ0Ld4P-Jjl8aq9UbeL3EWNKwI6V0jPt4zMVXbtwzfBO7x2rjyIvulRUVR2xL-g">
+</div>
+<span class="text-label-sm text-on-primary/60">+124 inscritos</span>
+</div>
+</div>
+<!-- Map Section -->
+<div class="space-y-stack-md">
+<h4 class="font-headline-md text-headline-md">Ubicación</h4>
+<div class="h-64 bg-surface-container-high rounded-lg overflow-hidden relative border border-outline-variant">
+<div class="absolute inset-0 grayscale contrast-125 opacity-80" data-location="Sierra Brava, Spain"></div>
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="bg-secondary text-on-primary p-3 rounded-full shadow-lg animate-bounce">
+<span class="material-symbols-outlined">location_on</span>
+</div>
+</div>
+<!-- Map Overlay Label -->
+<div class="absolute bottom-4 left-4 right-4 glass-card p-3 rounded border border-outline-variant/30">
+<p class="font-label-md text-label-md text-primary">Punto de Partida: Plaza Mayor de Sierra Brava</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full py-stack-lg bg-primary dark:bg-inverse-surface mt-stack-lg">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin-desktop max-w-container-max mx-auto gap-stack-lg">
+<div class="flex flex-col items-center md:items-start gap-2">
+<span class="font-display-lg text-display-lg text-on-primary">Calendario Ciclista</span>
+<p class="font-label-sm text-label-sm text-on-primary/50 uppercase tracking-widest">© 2024 CALENDARIO CICLISTA LOGISTICS</p>
+</div>
+<div class="flex flex-wrap justify-center gap-stack-md">
+<a class="font-label-sm text-label-sm text-on-primary/70 hover:text-on-primary hover:underline transition-all" href="#">Privacy Policy</a>
+<a class="font-label-sm text-label-sm text-on-primary/70 hover:text-on-primary hover:underline transition-all" href="#">Technical Specs</a>
+<a class="font-label-sm text-label-sm text-on-primary/70 hover:text-on-primary hover:underline transition-all" href="#">Race Submission</a>
+<a class="font-label-sm text-label-sm text-on-primary/70 hover:text-on-primary hover:underline transition-all" href="#">API Access</a>
+</div>
+<div class="flex gap-4">
+<div class="w-10 h-10 rounded-full border border-on-primary/20 flex items-center justify-center text-on-primary hover:bg-on-primary hover:text-primary transition-all cursor-pointer">
+<span class="material-symbols-outlined">share</span>
+</div>
+<div class="w-10 h-10 rounded-full border border-on-primary/20 flex items-center justify-center text-on-primary hover:bg-on-primary hover:text-primary transition-all cursor-pointer">
+<span class="material-symbols-outlined">mail</span>
+</div>
+</div>
+</div>
+</footer>
+<script>
+        // Micro-interaction for scroll depth
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 50) {
+                nav.classList.add('shadow-md');
+            } else {
+                nav.classList.remove('shadow-md');
+            }
+        });
+
+        // Simple button active states
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('mousedown', () => btn.classList.add('scale-95'));
+            btn.addEventListener('mouseup', () => btn.classList.remove('scale-95'));
+            btn.addEventListener('mouseleave', () => btn.classList.remove('scale-95'));
+        });
+    </script>
+
+</body></html>

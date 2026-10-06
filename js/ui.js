@@ -687,16 +687,16 @@ export function renderDetailView(container, race, isAdmin = false, currentUserId
               </a>
             `}
 
-            ${race.rulesUrl ? `
+            ${(race.rulesUrl && race.rulesUrl.trim()) ? `
               <a 
-                href="${escapeHTML(race.rulesUrl)}" 
+                href="${escapeHTML(race.rulesUrl.trim())}" 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 class="w-full bg-surface-container hover:bg-surface-container-high text-primary font-display font-bold text-sm py-3.5 px-4 rounded-2xl flex items-center justify-center gap-2 transition-all border border-outline-variant/50 shadow-sm mt-3"
               >
-                <span class="material-symbols-outlined text-lg text-secondary">description</span>
+                <span class="material-symbols-outlined text-lg text-secondary" aria-hidden="true">description</span>
                 Ver Bases de la Competencia
-                <span class="material-symbols-outlined text-sm text-outline">open_in_new</span>
+                <span class="material-symbols-outlined text-sm text-outline" aria-hidden="true">open_in_new</span>
               </a>
             ` : ''}
 

@@ -115,6 +115,55 @@ describe('3. Pruebas de Componentes DOM: Formulario y Modal de Edición', () => 
     renderDetailView(container, mockRace);
     expect(container.innerHTML).not.toContain('Ver Bases de la Competencia');
   });
+
+  it('renderDetailView no renderiza el botón de bases si rulesUrl contiene solo espacios en blanco', () => {
+    const container = document.createElement('div');
+    const mockRace = {
+      id: 'race-5',
+      name: 'Clásica Espacios',
+      discipline: 'Ruta',
+      date: '2026-11-20',
+      rulesUrl: '   '
+    };
+    renderDetailView(container, mockRace);
+    expect(container.innerHTML).not.toContain('Ver Bases de la Competencia');
+  });
+
+  it('renderDetailView incluye aria-hidden="true" en los iconos del botón de bases', () => {
+    const container = document.createElement('div');
+    const mockRace = {
+      id: 'race-6',
+      name: 'Clásica Accesible',
+      discipline: 'Ruta',
+      date: '2026-11-20',
+      rulesUrl: 'https://ejemplo.cl/bases.pdf'
+    };
+    renderDetailView(container, mockRace);
+    const rulesLink = container.querySelector('a[href="https://ejemplo.cl/bases.pdf"]');
+    expect(rulesLink).not.toBeNull();
+    const icons = rulesLink.querySelectorAll('span.material-symbols-outlined');
+    expect(icons.length).toBe(2);
+    icons.forEach(icon => {
+      expect(icon.getAttribute('aria-hidden')).toBe('true');
+    });
+  });
+
+  it('renderFormErrors asocia el error de rulesUrl al input correspondiente en #race-form y #edit-form', async () => {
+    const { renderFormErrors } = await import('../../js/app.js');
+    const raceForm = document.getElementById('race-form');
+    renderFormErrors(raceForm, { rulesUrl: 'URL de bases no válida' });
+    const raceInput = raceForm.querySelector('#form-rules-url');
+    expect(raceInput.classList.contains('border-secondary')).toBe(true);
+    const parent = raceInput.closest('.space-y-2') || raceInput.parentNode;
+    expect(parent.querySelector('.field-error-msg')?.textContent).toContain('URL de bases no válida');
+
+    const editForm = document.getElementById('edit-form');
+    renderFormErrors(editForm, { rulesUrl: 'URL de bases no válida' });
+    const editInput = editForm.querySelector('#edit-form-rules-url');
+    expect(editInput.classList.contains('border-secondary')).toBe(true);
+    const editParent = editInput.closest('.space-y-2') || editInput.parentNode;
+    expect(editParent.querySelector('.field-error-msg')?.textContent).toContain('URL de bases no válida');
+  });
 });
 
 
