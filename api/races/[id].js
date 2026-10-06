@@ -122,6 +122,7 @@ export default async function handler(req, res) {
         delete dbPayload.fecha_inicio;
         delete dbPayload.fecha_fin;
         delete dbPayload.status;
+        delete dbPayload.link_bases;
 
         const retry = await supabase
           .from('carreras')

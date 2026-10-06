@@ -63,6 +63,7 @@ describe('Fase 3: Pruebas de Integración y Anti-Silencio para Edición de Carre
       hero_image: 'https://storage.supabase.co/race-images/curico.webp',
       descripcion: 'Gran vuelta de 3 etapas.',
       creado_por: null,
+      link_bases: null,
       estado: 'aprobada',
       status: 'Inscripciones Abiertas'
     };
@@ -251,7 +252,8 @@ describe('Fase 3: Pruebas de Integración y Anti-Silencio para Edición de Carre
       price: 25000,
       heroImage: 'https://images.unsplash.com/test.jpg',
       description: 'Gran desafío del Maule.',
-      status: 'Inscripciones Abiertas'
+      status: 'Inscripciones Abiertas',
+      rulesUrl: 'https://drive.google.com/file/d/bases-curico/view'
     };
 
     const dbPayload = mapFrontendToDb(frontendData, 'user-uuid-1');
@@ -266,6 +268,7 @@ describe('Fase 3: Pruebas de Integración y Anti-Silencio para Edición de Carre
     expect(dbPayload.desnivel).toBe('1200 m');
     expect(dbPayload.organizador).toBe('Club Maule');
     expect(dbPayload.link_inscripcion).toBe('https://maule.cl');
+    expect(dbPayload.link_bases).toBe('https://drive.google.com/file/d/bases-curico/view');
     expect(dbPayload.categoria).toBe('Elite, Master A');
     expect(dbPayload.precio).toBe(25000);
     expect(dbPayload.hero_image).toBe('https://images.unsplash.com/test.jpg');
@@ -284,10 +287,31 @@ describe('Fase 3: Pruebas de Integración y Anti-Silencio para Edición de Carre
     expect(mappedBack.elevation).toBe(frontendData.elevation);
     expect(mappedBack.organizer).toBe(frontendData.organizer);
     expect(mappedBack.registrationUrl).toBe(frontendData.registrationUrl);
+    expect(mappedBack.rulesUrl).toBe(frontendData.rulesUrl);
     expect(mappedBack.categories).toEqual(frontendData.categories);
     expect(mappedBack.price).toBe(frontendData.price);
     expect(mappedBack.isFree).toBe(false);
     expect(mappedBack.heroImage).toBe(frontendData.heroImage);
     expect(mappedBack.description).toBe(frontendData.description);
+  });
+
+  it('7. Persiste y retorna rulesUrl mapeado a link_bases en PATCH /api/races/:id', async () => {
+    const payload = {
+      ...baseValidPayload,
+      rulesUrl: 'https://drive.google.com/file/d/bases-curico/view'
+    };
+
+    const { req, res } = createMockHttp({
+      method: 'PATCH',
+      headers: { authorization: 'Bearer admin-jwt' },
+      body: payload
+    });
+
+    await raceIdHandler(req, res);
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(dbRow.link_bases).toBe('https://drive.google.com/file/d/bases-curico/view');
+    expect(res.body.data.rulesUrl).toBe('https://drive.google.com/file/d/bases-curico/view');
   });
 });

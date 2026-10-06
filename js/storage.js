@@ -338,6 +338,11 @@ export async function updateRace(raceId, raceData) {
   if (raceData.categories && typeof raceData.categories === 'string') {
     updatedRace.categories = raceData.categories.split(',').map(c => c.trim()).filter(Boolean);
   }
+  if (raceData.rulesUrl !== undefined) {
+    updatedRace.rulesUrl = raceData.rulesUrl ? String(raceData.rulesUrl).trim() : '';
+  } else if (raceData.link_bases !== undefined) {
+    updatedRace.rulesUrl = raceData.link_bases ? String(raceData.link_bases).trim() : '';
+  }
 
   if (existingIndex >= 0) {
     // Si ya existe en custom races

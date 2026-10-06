@@ -116,6 +116,7 @@ function mapSupabaseToFrontend(row) {
     status: row.status || (row.estado === 'aprobada' ? 'Inscripciones Abiertas' : row.estado),
     organizer: row.organizador || '',
     registrationUrl: row.link_inscripcion || '',
+    rulesUrl: row.link_bases || '',
     heroImage: row.hero_image || '',
     description: row.descripcion || '',
     categories: categories,
@@ -213,6 +214,9 @@ export async function createRaceSupabase(raceData, userId) {
       ? rawUrl.trim()
       : null;
 
+    const rawRules = raceData.rulesUrl || raceData.link_bases || null;
+    const cleanRules = (rawRules && typeof rawRules === 'string' && rawRules.trim()) ? rawRules.trim() : null;
+
     const rawImage = raceData.hero_image || raceData.heroImage || null;
     const cleanImage = (rawImage && typeof rawImage === 'string' && !rawImage.startsWith('data:')) ? rawImage : null;
     const startDate = raceData.startDate || raceData.fecha_inicio || raceData.date || raceData.fecha;
@@ -230,6 +234,7 @@ export async function createRaceSupabase(raceData, userId) {
       desnivel: raceData.desnivel || raceData.elevation || null,
       organizador: raceData.organizador || raceData.organizer || null,
       link_inscripcion: cleanUrl,
+      link_bases: cleanRules,
       categoria: Array.isArray(raceData.categories)
         ? raceData.categories.join(', ')
         : (raceData.categoria || raceData.categories || null),
@@ -258,6 +263,7 @@ export async function createRaceSupabase(raceData, userId) {
       const fallbackPayload = { ...payload };
       delete fallbackPayload.distancia;
       delete fallbackPayload.desnivel;
+      delete fallbackPayload.link_bases;
 
       const distInfo = payload.distancia ? `Distancia: ${payload.distancia}` : '';
       const elevInfo = payload.desnivel ? `Desnivel: ${payload.desnivel}` : '';
@@ -578,6 +584,9 @@ export async function updateRaceSupabase(raceId, raceData) {
       ? rawUrl.trim()
       : null;
 
+    const rawRules = raceData.rulesUrl || raceData.link_bases || null;
+    const cleanRules = (rawRules && typeof rawRules === 'string' && rawRules.trim()) ? rawRules.trim() : null;
+
     const rawImage = raceData.heroImage || raceData.hero_image || null;
     const cleanImage = (rawImage && typeof rawImage === 'string' && !rawImage.startsWith('data:')) ? rawImage : null;
     const startDate = raceData.startDate || raceData.fecha_inicio || raceData.date || raceData.fecha;
@@ -595,6 +604,7 @@ export async function updateRaceSupabase(raceId, raceData) {
       desnivel: raceData.elevation || raceData.desnivel || null,
       organizador: raceData.organizer || raceData.organizador,
       link_inscripcion: cleanUrl,
+      link_bases: cleanRules,
       categoria: Array.isArray(raceData.categories) 
         ? raceData.categories.join(', ') 
         : (raceData.categoria || raceData.categories),
@@ -615,6 +625,7 @@ export async function updateRaceSupabase(raceId, raceData) {
       const fallbackPayload = { ...payload };
       delete fallbackPayload.distancia;
       delete fallbackPayload.desnivel;
+      delete fallbackPayload.link_bases;
       const retryRes = await client.from('carreras').update(fallbackPayload).eq('id', raceId).select('*');
       data = retryRes.data;
       error = retryRes.error;
