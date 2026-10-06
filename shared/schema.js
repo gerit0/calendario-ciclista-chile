@@ -101,7 +101,23 @@ export const raceSchema = z.object({
       }
     }, { message: 'La URL de inscripción debe ser una URL válida (http/https).' }),
 
-  rulesUrl: z.string().trim().url({ message: 'El enlace a las bases debe ser una URL válida (http/https).' }).or(z.literal('')).optional(),
+  rulesUrl: z
+    .string()
+    .optional()
+    .nullable()
+    .transform(val => (val ? sanitizePlainText(val) : ''))
+    .pipe(
+      z.string().max(500, 'El enlace a las bases no puede superar 500 caracteres.')
+    )
+    .refine(val => {
+      if (!val) return true;
+      try {
+        const parsed = new URL(val);
+        return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+      } catch {
+        return false;
+      }
+    }, { message: 'El enlace a las bases debe ser una URL válida (http/https).' }),
 
   distance: distanceElevationSchema,
   elevation: distanceElevationSchema,

@@ -139,24 +139,40 @@ describe('1. Pruebas Unitarias: Esquema de Validación Zod (raceSchema y validat
       expect(result.sanitizedData.rulesUrl).toBe('https://drive.google.com/file/d/123/view');
     });
 
-    it('acepta rulesUrl como cadena vacía o undefined', () => {
-      const payloadEmpty = { ...validBasePayload, rulesUrl: '' };
-      const resEmpty = validateRaceForm(payloadEmpty);
-      expect(resEmpty.isValid).toBe(true);
-      expect(resEmpty.sanitizedData.rulesUrl).toBe('');
+    it('acepta rulesUrl como cadena vacía, espacios en blanco, null o undefined y lo normaliza a cadena vacía', () => {
+      const cases = ['', '   ', null, undefined];
+      for (const val of cases) {
+        const payload = { ...validBasePayload, rulesUrl: val };
+        const result = validateRaceForm(payload);
+        expect(result.isValid).toBe(true);
+        expect(result.sanitizedData.rulesUrl).toBe('');
+      }
 
-      const payloadUndef = { ...validBasePayload };
-      delete payloadUndef.rulesUrl;
-      const resUndef = validateRaceForm(payloadUndef);
-      expect(resUndef.isValid).toBe(true);
+      const omittedPayload = { ...validBasePayload };
+      delete omittedPayload.rulesUrl;
+      const omittedResult = validateRaceForm(omittedPayload);
+      expect(omittedResult.isValid).toBe(true);
+      expect(omittedResult.sanitizedData.rulesUrl).toBe('');
     });
 
-    it('rechaza rulesUrl si no es una URL válida con error en el campo rulesUrl', () => {
-      const payload = { ...validBasePayload, rulesUrl: 'no-es-una-url' };
+    it('rechaza rulesUrl si no es una URL válida o usa esquemas no permitidos (ej. javascript:)', () => {
+      const invalidUrls = ['no-es-una-url', 'javascript:alert(1)', 'ftp://example.com/bases.pdf'];
+      for (const badUrl of invalidUrls) {
+        const payload = { ...validBasePayload, rulesUrl: badUrl };
+        const result = validateRaceForm(payload);
+        expect(result.isValid).toBe(false);
+        expect(result.errors.rulesUrl).toBeDefined();
+        expect(result.errors.rulesUrl).toMatch(/debe ser una URL válida/i);
+      }
+    });
+
+    it('rechaza rulesUrl si supera los 500 caracteres', () => {
+      const longUrl = 'https://example.com/' + 'a'.repeat(500);
+      const payload = { ...validBasePayload, rulesUrl: longUrl };
       const result = validateRaceForm(payload);
       expect(result.isValid).toBe(false);
       expect(result.errors.rulesUrl).toBeDefined();
-      expect(result.errors.rulesUrl).toMatch(/debe ser una URL válida/i);
+      expect(result.errors.rulesUrl).toMatch(/500 caracteres/i);
     });
   });
 });
