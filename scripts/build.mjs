@@ -43,6 +43,12 @@ async function build() {
     if (fs.existsSync('js/bundle.js.map')) {
       fs.copyFileSync('js/bundle.js.map', path.resolve('public/js/bundle.js.map'));
     }
+    const staticAssets = ['favicon.ico', 'favicon.svg', 'favicon-32x32.png', 'apple-touch-icon.png', 'og-image.jpg'];
+    for (const asset of staticAssets) {
+      if (fs.existsSync(asset)) {
+        fs.copyFileSync(asset, path.resolve('public', asset));
+      }
+    }
     console.log('📂 Carpeta public/ sincronizada para máxima compatibilidad con Vercel.');
   } catch (syncErr) {
     console.warn('Advertencia al sincronizar public/:', syncErr.message);
